@@ -1,18 +1,47 @@
-import { ThemeOptions } from "@mui/material/styles";
+import { PaletteOptions, responsiveFontSizes, ThemeOptions } from "@mui/material/styles";
 import { createTheme } from "@mui/material";
 
+declare module '@mui/material/styles' {
+  interface Theme {
+    extras: {
+      slabBackground: string;
+    };
+  }
+  interface ThemeOptions {
+    extras?: {
+      slabBackground?: string
+    }
+
+  }
+}
 
 export const themeOptions: ThemeOptions = {
+  extras: {
+    slabBackground: '#8E8D8A'
+  },
   palette: {
+
+    // primary: {
+    //   main: '#255828',
+    // },
+    // secondary: {
+    //   main: '#c34820',
+    // },
+    // background: {
+    //   default: '#D6D6DE',
+    //   paper: '#f7f7f7',
+    // },
+    background: { 
+      default: '#D8C3A5',
+      paper: '#EAE7DC'
+    },
     primary: {
-      main: '#255828',
+      main: '#E85A4F',
+      light: '#E98074',
+      dark: '#E7481A'
     },
     secondary: {
-      main: '#c34820',
-    },
-    background: {
-      default: '#efefef',
-      paper: '#f7f7f7',
+      main: '#8E8D8A'
     },
     text: {
       primary: 'rgba(16,16,16,0.87)',
@@ -47,5 +76,8 @@ export const themeOptions: ThemeOptions = {
 };
 
 
-export const theme = createTheme(themeOptions);
+let theme = createTheme(themeOptions);
+export const myTheme = responsiveFontSizes(theme);
+
+
   

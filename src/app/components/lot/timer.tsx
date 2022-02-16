@@ -46,7 +46,6 @@ export const Timer = ({ endTime, lotId }: { endTime?: Date, lotId: number }): JS
             {endTime && remaining && 
                 <h2 className='timer-text'>{remaining.hours.toString().padStart(2, '0')}:{remaining.minutes.toString().padStart(2, '0')}:{remaining.seconds.toString().padStart(2, '0')} 
                 </h2>}
-            {!endTime && <h2 style={{}}>{ownername}'s lot</h2>}
         </div>
     );
 }

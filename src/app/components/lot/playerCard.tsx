@@ -1,13 +1,16 @@
 import { Autocomplete, Divider, TextField } from '@mui/material';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { FreeAgent } from '../../redux/reducers/FreeAgentReducer';
-import Bid from '../../redux/reducers/LotReducer';
+import { Bid } from '../../redux/reducers/LotReducer';
 import { RootState } from '../../store';
-import { BioAndHistory } from '../bioAndHistory';
+import { BioAndHistory } from './bioAndHistory';
 import { BidInfo } from './bidInfo';
 import { Headshot } from './headshot';
 import { PlayerInfo } from './playerInfo';
 import './styles/lot.scss';
+import { tmColorMap } from '../../services/Common';
+import { useState } from 'react';
+import { selectPlayerToNominate } from '../../redux/actions/LotActions';
 
 interface PlayerCardProps {
   player?: FreeAgent
@@ -18,8 +21,16 @@ interface PlayerCardProps {
 
 export const PlayerCard = ({ player, bidInfo, lotId, screenWidth }: PlayerCardProps) => {
   const { freeAgents } = useSelector((state: RootState) => state);
+  const [selectedPlayer, setSelectedPlayer] = useState<FreeAgent>();
+  let x = {} as FreeAgent;
+  const dispatch = useDispatch();
+  const selectPlayerForNom = (player: FreeAgent) => {
+    setSelectedPlayer(player)
+    dispatch(selectPlayerToNominate(player))
+  }
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 10}}>
       <div style={{ flex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
         <Headshot lotId={lotId} img={player?.headshot ?? ''} player={player} />
         {bidInfo && <BioAndHistory bid={bidInfo} screenWidth={screenWidth} />}
@@ -29,6 +40,7 @@ export const PlayerCard = ({ player, bidInfo, lotId, screenWidth }: PlayerCardPr
           <div style={{ }}>
             <div>
               <PlayerInfo
+                team={player.team}
                 firstName={player.firstName}
                 lastName={player.lastName}
                 position={player.position} />
@@ -43,11 +55,15 @@ export const PlayerCard = ({ player, bidInfo, lotId, screenWidth }: PlayerCardPr
             </div>
           </div>
           :
-          <div style={{ minWidth: 240, paddingLeft: 10, backgroundColor: 'yellow' }}>
+          <div style={{ paddingLeft: 10 }}>
             <Autocomplete
               disablePortal
               id="free-agent-selection"
               options={freeAgents}
+              value={selectedPlayer ?? {firstName: '', lastName: ''} as FreeAgent}
+              onChange={(event: any, newValue) => {
+                if (newValue) selectPlayerForNom(newValue)
+              }}
               getOptionLabel={(option) => `${option.position ?? ''} ${option.fullName ?? ''}`}
               renderInput={(params) => <TextField {...params} label="Choose a player" />}
             />

@@ -36,6 +36,33 @@ const getFullPlayerBio = async (lastYear: number, id: string, position: string, 
     return res.data;
 }
 
+const login = async (ownername: string, password: string): Promise<Owner> => {
+    const res = await axios({
+        method: 'post',
+        url: `${URL}/FreeAgency/login`,
+        data: {
+                ownername: ownername,
+                password: password
+        } 
+    })
+    console.log('res', res.data);
+    return res.data;
+}
+
+const register = async (name: string, username: string, password: string): Promise<Owner> => {
+    const res = await axios({
+        method: 'post',
+        url: `${URL}/FreeAgency/register`,
+        data: {
+                email: name,
+                ownername: username,
+                password: password
+        } 
+    })
+    console.log('res', res.data);
+    return res.data;
+}
+
 const pageLoad = async (): Promise<PageLoad> => {
     console.log('env url', URL)
     console.log('env', env)
@@ -48,5 +75,7 @@ export default {
     loadLots,
     loadOwners,
     pageLoad,
-    getFullPlayerBio
+    getFullPlayerBio,
+    login,
+    register
 }
