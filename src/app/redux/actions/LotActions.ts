@@ -1,5 +1,6 @@
 import { Action } from "@reduxjs/toolkit";
 import React from "react";
+import AuctionApiSvc from "../../services/AuctionApiSvc";
 import { FreeAgent } from "../reducers/FreeAgentReducer";
 import { Lot, Bid } from "../reducers/LotReducer";
 import { RootState } from "../reducers/RootReducer";
@@ -50,4 +51,24 @@ export const turnOnNominationModeForThisOwnersLot = () => async (
     if (thisPlayersLotIndex < 0) return;
     updatedLots[thisPlayersLotIndex].newNom = true;
     dispatch(updateLots(updatedLots))
+}
+
+export const makeNewBid = (bid: Bid) => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    console.log('bid action', bid)
+    const res = await AuctionApiSvc.makeNewBid(bid)
+    console.log('bid res', res)
+    const bidBody = await AuctionApiSvc.handleErrorResponse(res);
+
+}
+
+export const makeNewNomination = (bid: Bid) => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const res = await AuctionApiSvc.makeNewNom(bid)
+    const bidBody = await AuctionApiSvc.handleErrorResponse(res);
+
 }

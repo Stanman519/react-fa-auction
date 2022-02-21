@@ -1,10 +1,11 @@
 
-import { ListItem, ListItemAvatar, Avatar, ListItemText, List, Button, ButtonGroup, Drawer, Container, Typography, TableCell, Table, TableBody, TableContainer, TableHead, TableRow, Card, CardMedia, CardContent, useTheme, Divider } from "@mui/material";
+import { BedroomBabyOutlined } from "@mui/icons-material";
+import { ListItem, ListItemAvatar, Avatar, ListItemText, List, Button, ButtonGroup, Drawer, Container, Typography, TableCell, Table, TableBody, TableContainer, TableHead, TableRow, Card, CardMedia, CardContent, useTheme, Divider, Skeleton } from "@mui/material";
 import { useState } from "react";
 import { PlayerBio } from "../../redux/reducers/FreeAgentReducer";
 import { Bid } from "../../redux/reducers/LotReducer";
 import AuctionApiSvc from "../../services/AuctionApiSvc";
-import { lastYear } from "../../services/Common";
+import { getRankStringSuffix, lastYear, tmColorMap } from "../../services/Common";
 
 
 export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: number }): JSX.Element => {
@@ -12,12 +13,14 @@ export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: num
     const [bidHistory, setBidHistory] = useState<Bid[]>([]);
     const [showBio, setShowBio] = useState<boolean>(false);
     const [bio, setBio] = useState<PlayerBio>();
+    const [isLoading, setIsLoading] = useState(false);
     const lastYr: number = lastYear
     const theme = useTheme()
     const slabWidthMultiplier = screenWidth < 800 ? 0.6 : 0.4;
 
     const loadHistory = async () => {
-        if (!bidHistory) {
+
+        if (!bidHistory ) {
             const historyRes: Bid[] = []//api call 
             setBidHistory(historyRes);
             return;
@@ -25,9 +28,15 @@ export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: num
         setShowHistory(true);
     }
     const loadBio = async () => {
-        if (!bio) {
-            const bioRes: PlayerBio = await AuctionApiSvc.getFullPlayerBio(lastYr, bid.player.mflId, bid.player.position, bid.player.firstName, bid.player.lastName);
+        if (!bio || !bid.expires) {
+            // NEED TO FIGURE OUT IF THIS IS A NEW NOM BECAUSE WE DON't hit this block
+            setIsLoading(true)
+            setShowBio(true)
+            const res = await AuctionApiSvc.getFullPlayerBio(lastYr, bid.player.mflId, bid.player.position, bid.player.firstName, bid.player.lastName);
+            const bioRes = await AuctionApiSvc.handleErrorResponse(res) as PlayerBio;
             setBio(bioRes);
+            setIsLoading(false);
+
         }
         setShowBio(true);
     }
@@ -66,51 +75,67 @@ export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: num
                     anchor="right"
                     onClose={() => setShowBio(!showBio)}
                 >
-                    <Container style={{ backgroundColor: theme.extras.slabBackground, width: screenWidth * slabWidthMultiplier, maxWidth: 600, flexDirection: 'column', flex: 1 }}>
+                    <Container style={{ backgroundColor: theme.palette.background.default, width: screenWidth * slabWidthMultiplier, maxWidth: 600, flexDirection: 'column', flex: 1 }}>
+                        {showBio && !isLoading && bio ?
                         <Card sx={{marginTop: '20px' }}>
                             <CardMedia component='img' image={bio?.actionShot} />
-
-                            {bio &&
                                 <CardContent>
                                     <List>
                                         <ListItem>
                                             <ListItemText>
-                                                <Typography variant="h3">{bio?.firstName.toUpperCase()} {bio?.lastName.toUpperCase()}</Typography>
+                                                <Typography variant="h3">{bio.firstName.toUpperCase()} {bio?.lastName.toUpperCase()}</Typography>
                                             </ListItemText>
                                         </ListItem>
+                                        <Divider /> 
                                         <ListItem >
                                             <ListItemText>
-                                                <Typography variant="h4">{bio?.position}, {bio?.team}</Typography>
+                                                <Typography variant="h5"> {tmColorMap.find(tm => tm.team == bio.team)?.nickname ?? "Free Agent"} {bio?.position}</Typography>
                                             </ListItemText>
                                         </ListItem>
-                                        <ListItem style={{display: 'flex', flexDirection: 'row', flexWrap: "wrap"}}>
+                                        <Divider /> 
+                                        <ListItem>
                                             <ListItemText>
-                                                <Typography variant="h4">{Math.floor(bio?.height / 12)}'{Math.floor(bio?.height % 12)}"</Typography>
-                                            </ListItemText>
-                                            <ListItemText>
-                                                <Typography variant="h4">{bio?.weight} lbs </Typography>
-                                            </ListItemText>
-                                            <ListItemText>
-                                                <Typography variant="h4">Age: {bio.age}</Typography>
+                                                <Typography variant="h5">{Math.floor(bio?.height / 12)}'{Math.floor(bio?.height % 12)}"</Typography>
                                             </ListItemText>
                                         </ListItem>
                                         <ListItem>
-                                            <ListItemText secondary={`Rd. ${bio?.draftRound} Pk. ${bio?.draftPick} (${bio?.college})`}>
-                                                <Typography variant="h4">Drafted: {bio?.draftYear}</Typography>
+                                            <ListItemText>
+                                                <Typography variant="h5">{bio?.weight} lbs </Typography>
                                             </ListItemText>
                                         </ListItem>
-                                        {bio?.lastSeasonSalary && bio?.lastSeasonSalary > 0 && <ListItem>
+                                        <ListItem>
+                                            <ListItemText>
+                                                <Typography variant="h5">Age: {bio.age}</Typography>
+                                            </ListItemText>
+                                        </ListItem>
+                                        <Divider /> 
+                                        <ListItem>
+                                            <ListItemText secondary={`Rd. ${bio?.draftRound} Pk. ${bio?.draftPick} (${bio?.college})`}>
+                                                <Typography variant="h5">Drafted: {bio?.draftYear}</Typography>
+                                            </ListItemText>
+                                        </ListItem>
+                                        <Divider />
+                                        {bio?.lastSeasonSalary > 0 && 
+                                        <ListItem>
                                             <ListItemText secondary={`(${bio?.prevOwner})`}>
-                                                <Typography variant="h4">2021 Salary: ${bio?.lastSeasonSalary}</Typography>
+                                                <Typography variant="h5">2021 Salary: ${bio?.lastSeasonSalary}</Typography>
                                             </ListItemText>
                                         </ListItem>}
                                     </List>
-                                </CardContent>}
+                                </CardContent> 
                         </Card>
+                        : 
+                        <>
+                            <Skeleton variant="rectangular" height={screenWidth/2}/>
+                            <Skeleton variant="text"/>
+                            <Skeleton variant="text"/>
+                            <Skeleton variant="text"/>
+                            <Skeleton variant="text"/>
+                        </> }
                         {bio?.positionRanks.some(yr => yr.points > 0) &&
                             <Card sx={{bgcolor: theme.palette.background.paper, marginTop: '20px', marginBottom: '20px'}}>
                                 <CardContent style={{padding: 8}}>
-                                    <TableContainer >
+                                    {showBio && !isLoading ? <TableContainer >
                                         <Table size="small">
                                             <TableHead >
                                                 <TableRow >
@@ -124,12 +149,15 @@ export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: num
                                                     <TableRow key={row.year}>
                                                         <TableCell style={{fontWeight: 'bold', marginRight: 0}} align="left">{row.year}</TableCell>
                                                         <TableCell align="right">{Math.floor(row.points)}</TableCell>
-                                                        <TableCell align="right">{row.rank}</TableCell>
+                                                        <TableCell align="right">{getRankStringSuffix(row.rank)}</TableCell>
                                                     </TableRow>
                                                 )}
                                             </TableBody>
                                         </Table>
-                                    </TableContainer>
+                                    </TableContainer> :
+                                    <Skeleton variant="rectangular" />
+                                    }
+
                                 </CardContent>
                             </Card>
                         }

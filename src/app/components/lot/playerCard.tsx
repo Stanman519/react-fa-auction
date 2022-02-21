@@ -22,7 +22,6 @@ interface PlayerCardProps {
 export const PlayerCard = ({ player, bidInfo, lotId, screenWidth }: PlayerCardProps) => {
   const { freeAgents } = useSelector((state: RootState) => state);
   const [selectedPlayer, setSelectedPlayer] = useState<FreeAgent>();
-  let x = {} as FreeAgent;
   const dispatch = useDispatch();
   const selectPlayerForNom = (player: FreeAgent) => {
     setSelectedPlayer(player)

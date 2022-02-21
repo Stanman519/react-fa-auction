@@ -1,5 +1,4 @@
-import { AppBar, Avatar, Box, Button, IconButton, Toolbar, useTheme } from "@mui/material";
-import MenuIcon from '@mui/icons-material/Menu';
+import { AppBar, Avatar, Box, Button, Toolbar, useTheme } from "@mui/material";
 import { Fragment, useState } from "react";
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -9,8 +8,6 @@ import ListItemText from '@mui/material/ListItemText';
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
 import { ownerMap } from "../services/Common";
-import AuctionApiSvc from "../services/AuctionApiSvc";
-import { loadAuthenticatedAccount } from "../redux/actions/LoginActions";
 import { turnOnNominationModeForThisOwnersLot } from "../redux/actions/LotActions";
 import { updateUI } from "../redux/actions/UiActions";
 
@@ -32,7 +29,7 @@ export function MenuBar() {
         <div style={{flex: 1}}>
             <Fragment>
                 <Box>
-                    <AppBar position="static" >
+                    <AppBar position="static" color="primary">
                         <Toolbar style={{display: 'flex', justifyContent: 'space-between', paddingLeft: 40, paddingRight: 50}}>
                             <div>
                                 <Button style={{marginRight: 20}} color="inherit" onClick={() => toggleDrawer()}><h3>Salary Caps</h3></Button>
@@ -55,12 +52,12 @@ export function MenuBar() {
                         sx={{ width: 250, height: '100%' }}
                         role="presentation"
                         onClick={() => toggleDrawer()}
-                        bgcolor={palette.grey[400]}
+                        bgcolor={palette.background.default}
                     >
                         <List>
 
                             {owners.map((o, index) => (
-                                <ListItem key={o.ownerId} style={{backgroundColor: index % 2 === 0 ? palette.grey[400] : palette.grey[300]}}>
+                                <ListItem key={o.ownerId} style={{backgroundColor: index % 2 === 0 ? palette.background.default : palette.background.paper}}>
                                     <Avatar style={{marginRight: 8}} sx={{height: 50, width: 50}} alt="" src={ownerMap.find(owner => owner.id == o.ownerId)?.avatar} />
                                     <ListItemText style={{}} primary={o.ownername} secondary={`$${o.capRoom}`} />
                                 </ListItem>

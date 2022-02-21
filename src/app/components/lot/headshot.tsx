@@ -13,7 +13,7 @@ export const Headshot = ({ img, lotId, player }: { img?: string, lotId: number, 
         {
             !player ? <Avatar variant='rounded' sx={{ flexGrow: 3, minHeight: 90, minWidth: 90, maxHeight: 200 }} alt="" src={avatar} /> 
             :
-            <div style={{ background: `url(${teamLogo}) no-repeat`, backgroundSize: 'contain', margin: -5}}>
+            <div style={{ backgroundImage: `url('${teamLogo}')`, backgroundSize: 'contain', backgroundRepeat: 'no-repeat', margin: -5}}>
                 <img className='headshot' src={img ? img : capnMug} />
             </div>
             

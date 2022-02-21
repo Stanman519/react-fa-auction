@@ -13,8 +13,8 @@ export interface UIState {
   errorText?: string;
   modal?: Modals;
 }
-
-export type ErrorTypes = undefined;
+ 
+export type ErrorTypes = 'snackbar' | undefined;
 
 export type Modals = 
   'signIn' | 

@@ -23,7 +23,7 @@ export default function Register() {
     const handleSubmit = async () => {
         try{
             await AuctionApiSvc.register(name, username, password);
-            dispatch(updateUI({modal: undefined}))
+            dispatch(updateUI({modal: 'signIn'}))
         } catch {
 
         }

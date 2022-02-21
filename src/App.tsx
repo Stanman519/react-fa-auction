@@ -2,43 +2,31 @@ import './App.css';
 import { LotBody } from './app/components/lot/lot';
 import { useEffect, useState } from 'react';
 import AuctionApiSvc from './app/services/AuctionApiSvc';
-import { updateFreeAgents } from './app/redux/actions/FreeAgentActions';
+import { getInitialData, updateFreeAgents } from './app/redux/actions/FreeAgentActions';
 import { updateLots } from './app/redux/actions/LotActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './app/store';
 import { MenuBar } from './app/components/menuBar';
 import { updateOwners } from './app/redux/actions/OwnerActions';
-import { Backdrop, Box, CircularProgress, Modal, useTheme } from '@mui/material';
+import { Alert, Backdrop, Box, CircularProgress, Modal, Snackbar, useTheme } from '@mui/material';
 import Register from './app/components/login/register';
 import SignIn from './app/components/login/signIn';
 import { updateUI } from './app/redux/actions/UiActions';
 
 function App() {
   const dispatch = useDispatch();
-  const getInitData = async () => AuctionApiSvc.pageLoad();
+
   const activeLots = useSelector((state: RootState) => state.lots.filter(l => l.bid && !l.newNom))
   const newNom = useSelector((state: RootState)=> state.lots.filter(l => l.newNom))
-  const { modal } = useSelector((state: RootState) => state.ui)
+  const { modal, error, errorText } = useSelector((state: RootState) => state.ui)
   const theme = useTheme()
   const [backdropOpen, setBackdropOpen] = useState(true);
   const [width, setWidth] = useState(0);
 
-  const handleClose = () => {
-    setBackdropOpen(false);
-  };
-  const handleToggle = () => {
-    setBackdropOpen(!backdropOpen);
-  };
-
   useEffect(() => {
-    const fetchData = async () => {
-      const initData = await getInitData();
-      dispatch(updateFreeAgents(initData.freeAgents));
-      dispatch(updateLots(initData.lots))
-      dispatch(updateOwners(initData.owners));
-      setBackdropOpen(false);
-    }
-    fetchData().catch(console.error);
+    dispatch(getInitialData())
+    
+    setBackdropOpen(false);
   }, [])
 
   useEffect(() => {
@@ -79,6 +67,11 @@ function App() {
           {modal === 'register' && <Register />}
         </>
       </Modal>
+      <Snackbar open={error === 'snackbar'} autoHideDuration={6000}>
+        <Alert onClose={() => dispatch(updateUI({error: undefined}))} severity="error" sx={{ width: '100%' }}>
+          {errorText}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

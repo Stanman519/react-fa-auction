@@ -32,16 +32,16 @@ export const themeOptions: ThemeOptions = {
     //   paper: '#f7f7f7',
     // },
     background: { 
-      default: '#D8C3A5',
-      paper: '#EAE7DC'
+      default: '#E3E2DF',
+      paper: 'white'
     },
     primary: {
-      main: '#E85A4F',
-      light: '#E98074',
-      dark: '#E7481A'
+      main: '#2F4454',
+      light: '#4F5565',
+      dark: '#1E3343'
     },
     secondary: {
-      main: '#8E8D8A'
+      main: '#53900F'
     },
     text: {
       primary: 'rgba(16,16,16,0.87)',
