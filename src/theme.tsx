@@ -11,7 +11,6 @@ declare module '@mui/material/styles' {
     extras?: {
       slabBackground?: string
     }
-
   }
 }
 
@@ -20,17 +19,6 @@ export const themeOptions: ThemeOptions = {
     slabBackground: '#8E8D8A'
   },
   palette: {
-
-    // primary: {
-    //   main: '#255828',
-    // },
-    // secondary: {
-    //   main: '#c34820',
-    // },
-    // background: {
-    //   default: '#D6D6DE',
-    //   paper: '#f7f7f7',
-    // },
     background: { 
       default: '#E3E2DF',
       paper: 'white'

@@ -1,7 +1,7 @@
 import { Action } from "@reduxjs/toolkit";
-import AuctionApiSvc, { ErrorResponse, PageLoad } from "../../services/AuctionApiSvc";
+import AuctionApiSvc from "../../services/AuctionApiSvc";
 import { FreeAgent } from "../reducers/FreeAgentReducer";
-import { RootState } from "../reducers/RootReducer";
+import { loadAuthenticatedAccount } from "./LoginActions";
 import { updateLots } from "./LotActions";
 import { updateOwners } from "./OwnerActions";
 import { updateUI } from "./UiActions";
@@ -19,17 +19,18 @@ export const updateFreeAgents = (freeAgents: FreeAgent[]): FreeAgentAction => {
     }
 }
 
-export const getInitialData = () => async ( 
+export const getInitialData = (cookie: string = "") => async ( 
     dispatch: Function,
 ): Promise<any> => {
     try{
-        const res = await AuctionApiSvc.pageLoad();
-        //const initData = await AuctionApiSvc.handleErrorResponse(res) as PageLoad;
-        const initData = await res.json() 
+        const initData = await AuctionApiSvc.pageLoad(cookie);
+        //const initData = await res.json() 
         console.log(initData)
+        console.log(initData.lots)
         dispatch(updateFreeAgents(initData.freeAgents));
         dispatch(updateLots(initData.lots))
         dispatch(updateOwners(initData.owners));
+        if(initData.profile) dispatch(loadAuthenticatedAccount(initData.profile));
     } catch (error: any){
         console.log('fail', error)
         dispatch(updateUI({ isLoading: undefined, error: 'snackbar', errorText: error.message }));

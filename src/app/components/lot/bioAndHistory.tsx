@@ -5,7 +5,7 @@ import { useState } from "react";
 import { PlayerBio } from "../../redux/reducers/FreeAgentReducer";
 import { Bid } from "../../redux/reducers/LotReducer";
 import AuctionApiSvc from "../../services/AuctionApiSvc";
-import { getRankStringSuffix, lastYear, tmColorMap } from "../../services/Common";
+import { getRankStringSuffix, lastYear, ownerMap, tmColorMap } from "../../services/Common";
 
 
 export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: number }): JSX.Element => {
@@ -18,12 +18,18 @@ export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: num
     const theme = useTheme()
     const slabWidthMultiplier = screenWidth < 800 ? 0.6 : 0.4;
 
-    const loadHistory = async () => {
+    const getLocalBidTimeStamp = (expires: Date) => {
+        let dayBefore = new Date(expires);
+        dayBefore.setUTCDate(expires.getUTCDate() - 1)
+        return `${dayBefore.toLocaleDateString()} ${dayBefore.toLocaleTimeString()} `
+    }
 
-        if (!bidHistory ) {
-            const historyRes: Bid[] = []//api call 
+    const loadHistory = async () => {
+        if (bidHistory.length === 0) {
+            const res = await AuctionApiSvc.getBidHistoryByPlayerId(bid.player.mflId);
+            const historyRes = await AuctionApiSvc.handleErrorResponse(res) as Bid[];
+            console.log('history', historyRes)
             setBidHistory(historyRes);
-            return;
         }
         setShowHistory(true);
     }
@@ -36,7 +42,6 @@ export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: num
             const bioRes = await AuctionApiSvc.handleErrorResponse(res) as PlayerBio;
             setBio(bioRes);
             setIsLoading(false);
-
         }
         setShowBio(true);
     }
@@ -53,14 +58,14 @@ export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: num
                 >
                     <Container>
                         <List dense>
-                            {[0, 1, 2].map(p =>
+                            {bidHistory.map(p =>
                                 <ListItem>
                                     <ListItemAvatar>
-                                        <Avatar />
+                                        <Avatar src={ownerMap.find(o => o.id == p.ownerId)?.avatar ?? ''}/>
                                     </ListItemAvatar>
                                     <ListItemText
-                                        primary="Single-line item"
-                                        secondary={'Secondary text'}
+                                        primary={`$${p.bidSalary}, ${p.bidLength} years`}
+                                        secondary={`${getLocalBidTimeStamp(new Date(p.expires ?? ""))}`}
                                     />
                                 </ListItem>)}
                         </List>

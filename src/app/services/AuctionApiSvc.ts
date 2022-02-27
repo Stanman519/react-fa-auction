@@ -1,4 +1,3 @@
-
 import axios from "axios";
 import { FreeAgent } from "../redux/reducers/FreeAgentReducer";
 import { Bid, Lot } from "../redux/reducers/LotReducer";
@@ -10,7 +9,8 @@ const env = process.env.NODE_ENV;
 export interface PageLoad {
     freeAgents: FreeAgent[],
     owners: Owner[],
-    lots: Lot[]
+    lots: Lot[],
+    profile?: Owner
 }
 export interface ErrorResponse {
     friendlyMessage: string
@@ -65,20 +65,21 @@ const makeNewBid = async (bid: Bid): Promise<Response> => {
 const makeNewNom = async (bid: Bid): Promise<Response> => {
     return await fetch(`${URL}/FreeAgency/nominate`, {
         method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+          },
         body: JSON.stringify({
-            
-                bidLength: bid.bidLength,
-                bidSalary: bid.bidSalary,
-                ownername: bid.ownername,
-                ownerId: bid.ownerId,
-                expires: bid.expires,
-                lotId: bid.lotId,
-                player: {
-                    mflId: bid.player.mflId,
-                    firstName: bid.player.firstName,
-                    lastName: bid.player.lastName,
-                }
-            }  as Bid)
+            bidLength: bid.bidLength,
+            bidSalary: bid.bidSalary,
+            ownername: bid.ownername,
+            ownerId: bid.ownerId,
+            lotId: bid.lotId,
+            player: {
+                mflId: bid.player.mflId,
+                firstName: bid.player.firstName,
+                lastName: bid.player.lastName,
+            }
+        })
     })
 }
 
@@ -114,10 +115,18 @@ const register = async (name: string, username: string, password: string): Promi
     return res;
 }
 
-const pageLoad = async (): Promise<Response> => {
+const pageLoad = async (cookie: string = ""): Promise<PageLoad> => {
     console.log('env url', URL)
     console.log('env', env)
-    return await fetch(`${URL}/FreeAgency/page-load`);
+    console.log(cookie)
+    const rest = await axios.get(`${URL}/FreeAgency/page-load`, 
+    {
+        params: { loginInfo: cookie }
+    }).catch(error => {
+        console.log(error.response)
+        throw new Error(error.response.data.friendlyMessage)
+    });
+    return rest.data;
 }
 
 async function handleErrorResponse<Type>(response: Response): Promise<Type | void> {
@@ -128,8 +137,8 @@ async function handleErrorResponse<Type>(response: Response): Promise<Type | voi
         const error = await response.json() as ErrorResponse
         throw new Error(error.friendlyMessage);
     }
-    if (response.status == 204) return Promise.resolve();
-    if (response.status != 200 && response.statusText != 'OK') throw new Error('Service unreachable.');
+    if (response.status === 204) return Promise.resolve();
+    if (response.status !== 200 && response.statusText !== 'OK') throw new Error('Service unreachable.');
     return response.json();
 }
 

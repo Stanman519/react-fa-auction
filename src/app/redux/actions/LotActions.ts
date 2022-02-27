@@ -39,12 +39,28 @@ export const selectPlayerToNominate = (selectedPlayer: FreeAgent | null) => asyn
     dispatch(updateLots(updatedLots));
 }
 
+export const updateLotWithFreshBid = (bid: Bid) => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const { lots } = getState();
+    const updated = [...lots];
+    console.log('is this thing on?')
+    const newLotIndex = updated.findIndex(l => l.lotId == bid.lotId);
+    if (newLotIndex < 0 || !updated[newLotIndex].bid) return;
+    const updatedBid = {...bid, player: updated[newLotIndex].bid?.player } as Bid
+    updated[newLotIndex] = {lotId: bid.lotId, newNom: false, bid: updatedBid} as Lot
+    console.log('update lots with', updated)
+    dispatch(updateLots(updated));
+}
+
 export const turnOnNominationModeForThisOwnersLot = () => async ( 
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
     const { lots } = getState()
     const { profile } = getState()
+    console.log(profile)
     let updatedLots = [...lots];
     if (!profile || lots.length === 0) return;
     const  thisPlayersLotIndex = updatedLots.findIndex(l => l.lotId == profile.ownerId);
@@ -68,7 +84,10 @@ export const makeNewNomination = (bid: Bid) => async (
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
+    console.log('action bid', bid)
     const res = await AuctionApiSvc.makeNewNom(bid)
+    console.log(res)
     const bidBody = await AuctionApiSvc.handleErrorResponse(res);
+    console.log(bidBody)
 
 }

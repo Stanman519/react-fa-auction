@@ -1,3 +1,5 @@
+import Owner from "../redux/reducers/OwnerReducer";
+
 interface OwnerLookup{
     name: string
     id: number
@@ -23,9 +25,20 @@ const file = process.env.PUBLIC_URL + '/avatars/';
 export const lastYear = 2021;
 
 
-export const checkValidity = (newBid: number, newYears: number, mflId: string, oldBid: number = 0, oldYears: number = 0): BidValidity => {
+export const checkValidity = (profile: Owner, newBid: number, newYears: number, mflId: string, oldBid: number = 0, oldYears: number = 0): BidValidity => {
     let validity: BidValidity = { isValid: true, violations: [] } 
-    console.log('newBid', newYears)
+    if(!profile.ownername){
+        validity.isValid = false;
+        validity.violations.push("You are not logged in.")
+    }
+    if(newYears > 5) {
+        validity.isValid = false
+        validity.violations.push("Contracts are 5 year max.");
+    }
+    if(newBid > 475) {
+        validity.isValid = false
+        validity.violations.push("Salary too high for cap.");
+    }
     if(newBid < 1 || newBid % 1 > 0 || newYears < 1 ) {
         validity.isValid = false
         validity.violations.push("Salary and years must be whole numbers over 0.");
@@ -104,7 +117,7 @@ export const tmColorMap: TmColor[] = [
     { team: 'WAS', nickname: 'Commanders (lol?)', primary: '#5A1414', secondary: '#FFB612', logo: 'https://loodibee.com/wp-content/uploads/washington-commanders-logo.png'  },
     { team: 'ATL', nickname: 'Falcons', primary: '#A71930', secondary: '#000000', logo: 'https://loodibee.com/wp-content/uploads/nfl-atlanta-falcons-team-logo-2.png'  },
     { team: 'CAR', nickname: 'Panthers',  primary: '#0085CA', secondary: '#101820', logo: 'https://loodibee.com/wp-content/uploads/nfl-carolina-panthers-team-logo-2.png'  },
-    { team: 'NO', nickname: 'Saints', primary: '#D3BC8D', secondary: '#101820', logo: 'https://loodibee.com/wp-content/uploads/nfl-new-orleans-saints-team-logo-2.png'  },
+    { team: 'NOS', nickname: 'Saints', primary: '#D3BC8D', secondary: '#101820', logo: 'https://loodibee.com/wp-content/uploads/nfl-new-orleans-saints-team-logo-2.png'  },
     { team: 'TBB', nickname: 'Buccaneers',  primary: '#D50A0A', secondary: '#FF7900', logo: 'https://loodibee.com/wp-content/uploads/tampa-bay-buccaneers-2020-logo.png'  },
     { team: 'ARI', nickname: 'Cardinals', primary: '#97233F', secondary: '#000000', logo: 'https://loodibee.com/wp-content/uploads/nfl-arizona-cardinals-team-logo-2.png' },
     { team: 'LAR', nickname: 'Rams', primary: '#003594', secondary: '#FFA300', logo: 'https://loodibee.com/wp-content/uploads/los-angeles-rams-2020-logo.png'  },

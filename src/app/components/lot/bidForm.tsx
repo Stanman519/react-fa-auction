@@ -35,7 +35,7 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
     const fauxButtonDisable = () => {
         if (getValidity().isValid) setConfirmModal(true)
     }
-    const getValidity = () => checkValidity(bidSalary ? bidSalary : 0, bidLength ? bidLength : 0, 
+    const getValidity = () => checkValidity(profile, bidSalary ? bidSalary : 0, bidLength ? bidLength : 0, 
         lot.bid?.player.mflId ?? "", lot.bid?.bidSalary ?? 0, lot.bid?.bidLength ?? 0);
 
     const handleSubmission = () => {

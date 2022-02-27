@@ -17,17 +17,13 @@ export interface Lot {
     newNom: boolean
 }
 
+const defaultState = Array.from(Array(13).keys()).map(l => { return { lotId: l + 1, newNom: false}}) as Lot[]
 
-
-const defaultState = [] as Lot[]
-
-for (let i = 1; i <= 12; i++) {
-    defaultState.push({lotId: i, newNom: false})
-}
 
 export const lotReducer = (state = defaultState, action: LotAction): Lot[] => {
     switch (action.type) {
         case UPDATE_LOTS:
+            console.log('lot reducer')
             return action.payload;
         default:
             return state;

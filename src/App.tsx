@@ -1,17 +1,17 @@
 import './App.css';
 import { LotBody } from './app/components/lot/lot';
 import { useEffect, useState } from 'react';
-import AuctionApiSvc from './app/services/AuctionApiSvc';
-import { getInitialData, updateFreeAgents } from './app/redux/actions/FreeAgentActions';
-import { updateLots } from './app/redux/actions/LotActions';
+import { getInitialData } from './app/redux/actions/FreeAgentActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './app/store';
 import { MenuBar } from './app/components/menuBar';
-import { updateOwners } from './app/redux/actions/OwnerActions';
-import { Alert, Backdrop, Box, CircularProgress, Modal, Snackbar, useTheme } from '@mui/material';
+import { Alert, Backdrop, CircularProgress, Modal, Snackbar, useTheme } from '@mui/material';
 import Register from './app/components/login/register';
 import SignIn from './app/components/login/signIn';
 import { updateUI } from './app/redux/actions/UiActions';
+import Cookies from 'universal-cookie/es6';
+import { setupEventsHub } from './app/signalR/socketMiddleware';
+import signalR from './app/signalR/socketMiddleware';
 
 function App() {
   const dispatch = useDispatch();
@@ -22,10 +22,11 @@ function App() {
   const theme = useTheme()
   const [backdropOpen, setBackdropOpen] = useState(true);
   const [width, setWidth] = useState(0);
+  const cookies = new Cookies();
 
   useEffect(() => {
-    dispatch(getInitialData())
-    
+    cookies.get('token') ? dispatch(getInitialData(cookies.get('token'))) : dispatch(getInitialData())
+    dispatch(signalR())
     setBackdropOpen(false);
   }, [])
 
@@ -59,7 +60,7 @@ function App() {
           {activeLots.map(l => <LotBody lot={l} screenWidth={width} key={l.lotId}/>)}
         </div>}
       <Modal
-        open={modal != undefined}
+        open={modal !== undefined}
         onClose={() => dispatch(updateUI({ modal: undefined }))}
       >
         <>
