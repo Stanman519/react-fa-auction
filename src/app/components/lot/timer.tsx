@@ -8,10 +8,16 @@ export const Timer = ({ endTime, lotId }: { endTime?: Date, lotId: number }): JS
     const calculateTimeLeft = (endTime: Date | undefined) => {
         if (!endTime) return
         let now = new Date(Date.now());
+
+        // i dont know why but for whatever reason i have to reconvert the expiration back into UTC... 
+        let utcExpiration = new Date(endTime.getFullYear(), endTime.getUTCMonth(), endTime.getUTCDate(),
+        endTime.getUTCHours(), endTime.getUTCMinutes(), endTime.getUTCSeconds(), 10);
+        
         let utcDate = new Date(
             now.getFullYear(), now.getUTCMonth(), now.getUTCDate(),
             now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), 10);
-        let difference = +endTime - +utcDate;
+
+        let difference = +utcExpiration - +utcDate;
 
         if (difference < 0) {
             // DO STUFF

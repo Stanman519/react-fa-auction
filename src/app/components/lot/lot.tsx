@@ -14,9 +14,8 @@ export const LotBody = ({lot, screenWidth}: LotProps): JSX.Element => {
   const dateProp = lot.bid?.expires ? new Date(lot.bid.expires) : undefined
   const bidMode = !lot.newNom;
   const theme = useTheme();
-  console.log('player in body', lot.bid?.player)
   return (
-        <div className="lot-frame" style={{backgroundColor: theme.palette.background.paper}}>
+        <div className="lot-frame" style={{ minHeight: bidMode ? 325 : 0, backgroundColor: theme.palette.background.paper}}>
             <PlayerCard screenWidth={screenWidth} lotId={lot.lotId} player={lot.bid?.player ?? undefined} bidInfo={lot.bid}/>
             <Timer endTime={dateProp} lotId={lot.lotId}/>
             <BidForm bidMode={bidMode} lot={lot} />

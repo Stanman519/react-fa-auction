@@ -12,6 +12,7 @@ import { updateUI } from './app/redux/actions/UiActions';
 import Cookies from 'universal-cookie/es6';
 import { setupEventsHub } from './app/signalR/socketMiddleware';
 import signalR from './app/signalR/socketMiddleware';
+import { NoActiveAuctions } from './app/components/noActiveAuctions';
 
 function App() {
   const dispatch = useDispatch();
@@ -43,22 +44,30 @@ function App() {
 
   return (
     <div className="App" style={{backgroundColor: theme.palette.background.default}}>
+      
       <div className='menu-container'>
         <MenuBar />
       </div>
-      {backdropOpen ?
-        <>
-          <Backdrop
-            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-            open={backdropOpen}
-          >
-            <CircularProgress size={100} />
-          </Backdrop>
-        </> :
-        <div className='lot-container'>
-          {newNom.length > 0 && newNom.map(l => <LotBody lot={l} screenWidth={width} key={l.lotId}/>)}
-          {activeLots.map(l => <LotBody lot={l} screenWidth={width} key={l.lotId}/>)}
-        </div>}
+      <div style={{display: 'flex', justifyContent: 'center'}}>
+        {backdropOpen ?
+          <>
+            <Backdrop
+              sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+              open={backdropOpen}
+            >
+              <CircularProgress size={100} />
+            </Backdrop>
+          </> :
+          <div className='lot-container'>
+            {newNom.length > 0 && newNom.map(l => <LotBody lot={l} screenWidth={width} key={l.lotId}/>)}
+            {activeLots.map(l => <LotBody lot={l} screenWidth={width} key={l.lotId}/>)}
+          </div>}
+        {newNom.length === 0 && activeLots.length === 0 && 
+        <div style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
+          <NoActiveAuctions />
+        </div>
+        }
+      </div>
       <Modal
         open={modal !== undefined}
         onClose={() => dispatch(updateUI({ modal: undefined }))}

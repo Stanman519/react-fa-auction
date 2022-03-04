@@ -64,7 +64,7 @@ export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: num
                                         <Avatar src={ownerMap.find(o => o.id == p.ownerId)?.avatar ?? ''}/>
                                     </ListItemAvatar>
                                     <ListItemText
-                                        primary={`$${p.bidSalary}, ${p.bidLength} years`}
+                                        primary={`$${p.bidSalary}, ${p.bidLength} ${p.bidLength == 1 ? 'year' : 'years'}`}
                                         secondary={`${getLocalBidTimeStamp(new Date(p.expires ?? ""))}`}
                                     />
                                 </ListItem>)}

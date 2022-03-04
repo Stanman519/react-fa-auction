@@ -19,7 +19,6 @@ const ryTheme = createTheme({
         warning: {
             main: deepOrange[500],
         },
-        // TODO Bruno: what about accent? should be blue-grey 500,900
     },
     typography: {
         // dangerous: lets you modify typography for all variants (h1, h2, h3, etc)

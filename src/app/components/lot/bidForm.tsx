@@ -20,8 +20,8 @@ const Transition = forwardRef(function Transition(
 
 export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.Element => {
     const capnWarning = process.env.PUBLIC_URL + '/capn-wtf.png';
-    const [bidSalary, setBidSalary] = useState<number>();
-    const [bidLength, setBidLength] = useState<number>();
+    const [bidSalary, setBidSalary] = useState<number>(0);
+    const [bidLength, setBidLength] = useState<number>(0);
     const { profile } = useSelector((state: RootState) => state);
     const [confirmModal, setConfirmModal] = useState<boolean>(false);
     const theme = useTheme();

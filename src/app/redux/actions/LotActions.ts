@@ -45,11 +45,14 @@ export const updateLotWithFreshBid = (bid: Bid) => async (
 ): Promise<any> => {
     const { lots } = getState();
     const updated = [...lots];
-    console.log('is this thing on?')
+    console.log('bid in action', bid)
     const newLotIndex = updated.findIndex(l => l.lotId == bid.lotId);
-    if (newLotIndex < 0 || !updated[newLotIndex].bid) return;
-    const updatedBid = {...bid, player: updated[newLotIndex].bid?.player } as Bid
-    updated[newLotIndex] = {lotId: bid.lotId, newNom: false, bid: updatedBid} as Lot
+    if (newLotIndex < 0) return; // i was checking for !updated[newLotIndex].bid here but i dont know why. took out because it was breaking nominations
+    //const updatedBid = {...bid, player: updated[newLotIndex].bid?.player } as Bid 
+    // this was here to just update bids but it was breaking nominations - (and now we are missing headshot and team and position)
+    // once update api to get full player back to send with bid response, check if it is okay with bids
+
+    updated[newLotIndex] = {lotId: bid.lotId, newNom: false, bid: bid} as Lot
     console.log('update lots with', updated)
     dispatch(updateLots(updated));
 }

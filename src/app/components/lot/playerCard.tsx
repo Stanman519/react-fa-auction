@@ -5,7 +5,7 @@ import { Bid } from '../../redux/reducers/LotReducer';
 import { RootState } from '../../store';
 import { BioAndHistory } from './bioAndHistory';
 import { BidInfo } from './bidInfo';
-import { Headshot } from './headshot';
+import { Headshot, MemoHeadshot } from './headshot';
 import { PlayerInfo } from './playerInfo';
 import './styles/lot.scss';
 import { tmColorMap } from '../../services/Common';
@@ -31,7 +31,7 @@ export const PlayerCard = ({ player, bidInfo, lotId, screenWidth }: PlayerCardPr
   return (
     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 10}}>
       <div style={{ flex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-        <Headshot lotId={lotId} img={player?.headshot ?? ''} player={player} />
+        <MemoHeadshot lotId={lotId} img={player?.headshot ?? ''} player={player} />
         {bidInfo && <BioAndHistory bid={bidInfo} screenWidth={screenWidth} />}
       </div>
       <div style={{ flexDirection: 'column', flex: 3 }}>
@@ -54,7 +54,7 @@ export const PlayerCard = ({ player, bidInfo, lotId, screenWidth }: PlayerCardPr
             </div>
           </div>
           :
-          <div style={{ paddingLeft: 10 }}>
+          
             <Autocomplete
               disablePortal
               id="free-agent-selection"
@@ -63,10 +63,11 @@ export const PlayerCard = ({ player, bidInfo, lotId, screenWidth }: PlayerCardPr
               onChange={(event: any, newValue) => {
                 if (newValue) selectPlayerForNom(newValue)
               }}
+              sx={{minWidth: 250, flex: 1, paddingLeft: '10px'}}
               getOptionLabel={(option) => `${option.position ?? ''} ${option.fullName ?? ''}`}
               renderInput={(params) => <TextField {...params} label="Choose a player" />}
             />
-          </div>}
+          }
       </div>
     </div>
 
