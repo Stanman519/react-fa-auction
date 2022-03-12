@@ -2,7 +2,6 @@ import { Action } from "@reduxjs/toolkit";
 import Cookies from "universal-cookie/es6";
 import AuctionApiSvc from "../../services/AuctionApiSvc";
 import Owner from "../reducers/OwnerReducer";
-import { RootState } from "../reducers/RootReducer";
 import { updateUI } from "./UiActions";
 
 
@@ -33,5 +32,4 @@ export const submitLogin = (username:string, password: string) => async(
         dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
     }
 
-    
 }

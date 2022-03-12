@@ -130,7 +130,6 @@ const pageLoad = async (cookie: string = ""): Promise<PageLoad> => {
 }
 
 async function handleErrorResponse<Type>(response: Response): Promise<Type | void> {
-    
     console.log('response ok', response)
     const failureCodes = [400, 500]
     if (failureCodes.includes(response.status)) {
@@ -142,10 +141,19 @@ async function handleErrorResponse<Type>(response: Response): Promise<Type | voi
     return response.json();
 }
 
+const sendWin = async (bid: Bid): Promise<Response> => {
+    const json = JSON.stringify(bid)
+    console.log('json', json)
+    const res = await fetch(`${URL}/FreeAgency/win`, {
+        method: 'PUT',
+        headers: { "Content-Type": "application/json" },
+        body: json
+        })
+    return res;
+}
+
+
 export default {
-    // getInitialFreeAgents,
-    // loadLots,
-    // loadOwners,
     pageLoad,
     getFullPlayerBio,
     login,
@@ -153,5 +161,6 @@ export default {
     register,
     handleErrorResponse,
     makeNewBid,
-    makeNewNom
+    makeNewNom,
+    sendWin
 }

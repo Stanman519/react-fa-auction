@@ -4,6 +4,7 @@ import AuctionApiSvc from "../../services/AuctionApiSvc";
 import { FreeAgent } from "../reducers/FreeAgentReducer";
 import { Lot, Bid } from "../reducers/LotReducer";
 import { RootState } from "../reducers/RootReducer";
+import { updateUI } from "./UiActions";
 
 export const UPDATE_LOTS = 'UPDATE_LOTS';
 
@@ -83,14 +84,32 @@ export const makeNewBid = (bid: Bid) => async (
 
 }
 
-export const makeNewNomination = (bid: Bid) => async ( 
-    dispatch: Function,
-    getState: () => RootState
-): Promise<any> => {
+export const makeNewNomination = (bid: Bid) => async ( ): Promise<any> => {
     console.log('action bid', bid)
     const res = await AuctionApiSvc.makeNewNom(bid)
     console.log(res)
     const bidBody = await AuctionApiSvc.handleErrorResponse(res);
     console.log(bidBody)
 
+}
+
+export const submitWin = (bid: Bid) => async (
+    dispatch: Function,
+    getState: () => RootState
+) : Promise<any> => {
+    try {
+        const res = await AuctionApiSvc.sendWin(bid)
+        const complete = await AuctionApiSvc.handleErrorResponse(res);
+        const l = getState().lots;
+        const lots = [...l]
+        const lotToCleanIndex = lots.findIndex(l => l.lotId === bid.lotId)
+        if (lotToCleanIndex < 0) {
+            lots[lotToCleanIndex] = {...lots[lotToCleanIndex], bid: undefined}
+            dispatch(updateLots(lots))
+        }
+        
+    } catch (e: any) { 
+        console.log('e', e.data)
+        dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
+    }
 }
