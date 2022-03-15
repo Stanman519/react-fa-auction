@@ -14,6 +14,7 @@ export const LotBody = ({lot, screenWidth}: LotProps): JSX.Element => {
   const bidMode = !lot.newNom;
   const theme = useTheme();
   const getUTC = (endTime?: Date): Date | undefined => {
+    console.log('enntering func', endTime)
     if (endTime){
       return new Date(
         endTime.getFullYear(), endTime.getUTCMonth(), endTime.getUTCDate(),

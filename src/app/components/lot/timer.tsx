@@ -22,8 +22,8 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
 
         //TODO: FIX THIS pass in UTC from parent?
         //i dont know why but for whatever reason i have to reconvert the expiration back into UTC... 
-        let utcExpiration = new Date(endTime.getFullYear(), endTime.getUTCMonth(), endTime.getUTCDate(),
-        endTime.getUTCHours(), endTime.getUTCMinutes(), endTime.getUTCSeconds(), 10);
+        //let utcExpiration = new Date(endTime.getFullYear(), endTime.getUTCMonth(), endTime.getUTCDate(),
+        //endTime.getUTCHours(), endTime.getUTCMinutes(), endTime.getUTCSeconds(), 10);
         
         let utcDate = new Date(
             now.getFullYear(), now.getUTCMonth(), now.getUTCDate(),

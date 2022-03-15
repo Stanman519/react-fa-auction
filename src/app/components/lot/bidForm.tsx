@@ -1,6 +1,7 @@
 import { Cancel } from "@mui/icons-material";
 import { Backdrop, Button, Dialog, DialogActions, DialogContent, Slide, TextField, Tooltip, Typography, useTheme } from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
+import LoadingButton from '@mui/lab/LoadingButton';
 import { forwardRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { makeNewBid, makeNewNomination } from "../../redux/actions/LotActions";
@@ -22,16 +23,12 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
     const capnWarning = process.env.PUBLIC_URL + '/capn-wtf.png';
     const [bidSalary, setBidSalary] = useState<number>(0);
     const [bidLength, setBidLength] = useState<number>(0);
+    const [isLoading, setIsLoading] = useState<boolean>();
     const { profile } = useSelector((state: RootState) => state);
     const [confirmModal, setConfirmModal] = useState<boolean>(false);
     const theme = useTheme();
     const dispatch = useDispatch();
-    const getTimeStamp = (): Date => {
-        let date = new Date(Date.now());
-        let tomorrow = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-            date.getUTCHours() + 24, date.getUTCMinutes(), date.getUTCSeconds());
-        return tomorrow;
-    }
+    
     const fauxButtonDisable = () => {
         if (getValidity().isValid) setConfirmModal(true)
     }
@@ -40,6 +37,7 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
 
     const handleSubmission = () => {
         if (bidMode && lot.bid) {
+            setIsLoading(true);
             dispatch(makeNewBid({
                 ownerId: profile.ownerId,
                 ownername: profile.ownername,
@@ -48,7 +46,9 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
                 lotId: lot.lotId,
                 player: { ...lot?.bid?.player }
             }))
+            setIsLoading(false);
         } else if (lot.bid) {
+            setIsLoading(true);
             dispatch(makeNewNomination({
                 ownerId: profile.ownerId,
                 ownername: profile.ownername,
@@ -57,6 +57,7 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
                 lotId: lot.lotId,
                 player: { ...lot?.bid?.player }
             }))
+            setIsLoading(false);
         }
         setConfirmModal(false);
     }
@@ -109,7 +110,7 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
                 </DialogContent>
                 <DialogActions>
                     <Button color='primary' onClick={() => setConfirmModal(false)} size='large' variant='contained'>Cancel</Button>
-                    <Button color='success' style={{ marginLeft: 8 }} size='large' variant='contained' onClick={() => handleSubmission()}>Submit</Button>
+                    <LoadingButton loading={isLoading} color='success' style={{ marginLeft: 8 }} size='large' variant='contained' onClick={() => handleSubmission()}>Submit</LoadingButton>
                 </DialogActions>
             </Dialog>
         </div>

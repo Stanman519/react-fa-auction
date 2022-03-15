@@ -1,6 +1,5 @@
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
@@ -9,8 +8,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { useState } from 'react';
-import AuctionApiSvc from '../../services/AuctionApiSvc';
-import { loadAuthenticatedAccount, submitLogin } from '../../redux/actions/LoginActions';
+import { submitLogin } from '../../redux/actions/LoginActions';
 import { useDispatch } from 'react-redux';
 import { useTheme } from '@mui/material';
 import { updateUI } from '../../redux/actions/UiActions';
@@ -59,6 +57,10 @@ export default function SignIn() {
                         label="Password"
                         type="password"
                         id="password"
+                        onKeyPress={(event) => {
+                            if (event.key === 'Enter')
+                                dispatch(submitLogin(username, password))
+                          }}
                         autoComplete="current-password"
                         value={password}
                         onChange={u => setPassword(u.target.value)}

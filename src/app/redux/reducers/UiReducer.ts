@@ -8,7 +8,7 @@ const defaultState: UIState = {
 };
 
 export interface UIState {
-  isLoading?: boolean;
+  isLoading?: string;
   error?: ErrorTypes;
   errorText?: string;
   modal?: Modals;

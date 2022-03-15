@@ -10,25 +10,21 @@ import Register from './app/components/login/register';
 import SignIn from './app/components/login/signIn';
 import { updateUI } from './app/redux/actions/UiActions';
 import Cookies from 'universal-cookie/es6';
-import { setupEventsHub } from './app/signalR/socketMiddleware';
 import signalR from './app/signalR/socketMiddleware';
 import { NoActiveAuctions } from './app/components/noActiveAuctions';
 
 function App() {
+  const theme = useTheme()
   const dispatch = useDispatch();
-
   const activeLots = useSelector((state: RootState) => state.lots.filter(l => l.bid && !l.newNom))
   const newNom = useSelector((state: RootState)=> state.lots.filter(l => l.newNom))
-  const { modal, error, errorText } = useSelector((state: RootState) => state.ui)
-  const theme = useTheme()
-  const [backdropOpen, setBackdropOpen] = useState(true);
+  const { modal, error, errorText, isLoading } = useSelector((state: RootState) => state.ui)
   const [width, setWidth] = useState(0);
   const cookies = new Cookies();
 
   useEffect(() => {
     cookies.get('token') ? dispatch(getInitialData(cookies.get('token'))) : dispatch(getInitialData())
     dispatch(signalR())
-    setBackdropOpen(false);
   }, [])
 
   useEffect(() => {
@@ -49,20 +45,20 @@ function App() {
         <MenuBar />
       </div>
       <div style={{display: 'flex', justifyContent: 'center'}}>
-        {backdropOpen ?
-          <>
+        {isLoading == 'fullscreen' ?
+          <div>
             <Backdrop
               sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-              open={backdropOpen}
+              open={isLoading == 'fullscreen'}
             >
-              <CircularProgress size={100} />
+              <CircularProgress size={200} />
             </Backdrop>
-          </> :
+          </div> :
           <div className='lot-container'>
             {newNom.length > 0 && newNom.map(l => <LotBody lot={l} screenWidth={width} key={l.lotId}/>)}
             {activeLots.map(l => <LotBody lot={l} screenWidth={width} key={l.lotId}/>)}
           </div>}
-        {newNom.length === 0 && activeLots.length === 0 && 
+        {newNom.length === 0 && activeLots.length === 0 && isLoading != 'fullscreen' && 
         <div style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
           <NoActiveAuctions />
         </div>

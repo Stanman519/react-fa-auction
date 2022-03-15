@@ -81,7 +81,6 @@ export const makeNewBid = (bid: Bid) => async (
     const res = await AuctionApiSvc.makeNewBid(bid)
     console.log('bid res', res)
     const bidBody = await AuctionApiSvc.handleErrorResponse(res);
-
 }
 
 export const makeNewNomination = (bid: Bid) => async ( ): Promise<any> => {
