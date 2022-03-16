@@ -29,7 +29,7 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
             now.getFullYear(), now.getUTCMonth(), now.getUTCDate(),
             now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), 10);
 
-        let difference = +utcExpiration - +utcDate;
+        let difference = +endTime - +utcDate;
 
         if (difference <= 0) {
             // NEED TO RESET THE CLOCK SO IT DOESN'T CALL API MULTIPLE TIMES

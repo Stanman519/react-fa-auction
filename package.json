@@ -28,6 +28,8 @@
     "react-scripts": "5.0.0",
     "react-signalr": "^0.2.8",
     "sass": "^1.49.4",
+    "stream-chat": "^6.2.0",
+    "stream-chat-react": "^7.0.0",
     "typescript": "~4.1.5",
     "universal-cookie": "^4.0.4"
   },
