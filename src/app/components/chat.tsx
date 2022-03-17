@@ -72,7 +72,7 @@ export const FAChatWindow = (): JSX.Element | null => {
                 messageType: MessageType;
                 reactionType: ReactionType;
                 userType: UserType;
-            }>(apiKey, { enableWSFallback: true });
+            }>(apiKey!, { enableWSFallback: true });
 
             await client.connectUser({
                 id: user.ownername,
