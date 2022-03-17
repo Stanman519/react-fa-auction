@@ -7,6 +7,7 @@ export default interface Owner {
     password: string
     capRoom: number
     yearsLeft: number
+    token: string
 }
 
 

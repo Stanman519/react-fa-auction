@@ -10,6 +10,7 @@ import { RootState } from "../store";
 import { ownerMap } from "../services/Common";
 import { turnOnNominationModeForThisOwnersLot } from "../redux/actions/LotActions";
 import { updateUI } from "../redux/actions/UiActions";
+import { FAChatWindow } from "./chat";
 
 
 export function MenuBar() {
@@ -73,6 +74,7 @@ export function MenuBar() {
                             ))}
                             <Divider />
                         </List>
+                        
                     </Box>
                 </Drawer>
             </Fragment>

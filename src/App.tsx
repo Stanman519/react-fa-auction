@@ -12,6 +12,7 @@ import { updateUI } from './app/redux/actions/UiActions';
 import Cookies from 'universal-cookie/es6';
 import signalR from './app/signalR/socketMiddleware';
 import { NoActiveAuctions } from './app/components/noActiveAuctions';
+import { FAChatWindow } from './app/components/chat';
 
 function App() {
   const theme = useTheme()
@@ -63,7 +64,9 @@ function App() {
           <NoActiveAuctions />
         </div>
         }
+        
       </div>
+      <FAChatWindow />
       <Modal
         open={modal !== undefined}
         onClose={() => dispatch(updateUI({ modal: undefined }))}

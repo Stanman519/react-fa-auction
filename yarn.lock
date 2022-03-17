@@ -1850,7 +1850,7 @@
   resolved "https://registry.yarnpkg.com/@stream-io/escape-string-regexp/-/escape-string-regexp-5.0.1.tgz#362505c92799fea6afe4e369993fbbda8690cc37"
   integrity sha512-qIaSrzJXieZqo2fZSYTdzwSbZgHHsT3tkd646vvZhh4fr+9nO4NlvqGmPF43Y+OfZiWf+zYDFgNiPGG5+iZulQ==
 
-"@stream-io/stream-chat-css@^2.2.1":
+"@stream-io/stream-chat-css@^2.2.1", "@stream-io/stream-chat-css@^2.6.0":
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/@stream-io/stream-chat-css/-/stream-chat-css-2.6.0.tgz#962561faadfac0f7285fdb60bd53d9e83eed9e5a"
   integrity sha512-CAzRUVlEeackMVUMOVQHSlh4Qmb68zGEAv8+t4iyQYgaOxMLX8ZgZoxULQgMiDfZPhVF89xijb6acyivO6pP5g==
