@@ -88,6 +88,7 @@ export const FAChatWindow = (): JSX.Element | null => {
         }
         if (user.token) {
             console.log('if in init',user.token)
+            console.log('key', apiKey)
             initChat();
         }
         // return () => {
