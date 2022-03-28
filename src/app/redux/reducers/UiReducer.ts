@@ -5,6 +5,8 @@ const defaultState: UIState = {
   error: undefined,
   errorText: '',
   modal: undefined,
+  chatOpen: false,
+  isMobile: true
 };
 
 export interface UIState {
@@ -12,6 +14,8 @@ export interface UIState {
   error?: ErrorTypes;
   errorText?: string;
   modal?: Modals;
+  chatOpen?: boolean;
+  isMobile?: boolean;
 }
  
 export type ErrorTypes = 'snackbar' | undefined;

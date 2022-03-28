@@ -27,7 +27,7 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
         
         let utcDate = new Date(
             now.getFullYear(), now.getUTCMonth(), now.getUTCDate(),
-            now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), 10);
+            now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
 
         let difference = +endTime - +utcDate;
 
@@ -43,7 +43,7 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
             days: Math.floor(difference / (1000 * 60 * 60 * 24)),
             hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
             minutes: Math.floor((difference / 1000 / 60) % 60),
-            seconds: Math.floor((difference / 1000) % 60)
+            seconds: Math.floor((difference / 1000) % 60) + 1
         };
         return timeLeft;
     }

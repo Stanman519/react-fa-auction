@@ -4,12 +4,12 @@ import {
     Channel,
     Window,
 
-  } from 'stream-chat-react';
+} from 'stream-chat-react';
 import { LiteralStringForUnion, StreamChat } from 'stream-chat';
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { ownerMap } from "../services/Common";
-import { apiKey } from "../services/ChatUtils";
+import { ChatClient } from "../services/ChatUtils";
 import MessagingInput from "./chat/MessagingInput/MessagingInput";
 import React from "react";
 import CustomMessage from "./chat/CustomMessage/CustomMessage";
@@ -27,86 +27,56 @@ export type ReactionType = {};
 export type UserType = { image?: string };
 
 export const GiphyContext = React.createContext(
-  {} as { giphyState: boolean; setGiphyState: React.Dispatch<React.SetStateAction<boolean>> },
+    {} as { giphyState: boolean; setGiphyState: React.Dispatch<React.SetStateAction<boolean>> },
 );
 
 export const FAChatWindow = (): JSX.Element | null => {
 
-    
+
     const user = useSelector((state: RootState) => state.profile)
-    const [channel, setChannel] = useState();
+    const [channel, setChannel] = useState<any>();
     const [isMobileNavVisible, setMobileNav] = useState(false);
     const [giphyState, setGiphyState] = useState(false);
     const [chatClient, setChatClient] = useState<StreamChat | null>(null);
-    // const connectStream = async () => {
-    //     console.log('this is running... user:', user)
-    //     const img = ownerMap.find(o => o.id === user.ownerId)?.avatar
-    //     try{
-    //         chatClient.connectUser(
-    //             {
-    //             id: user.ownername,
-    //             name: user.ownername,
-    //             role: 'admin',
-    //             image: img,
-    //             },
-    //             user.token
-    //         );
-    //             //@ts-ignore
-    //         setChannel(chatClient.channel('messaging', 'chat'));
-    //     }
-    //     catch(e: any) {
-    //         console.log('our error' , e)
-    //     }
-    // }
+    const [chatIsInitialized, setChatIsInitialized] = useState<boolean>(false);
 
-    useEffect(() => {   
+
+    useEffect(() => {
         //if (user?.token) connectStream();
-        let img : string = ownerMap.find(o => o.id === user.ownerId)?.avatar ?? ''
-
-        const initChat = async () => {
-            const client = StreamChat.getInstance<{
-                attachmentType: AttachmentType;
-                channelType: ChannelType;
-                commandType: CommandType;
-                eventType: EventType;
-                messageType: MessageType;
-                reactionType: ReactionType;
-                userType: UserType;
-            }>(apiKey!, { enableWSFallback: true });
-
-            await client.connectUser({
-                id: user.ownername,
-                name: user.ownername,
-                role: 'admin',
-                image: img,
-                },
-                user.token);
-
-            setChatClient(client);
-            //@ts-ignore
-            setChannel(client.channel('messaging', 'chat'));
+        let img: string = ownerMap.find(o => o.id === user.ownerId)?.avatar ?? ''
+        const chatSetup = async () => {
+            console.log('if in init', user.token)
+            let chatClient = ChatClient.getInstance()
+            if(!chatClient.isInitialized){
+                setChannel(await ChatClient.finishSetup({
+                    id: user.ownername,
+                    name: user.ownername,
+                    role: 'admin',
+                    image: img,
+                }, user.token))
+                setChatClient(chatClient.chatInstance)
+            }
         }
-        if (user.token) {
-            console.log('if in init',user.token)
-            console.log('key', apiKey)
-            initChat();
+        if (user.token && !chatIsInitialized) {
+            chatSetup()
+            setChatIsInitialized(true);
         }
         // return () => {
         //     console.log('tear down', user.token)
         //     chatClient?.disconnectUser();
         //   };
     }, [user.token])
-    
+
     const toggleMobile = () => setMobileNav(!isMobileNavVisible);
     const giphyContextValue = { giphyState, setGiphyState };
 
     if (!chatClient) return null;
 
     return (
-            <div>
-                {channel && 
+        <div style={{flex: 1}}>
+            {channel &&
                 <Chat client={chatClient}>
-                    <Channel 
+                    <Channel
                         Input={MessagingInput}
                         maxNumberOfFiles={5}
                         Message={CustomMessage}
@@ -115,19 +85,13 @@ export const FAChatWindow = (): JSX.Element | null => {
                         TypingIndicator={() => null}
                         channel={channel}>
                         <Window>
-                        <GiphyContext.Provider value={giphyContextValue}>
-                            <ChannelInner theme={'light'} toggleMobile={toggleMobile} />
-                        </GiphyContext.Provider>
-                        {/* <Window >
-                            <MessageList />
-                            <MessageInput  />
-                        </Window> */}
-                        {/* <Thread Input={MessagingInput} /> */}
+                            <GiphyContext.Provider value={giphyContextValue}>
+                                <ChannelInner theme={'light'} toggleMobile={toggleMobile} />
+                            </GiphyContext.Provider>
                         </Window>
                     </Channel>
                 </Chat>}
-            </div>
-    
-        );
-  }
-  
+        </div>
+
+    );
+}

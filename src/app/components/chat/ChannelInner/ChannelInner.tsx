@@ -87,17 +87,16 @@ export const ChannelInner: React.FC<ChannelInnerProps> = (props) => {
 
   return (
     <>
-      <Window>
-        <MessagingChannelHeader theme={theme} toggleMobile={toggleMobile} />
+      {/* <Window > */}
+        {/* <MessagingChannelHeader theme={theme} toggleMobile={toggleMobile} /> */}
         <MessageList 
-        messageActions={[]} 
+        
+        messageActions={['delete', 'quote', 'react']} 
         />
         
-        <MessageInput focus 
-        //overrideSubmitHandler={overrideSubmitHandler} 
-        />
-      </Window>
-      <Thread Input={MessagingInput} />
+      {/* </Window> */}
+      <MessageInput focus />
+      {/* <Thread Input={MessagingInput} /> */}
     </>
   );
 };

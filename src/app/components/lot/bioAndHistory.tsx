@@ -1,13 +1,16 @@
 
 import { ListItem, ListItemAvatar, Avatar, ListItemText, List, Button, ButtonGroup, Drawer, Container, Typography, TableCell, Table, TableBody, TableContainer, TableHead, TableRow, Card, CardMedia, CardContent, useTheme, Divider, Skeleton } from "@mui/material";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { PlayerBio } from "../../redux/reducers/FreeAgentReducer";
 import { Bid } from "../../redux/reducers/LotReducer";
 import AuctionApiSvc from "../../services/AuctionApiSvc";
 import { getRankStringSuffix, lastYear, ownerMap, tmColorMap } from "../../services/Common";
+import { RootState } from "../../store";
 
 
-export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: number }): JSX.Element => {
+export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
+    const {isMobile} = useSelector((state: RootState) => state.ui)
     const [showHistory, setShowHistory] = useState<boolean>(false);
     const [bidHistory, setBidHistory] = useState<Bid[]>([]);
     const [showBio, setShowBio] = useState<boolean>(false);
@@ -15,7 +18,7 @@ export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: num
     const [isLoading, setIsLoading] = useState(false);
     const lastYr: number = lastYear
     const theme = useTheme()
-    const slabWidthMultiplier = screenWidth < 800 ? 0.6 : 0.4;
+    const slabWidthMultiplier = isMobile ? 0.6 : 0.4;
 
     const getLocalBidTimeStamp = (expires: Date) => {
         let dayBefore = new Date(expires);
@@ -39,6 +42,7 @@ export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: num
             setShowBio(true)
             const res = await AuctionApiSvc.getFullPlayerBio(lastYr, bid.player.mflId, bid.player.position, bid.player.firstName, bid.player.lastName);
             const bioRes = await AuctionApiSvc.handleErrorResponse(res) as PlayerBio;
+            console.log(bioRes)
             setBio(bioRes);
             setIsLoading(false);
         }
@@ -79,7 +83,7 @@ export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: num
                     anchor="right"
                     onClose={() => setShowBio(!showBio)}
                 >
-                    <Container style={{ backgroundColor: theme.palette.background.default, width: screenWidth * slabWidthMultiplier, maxWidth: 600, flexDirection: 'column', flex: 1 }}>
+                    <Container style={{ backgroundColor: theme.palette.background.default, width: window.innerWidth * slabWidthMultiplier, maxWidth: 600, flexDirection: 'column', flex: 1 }}>
                         {showBio && !isLoading && bio ?
                         <Card sx={{marginTop: '20px' }}>
                             <CardMedia component='img' image={bio?.actionShot} />
@@ -130,7 +134,7 @@ export const BioAndHistory = ({ bid, screenWidth }: { bid: Bid, screenWidth: num
                         </Card>
                         : 
                         <>
-                            <Skeleton variant="rectangular" height={screenWidth/2}/>
+                            <Skeleton variant="rectangular" height={window.innerWidth/2}/>
                             <Skeleton variant="text"/>
                             <Skeleton variant="text"/>
                             <Skeleton variant="text"/>

@@ -15,13 +15,13 @@ import { selectPlayerToNominate } from '../../redux/actions/LotActions';
 interface PlayerCardProps {
   player?: FreeAgent
   bidInfo?: Bid
-  lotId: number,
-  screenWidth: number
+  lotId: number
 }
 
-export const PlayerCard = ({ player, bidInfo, lotId, screenWidth }: PlayerCardProps) => {
+export const PlayerCard = ({ player, bidInfo, lotId }: PlayerCardProps) => {
   const { freeAgents } = useSelector((state: RootState) => state);
   const [selectedPlayer, setSelectedPlayer] = useState<FreeAgent>();
+  const {isMobile} = useSelector((state: RootState) => state.ui)
   const dispatch = useDispatch();
   const selectPlayerForNom = (player: FreeAgent) => {
     setSelectedPlayer(player)
@@ -32,7 +32,7 @@ export const PlayerCard = ({ player, bidInfo, lotId, screenWidth }: PlayerCardPr
     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 10}}>
       <div style={{ flex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
         <MemoHeadshot lotId={lotId} img={player?.headshot ?? ''} player={player} />
-        {bidInfo && <BioAndHistory bid={bidInfo} screenWidth={screenWidth} />}
+        {bidInfo && <BioAndHistory bid={bidInfo} />}
       </div>
       <div style={{ flexDirection: 'column', flex: 3 }}>
         {bidInfo?.bidId && player ?

@@ -1,6 +1,6 @@
 import './App.css';
 import { LotBody } from './app/components/lot/lot';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getInitialData } from './app/redux/actions/FreeAgentActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './app/store';
@@ -19,31 +19,32 @@ function App() {
   const dispatch = useDispatch();
   const activeLots = useSelector((state: RootState) => state.lots.filter(l => l.bid && !l.newNom))
   const newNom = useSelector((state: RootState)=> state.lots.filter(l => l.newNom))
-  const { modal, error, errorText, isLoading } = useSelector((state: RootState) => state.ui)
-  const [width, setWidth] = useState(0);
+  const {isMobile} = useSelector((state: RootState) => state.ui)
+  const { modal, error, errorText, isLoading, chatOpen } = useSelector((state: RootState) => state.ui)
+  // const width = useRef(0);
   const cookies = new Cookies();
+
+  const setWidth = (newWidth: number) => {
+    console.log('width re render', newWidth)
+    if(newWidth == 0) return;
+    if(isMobile && newWidth > 760) dispatch(updateUI({isMobile: false}))
+    if(!isMobile && newWidth <= 760) dispatch(updateUI({isMobile: true}))
+  }
 
   useEffect(() => {
     cookies.get('token') ? dispatch(getInitialData(cookies.get('token'))) : dispatch(getInitialData())
     dispatch(signalR())
-  }, [])
-
-  useEffect(() => {
-    function handleResize() {
-      setWidth(window.innerWidth)
-    }
-    window.addEventListener("resize", handleResize)
-    handleResize()
+    window.addEventListener("resize", () => setWidth(window.innerWidth))
     return () => {
-      window.removeEventListener("resize", handleResize)
+      window.removeEventListener("resize", () => setWidth(window.innerWidth))
     }
-  }, [setWidth])
+  }, [])
 
   return (
     <div className="App" style={{backgroundColor: theme.palette.background.default}}>
       
       <div className='menu-container'>
-        <MenuBar />
+        <MenuBar/>
       </div>
       <div style={{display: 'flex', justifyContent: 'center'}}>
         {isLoading == 'fullscreen' ?
@@ -52,12 +53,12 @@ function App() {
               sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
               open={isLoading == 'fullscreen'}
             >
-              <CircularProgress size={200} />
+              <CircularProgress size={100} />
             </Backdrop>
           </div> :
           <div className='lot-container'>
-            {newNom.length > 0 && newNom.map(l => <LotBody lot={l} screenWidth={width} key={l.lotId}/>)}
-            {activeLots.map(l => <LotBody lot={l} screenWidth={width} key={l.lotId}/>)}
+            {newNom.length > 0 && newNom.map(l => <LotBody lot={l} key={l.lotId}/>)}
+            {activeLots.map(l => <LotBody lot={l} key={l.lotId}/>)}
           </div>}
         {newNom.length === 0 && activeLots.length === 0 && isLoading != 'fullscreen' && 
         <div style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
@@ -66,10 +67,10 @@ function App() {
         }
         
       </div>
-      <FAChatWindow />
+      {/* {chatOpen && <FAChatWindow />} */}
       <Modal
         open={modal !== undefined}
-        onClose={() => dispatch(updateUI({ modal: undefined }))}
+        onClose={() => dispatch(updateUI({modal: undefined, isMobile }))}
       >
         <>
           {modal === 'signIn' && <SignIn />}
@@ -77,7 +78,7 @@ function App() {
         </>
       </Modal>
       <Snackbar open={error === 'snackbar'} autoHideDuration={6000}>
-        <Alert onClose={() => dispatch(updateUI({error: undefined}))} severity="error" sx={{ width: '100%' }}>
+        <Alert onClose={() => dispatch(updateUI({isMobile, error: undefined}))} severity="error" sx={{ width: '100%' }}>
           {errorText}
         </Alert>
       </Snackbar>

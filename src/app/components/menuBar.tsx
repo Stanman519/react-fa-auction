@@ -12,10 +12,11 @@ import { turnOnNominationModeForThisOwnersLot } from "../redux/actions/LotAction
 import { updateUI } from "../redux/actions/UiActions";
 import { FAChatWindow } from "./chat";
 
+type DrawerType = 'Salaries' | 'Chat' | undefined
 
 export function MenuBar() {
-    const [isOpen, setIsOpen] = useState(false);
-    const { owners, profile } = useSelector((state: RootState) => state); 
+    const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
+    const { owners, profile, ui } = useSelector((state: RootState) => state);
     const nomIsUsed = useSelector((state: RootState) => {
         if (!profile.ownername) return false
         return state.lots.find(l => l.lotId === profile.ownerId)?.bid?.player
@@ -23,59 +24,87 @@ export function MenuBar() {
     const dispatch = useDispatch();
     const { palette } = useTheme();
 
-    const toggleDrawer = () => {
-        setIsOpen(!isOpen);
+    const closeDrawer = () => {
+        setOpenDrawer(undefined);
     };
 
     const addNominationCard = () => {
         dispatch(turnOnNominationModeForThisOwnersLot());
     }
     return (
-        <div style={{flex: 1}}>
+        <div style={{ flex: 1 }}>
             <Fragment>
                 <Box>
                     <AppBar position="static" color="primary">
-                        <Toolbar style={{display: 'flex', justifyContent: 'space-between', paddingLeft: 40, paddingRight: 50}}>
+                        <Toolbar style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: 40, paddingRight: 50 }}>
                             <div>
-                                <Button style={{marginRight: 20}} color="inherit" 
-                                onClick={() => toggleDrawer()}>
-                                    <Typography fontWeight={'bold'}>Salary Caps</Typography>
-                                    </Button>
-                                {!nomIsUsed && <Button color='inherit' onClick={() => addNominationCard()}>
-                                    <Typography fontWeight={'bold'} >Nominate a Player</Typography>
+                                <Button color="inherit"
+                                    onClick={() => setOpenDrawer('Salaries')}>
+                                    Salary Caps
+                                </Button>
+                                <Button color="inherit"
+                                    onClick={() => {
+                                        //dispatch()
+                                        setOpenDrawer('Chat')
+                                        }}>
+                                    {openDrawer == 'Chat' ? 'Close Chat' : 'Open Chat'}
+                                </Button>
+                                {!nomIsUsed &&
+                                    <Button color='inherit' onClick={() => addNominationCard()}>
+                                        Nominate a Player
                                     </Button>}
                             </div>
-                            {!profile.ownerId && 
-                            <div>
-                                <Button color="inherit" onClick={() => dispatch(updateUI({modal: 'signIn'}))}><Typography fontWeight={'bold'}>LOGIN</Typography></Button>
-                            </div>}
-                            
+                            {!profile.ownerId &&
+                                <div>
+                                    <Button color="inherit" onClick={() => dispatch(updateUI({ modal: 'signIn' }))}>
+                                        LOGIN
+                                    </Button>
+                                </div>}
+
                         </Toolbar>
                     </AppBar>
                 </Box>
                 <Drawer
                     anchor={'left'}
-                    open={isOpen}
-                    onClose={() => toggleDrawer()}
+                    open={openDrawer == 'Salaries'}
+                    onClose={() => closeDrawer()}
                 >
                     <Box
                         sx={{ width: 250, height: '100%' }}
                         role="presentation"
-                        onClick={() => toggleDrawer()}
+                        onClick={() => closeDrawer()}
                         bgcolor={palette.background.default}
                     >
                         <List>
 
                             {owners.map((o, index) => (
-                                <ListItem key={o.ownerId} style={{backgroundColor: index % 2 === 0 ? palette.background.default : palette.background.paper}}>
-                                    <Avatar style={{marginRight: 8}} sx={{height: 50, width: 50}} alt="" src={ownerMap.find(owner => owner.id === o.ownerId)?.avatar} />
+                                <ListItem key={o.ownerId} style={{ backgroundColor: index % 2 === 0 ? palette.background.default : palette.background.paper }}>
+                                    <Avatar style={{ marginRight: 8 }} sx={{ height: 50, width: 50 }} alt="" src={ownerMap.find(owner => owner.id === o.ownerId)?.avatar} />
                                     <ListItemText style={{}} primary={o.ownername} secondary={`$${o.capRoom}`} />
                                 </ListItem>
                             ))}
                             <Divider />
                         </List>
-                        
+
                     </Box>
+                </Drawer>
+                <Drawer
+                    PaperProps={{
+                        sx: { width: "40%", minWidth: 350}
+                      }}
+                    anchor={'left'}
+                    open={openDrawer == 'Chat'}
+                    onClose={() => closeDrawer()}
+                >
+                    {/* <Box
+                        sx={{ width: 350, height: 500 }}
+                        role="presentation"
+                        //onClick={() => closeDrawer()}
+                        bgcolor={palette.background.default}
+                    > */}
+                        <FAChatWindow />
+
+                    {/* </Box> */}
                 </Drawer>
             </Fragment>
         </div>
