@@ -34,37 +34,32 @@ export const FAChatWindow = (): JSX.Element | null => {
 
 
     const user = useSelector((state: RootState) => state.profile)
-    const [channel, setChannel] = useState<any>();
+    const [channel, setChannel] = useState<any>(ChatClient.getInstance().chatInstance.activeChannels['messaging:chat']);
     const [isMobileNavVisible, setMobileNav] = useState(false);
     const [giphyState, setGiphyState] = useState(false);
-    const [chatClient, setChatClient] = useState<StreamChat | null>(null);
-    const [chatIsInitialized, setChatIsInitialized] = useState<boolean>(false);
+    const [chatClient, setChatClient] = useState<StreamChat | null>(ChatClient.getInstance().chatInstance);
+    const [chatIsInitialized, setChatIsInitialized] = useState<boolean>(ChatClient.getInstance().isInitialized);
 
 
     useEffect(() => {
-        //if (user?.token) connectStream();
+        let chatClientToUpdate = ChatClient.getInstance()
         let img: string = ownerMap.find(o => o.id === user.ownerId)?.avatar ?? ''
         const chatSetup = async () => {
-            console.log('if in init', user.token)
-            let chatClient = ChatClient.getInstance()
-            if(!chatClient.isInitialized){
+            if(!chatClientToUpdate.isInitialized){
                 setChannel(await ChatClient.finishSetup({
                     id: user.ownername,
                     name: user.ownername,
                     role: 'admin',
                     image: img,
                 }, user.token))
-                setChatClient(chatClient.chatInstance)
+                setChatClient(chatClientToUpdate.chatInstance)
             }
         }
         if (user.token && !chatIsInitialized) {
             chatSetup()
             setChatIsInitialized(true);
         }
-        // return () => {
-        //     console.log('tear down', user.token)
-        //     chatClient?.disconnectUser();
-        //   };
+
     }, [user.token])
 
     const toggleMobile = () => setMobileNav(!isMobileNavVisible);

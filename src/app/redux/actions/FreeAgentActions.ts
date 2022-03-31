@@ -26,15 +26,12 @@ export const getInitialData = (cookie: string = "") => async (
         dispatch(updateUI({isLoading: 'fullscreen'}))
         const initData = await AuctionApiSvc.pageLoad(cookie);
         //const initData = await res.json() 
-        console.log(initData)
-        console.log(initData.lots)
         dispatch(updateFreeAgents(initData.freeAgents));
         dispatch(updateLots(initData.lots))
         dispatch(updateOwners(initData.owners));
         if(initData.profile) dispatch(loadAuthenticatedAccount(initData.profile));
         dispatch(updateUI({isLoading: undefined}))
     } catch (error: any){
-        console.log('fail', error)
         dispatch(updateUI({ isLoading: undefined, error: 'snackbar', errorText: error.message }));
     }
 

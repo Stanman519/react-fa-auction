@@ -13,7 +13,6 @@ import { useDispatch } from 'react-redux';
     try {
       await connection.start();
       console.assert(connection.state === HubConnectionState.Connected);
-      console.log('SignalR connection established');
     } catch (err) {
       console.assert(connection.state === HubConnectionState.Disconnected);
       console.error('SignalR Connection Error: ', err);
@@ -67,10 +66,10 @@ import { useDispatch } from 'react-redux';
     startSignalRConnection(connection);
   
     connection.on('FreshBid', res => {
-      console.log("we made contact new bid is: ", res)
+      console.log("made contact new bid is: ", res)
       console.log(actionEventMap)
       const eventHandler = actionEventMap.FreshBid;
-      console.log('we are dispatching', eventHandler)
+      console.log('dispatching', eventHandler)
       eventHandler && dispatch(eventHandler(res));
     });
   

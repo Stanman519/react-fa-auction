@@ -45,6 +45,10 @@ export class ChatClient {
         }
         return ChatClient.instance.chatInstance.channel('messaging', 'chat');
     } 
+
+    public static disconnectUser = async () => {
+        await ChatClient.instance.chatInstance.disconnectUser()
+    }
 }
 
 

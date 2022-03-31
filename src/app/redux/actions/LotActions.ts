@@ -46,7 +46,6 @@ export const updateLotWithFreshBid = (bid: Bid) => async (
 ): Promise<any> => {
     const { lots } = getState();
     const updated = [...lots];
-    console.log('bid in action', bid)
     const newLotIndex = updated.findIndex(l => l.lotId == bid.lotId);
     if (newLotIndex < 0) return; // i was checking for !updated[newLotIndex].bid here but i dont know why. took out because it was breaking nominations
     //const updatedBid = {...bid, player: updated[newLotIndex].bid?.player } as Bid 
@@ -54,7 +53,6 @@ export const updateLotWithFreshBid = (bid: Bid) => async (
     // once update api to get full player back to send with bid response, check if it is okay with bids
 
     updated[newLotIndex] = {lotId: bid.lotId, newNom: false, bid: bid} as Lot
-    console.log('update lots with', updated)
     dispatch(updateLots(updated));
 }
 
@@ -64,7 +62,6 @@ export const turnOnNominationModeForThisOwnersLot = () => async (
 ): Promise<any> => {
     const { lots } = getState()
     const { profile } = getState()
-    console.log(profile)
     let updatedLots = [...lots];
     if (!profile || lots.length === 0) return;
     const  thisPlayersLotIndex = updatedLots.findIndex(l => l.lotId == profile.ownerId);
@@ -77,19 +74,13 @@ export const makeNewBid = (bid: Bid) => async (
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
-    console.log('bid action', bid)
     const res = await AuctionApiSvc.makeNewBid(bid)
-    console.log('bid res', res)
     const bidBody = await AuctionApiSvc.handleErrorResponse(res);
 }
 
 export const makeNewNomination = (bid: Bid) => async ( ): Promise<any> => {
-    console.log('action bid', bid)
     const res = await AuctionApiSvc.makeNewNom(bid)
-    console.log(res)
     const bidBody = await AuctionApiSvc.handleErrorResponse(res);
-    console.log(bidBody)
-
 }
 
 export const submitWin = (bid: Bid) => async (

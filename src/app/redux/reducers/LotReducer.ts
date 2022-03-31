@@ -23,7 +23,6 @@ const defaultState = Array.from(Array(13).keys()).map(l => { return { lotId: l +
 export const lotReducer = (state = defaultState, action: LotAction): Lot[] => {
     switch (action.type) {
         case UPDATE_LOTS:
-            console.log('lot reducer')
             return action.payload;
         default:
             return state;

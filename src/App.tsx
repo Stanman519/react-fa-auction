@@ -13,6 +13,7 @@ import Cookies from 'universal-cookie/es6';
 import signalR from './app/signalR/socketMiddleware';
 import { NoActiveAuctions } from './app/components/noActiveAuctions';
 import { FAChatWindow } from './app/components/chat';
+import { ChatClient } from './app/services/ChatUtils';
 
 function App() {
   const theme = useTheme()
@@ -24,19 +25,21 @@ function App() {
   // const width = useRef(0);
   const cookies = new Cookies();
 
-  const setWidth = (newWidth: number) => {
-    console.log('width re render', newWidth)
-    if(newWidth == 0) return;
-    if(isMobile && newWidth > 760) dispatch(updateUI({isMobile: false}))
-    if(!isMobile && newWidth <= 760) dispatch(updateUI({isMobile: true}))
-  }
+  // const setWidth = (newWidth: number) => {
+  //   console.log('width re render', newWidth)
+  //   if(newWidth == 0) return;
+  //   if(isMobile && newWidth > 760) dispatch(updateUI({isMobile: false}))
+  //   if(!isMobile && newWidth <= 760) dispatch(updateUI({isMobile: true}))
+  // }
 
   useEffect(() => {
     cookies.get('token') ? dispatch(getInitialData(cookies.get('token'))) : dispatch(getInitialData())
     dispatch(signalR())
-    window.addEventListener("resize", () => setWidth(window.innerWidth))
+    //window.addEventListener("resize", () => setWidth(window.innerWidth))
     return () => {
-      window.removeEventListener("resize", () => setWidth(window.innerWidth))
+      //window.removeEventListener("resize", () => setWidth(window.innerWidth))
+        ChatClient.getInstance().chatInstance.disconnectUser();
+
     }
   }, [])
 

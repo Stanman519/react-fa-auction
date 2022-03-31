@@ -41,7 +41,6 @@ const makeNewBid = async (bid: Bid): Promise<Response> => {
             lastName: bid.player.lastName,
         }
     }  as Bid)
-    console.log('body', body)
     return await fetch(`${URL}/FreeAgency/bid`, {
         method: 'POST',
         headers: {
@@ -97,7 +96,6 @@ const login = async (ownername: string, password: string): Promise<Owner> => {
                 ownername: ownername,
                 password: password
             }).catch(error => {
-                console.log(error.response)
                 throw new Error(error.response.data.friendlyMessage)
             })
     return res.data;
@@ -116,21 +114,16 @@ const register = async (name: string, username: string, password: string): Promi
 }
 
 const pageLoad = async (cookie: string = ""): Promise<PageLoad> => {
-    console.log('env url', URL)
-    console.log('env', env)
-    console.log(cookie)
     const rest = await axios.get(`${URL}/FreeAgency/page-load`, 
     {
         params: { loginInfo: cookie }
     }).catch(error => {
-        console.log(error.response)
         throw new Error(error.response.data.friendlyMessage)
     });
     return rest.data;
 }
 
 async function handleErrorResponse<Type>(response: Response): Promise<Type | void> {
-    console.log('response ok', response)
     const failureCodes = [400, 500]
     if (failureCodes.includes(response.status)) {
         const error = await response.json() as ErrorResponse
@@ -143,7 +136,6 @@ async function handleErrorResponse<Type>(response: Response): Promise<Type | voi
 
 const sendWin = async (bid: Bid): Promise<Response> => {
     const json = JSON.stringify(bid)
-    console.log('json', json)
     const res = await fetch(`${URL}/FreeAgency/win`, {
         method: 'PUT',
         headers: { "Content-Type": "application/json" },

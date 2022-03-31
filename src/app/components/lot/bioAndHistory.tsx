@@ -10,7 +10,6 @@ import { RootState } from "../../store";
 
 
 export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
-    const {isMobile} = useSelector((state: RootState) => state.ui)
     const [showHistory, setShowHistory] = useState<boolean>(false);
     const [bidHistory, setBidHistory] = useState<Bid[]>([]);
     const [showBio, setShowBio] = useState<boolean>(false);
@@ -18,7 +17,7 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
     const [isLoading, setIsLoading] = useState(false);
     const lastYr: number = lastYear
     const theme = useTheme()
-    const slabWidthMultiplier = isMobile ? 0.6 : 0.4;
+    const slabWidthMultiplier = window.innerWidth < 720 ? 0.6 : 0.4;
 
     const getLocalBidTimeStamp = (expires: Date) => {
         let dayBefore = new Date(expires);
@@ -30,7 +29,6 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
         if (bidHistory.length === 0) {
             const res = await AuctionApiSvc.getBidHistoryByPlayerId(bid.player.mflId);
             const historyRes = await AuctionApiSvc.handleErrorResponse(res) as Bid[];
-            console.log('history', historyRes)
             setBidHistory(historyRes);
         }
         setShowHistory(true);
