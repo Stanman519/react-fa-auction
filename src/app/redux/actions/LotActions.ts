@@ -87,19 +87,21 @@ export const submitWin = (bid: Bid) => async (
     dispatch: Function,
     getState: () => RootState
 ) : Promise<any> => {
+    console.log('bid', bid)
+    const oldLots = getState().lots;
+    let lots = [...oldLots]
     try {
         const res = await AuctionApiSvc.sendWin(bid)
         const complete = await AuctionApiSvc.handleErrorResponse(res);
-        const l = getState().lots;
-        const lots = [...l]
-        const lotToCleanIndex = lots.findIndex(l => l.lotId === bid.lotId)
-        if (lotToCleanIndex < 0) {
-            lots[lotToCleanIndex] = {...lots[lotToCleanIndex], bid: undefined}
-            dispatch(updateLots(lots))
-        }
-        
     } catch (e: any) { 
         console.log('e', e.data)
         dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
+    }
+    console.log('lots', lots)
+    const lotToCleanIndex = lots.findIndex(lot => lot.lotId === bid.lotId)
+    if (lotToCleanIndex >= 0) {
+        console.log('whats going on here')
+        lots[lotToCleanIndex] = {lotId: lots[lotToCleanIndex].lotId, bid: undefined, newNom: false} as Lot
+        dispatch(updateLots(lots))
     }
 }

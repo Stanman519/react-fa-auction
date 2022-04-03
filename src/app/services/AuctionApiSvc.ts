@@ -125,7 +125,7 @@ const pageLoad = async (cookie: string = ""): Promise<PageLoad> => {
 
 async function handleErrorResponse<Type>(response: Response): Promise<Type | void> {
     const failureCodes = [400, 500]
-    if (failureCodes.includes(response.status)) {
+    if (failureCodes.includes(response.status) && response.body) {
         const error = await response.json() as ErrorResponse
         throw new Error(error.friendlyMessage);
     }

@@ -76,7 +76,6 @@ export function MenuBar() {
                         bgcolor={palette.background.default}
                     >
                         <List>
-
                             {owners.map((o, index) => (
                                 <ListItem key={o.ownerId} style={{ backgroundColor: index % 2 === 0 ? palette.background.default : palette.background.paper }}>
                                     <Avatar style={{ marginRight: 8 }} sx={{ height: 50, width: 50 }} alt="" src={ownerMap.find(owner => owner.id === o.ownerId)?.avatar} />

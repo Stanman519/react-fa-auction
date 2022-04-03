@@ -60,7 +60,7 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
                     <Container>
                         <List dense>
                             {bidHistory.map(p =>
-                                <ListItem>
+                                <ListItem key={p.bidId}>
                                     <ListItemAvatar>
                                         <Avatar src={ownerMap.find(o => o.id == p.ownerId)?.avatar ?? ''}/>
                                     </ListItemAvatar>
@@ -116,8 +116,8 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
                                         </ListItem>
                                         <Divider /> 
                                         <ListItem>
-                                            <ListItemText secondary={`Rd. ${bio?.draftRound} Pk. ${bio?.draftPick} (${bio?.college})`}>
-                                                <Typography variant="h5">Drafted: {bio?.draftYear}</Typography>
+                                            <ListItemText secondary={bio?.draftRound ? `Rd. ${bio?.draftRound} Pk. ${bio?.draftPick} (${bio?.college})` : ''}>
+                                                <Typography variant="h5">{bio?.draftRound ? `Drafted: ${bio?.draftYear}`: `${bio?.draftYear} undrafted`}</Typography>
                                             </ListItemText>
                                         </ListItem>
                                         <Divider />
@@ -172,7 +172,7 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
 
                 <ButtonGroup sx={{ display: 'flex', width: '100%' }} aria-label="small button group">
                     <Button sx={{ flex: 1 }} onClick={() => loadBio()}>Bio</Button>
-                    <Button sx={{ flex: 2 }} onClick={() => loadHistory()}>Bid History</Button>
+                    {bid?.expires && <Button sx={{ flex: 2 }} onClick={() => loadHistory()}>Bid History</Button>}
                 </ButtonGroup>
 
             </div>

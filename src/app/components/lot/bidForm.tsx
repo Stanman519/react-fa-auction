@@ -28,11 +28,11 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
     const [confirmModal, setConfirmModal] = useState<boolean>(false);
     const theme = useTheme();
     const dispatch = useDispatch();
-    
+
     const fauxButtonDisable = () => {
         if (getValidity().isValid) setConfirmModal(true)
     }
-    const getValidity = () => checkValidity(profile, bidSalary ? bidSalary : 0, bidLength ? bidLength : 0, 
+    const getValidity = () => checkValidity(profile, bidSalary ? bidSalary : 0, bidLength ? bidLength : 0,
         lot.bid?.player.mflId ?? "", lot.bid?.bidSalary ?? 0, lot.bid?.bidLength ?? 0);
 
     const handleSubmission = () => {
@@ -67,25 +67,29 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
 
         <div style={{ marginTop: 10 }}>
             <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                        <TextField value={bidLength}
-                            onChange={b => setBidLength(Number.parseInt(b.target.value))}
-                            style={{flex: 1, marginLeft: 10, marginRight: 10 }}
-                            className='number-input' 
-                            label='Years' type='number' InputProps={{ inputProps: { min: 0, max: 5 } }} />
-                        <TextField value={bidSalary}
-                            onChange={b => setBidSalary(Number.parseInt(b.target.value))}
-                            style={{flex: 1, marginLeft: 10, marginRight: 10 }}
-                            className='number-input' 
-                            label='Salary' type='number' InputProps={{ inputProps: { min: 0, max: 500 } }} />
-                <Tooltip title={getValidity().violations.length > 0 ? 
-                    getValidity().violations.map(v => <div style={{alignItems: 'center', display: 'flex'}}><Cancel fontSize={'small'} color={'warning'}/><span>{v}</span></div>) 
-                    : ""} arrow placement='bottom'>
-                        <Button
-                            onClick={() => fauxButtonDisable()}
-                            disableRipple={!getValidity().isValid} // need to do this because tooltip won't work if disabled is a property
-                            style={{ flex: 1, marginLeft: 10, marginRight: 10 }} size='large' variant='contained'>
-                            <h3 style={{ margin: 0 }}>{bidMode ? 'BID' : 'NOMINATE'}</h3>
-                        </Button>
+                <TextField value={bidLength}
+                    onChange={b => setBidLength(Number.parseInt(b.target.value))}
+                    style={{ flex: 1, marginLeft: 10, marginRight: 10 }}
+                    className='number-input'
+                    label='Years' type='number' InputProps={{ inputProps: { min: 0, max: 5 } }} />
+                <TextField value={bidSalary}
+                    onChange={b => setBidSalary(Number.parseInt(b.target.value))}
+                    style={{ flex: 1, marginLeft: 10, marginRight: 10 }}
+                    className='number-input'
+                    label='Salary' type='number' InputProps={{ inputProps: { min: 0, max: 500 } }} />
+                <Tooltip 
+                title={getValidity().violations.length > 0 ?
+                    getValidity().violations.map(v =>
+                        <div style={{ alignItems: 'center', display: 'flex' }} key={v}>
+                            <Cancel fontSize={'small'} color={'warning'} /><span>{v}</span>
+                        </div>) : ""} 
+                arrow placement='bottom'>
+                    <Button
+                        onClick={() => fauxButtonDisable()}
+                        disableRipple={!getValidity().isValid} // need to do this because tooltip won't work if disabled is a property
+                        style={{ flex: 1, marginLeft: 10, marginRight: 10 }} size='large' variant='contained'>
+                        <h3 style={{ margin: 0 }}>{bidMode ? 'BID' : 'NOMINATE'}</h3>
+                    </Button>
                 </Tooltip>
             </div>
             <Backdrop
