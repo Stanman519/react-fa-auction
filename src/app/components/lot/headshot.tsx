@@ -8,7 +8,6 @@ export function Headshot({ img, lotId, player }: { img?: string, lotId: number, 
     const capnMug = process.env.PUBLIC_URL + '/capnMug.jpg';
     const avatar = ownerMap.find(o => o.id == lotId)?.avatar;
     const teamLogo = tmColorMap.find(tm => tm.team == player?.team)?.logo;
-    console.log('headshot render')
     return (
         <>
         {

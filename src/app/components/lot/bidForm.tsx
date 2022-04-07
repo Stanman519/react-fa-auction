@@ -20,6 +20,7 @@ const Transition = forwardRef(function Transition(
 });
 
 export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.Element => {
+    console.log('bidform re-rendered')
     const capnWarning = process.env.PUBLIC_URL + '/capn-wtf.png';
     const [bidSalary, setBidSalary] = useState<number>(0);
     const [bidLength, setBidLength] = useState<number>(0);
@@ -46,6 +47,8 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
                 lotId: lot.lotId,
                 player: { ...lot?.bid?.player }
             }))
+            setBidLength(0);
+            setBidSalary(0);
             setIsLoading(false);
         } else if (lot.bid) {
             setIsLoading(true);
@@ -57,6 +60,8 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
                 lotId: lot.lotId,
                 player: { ...lot?.bid?.player }
             }))
+            setBidLength(0);
+            setBidSalary(0);
             setIsLoading(false);
         }
         setConfirmModal(false);

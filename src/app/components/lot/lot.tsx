@@ -1,4 +1,5 @@
 import { useTheme } from "@mui/material";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Lot } from "../../redux/reducers/LotReducer";
 import { RootState } from "../../store";
@@ -15,7 +16,6 @@ export const LotBody = ({lot}: LotProps): JSX.Element => {
   const bidMode = !lot.newNom;
   const theme = useTheme();
   const getUTC = (endTime?: Date): Date | undefined => {
-    console.log('enntering func', endTime)
     if (endTime){
       return new Date(
         endTime.getFullYear(), endTime.getUTCMonth(), endTime.getUTCDate(),
@@ -23,9 +23,18 @@ export const LotBody = ({lot}: LotProps): JSX.Element => {
     }
   }
 
+  useEffect(() => {
+    console.log(lot.isFresh)
+}, [lot.isFresh])
+
   return (
-        <div className="lot-frame" style={{ minHeight: bidMode ? 325 : 0, backgroundColor: theme.palette.background.paper}}>
-            <PlayerCard lotId={lot.lotId} player={lot.bid?.player ?? undefined} bidInfo={lot.bid}/>
+        <div className="lot-frame" 
+        style={{ minHeight: bidMode ? 325 : 0, 
+        backgroundColor: theme.palette.background.paper, 
+        borderStyle: lot.isFresh ? 'ridge' : 'none',
+        borderWidth: 4,
+        borderColor: 'green'}}>
+            <PlayerCard lot={lot}/>
             <Timer endTime={getUTC(dateProp)} lot={lot}/>
             <BidForm bidMode={bidMode} lot={lot} />
         </div>

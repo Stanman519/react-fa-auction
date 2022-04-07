@@ -7,6 +7,7 @@ import {
   StreamMessage,
   useChannelActionContext,
   Thread,
+  TypingIndicator,
 } from 'stream-chat-react';
 
 
@@ -86,17 +87,18 @@ export const ChannelInner: React.FC<ChannelInnerProps> = (props) => {
   // const actions = ['delete', 'edit', 'flag', 'mute', 'react', 'reply'];
 
   return (
-    <>
+    <div style={{backgroundColor: 'white'}}>
       {/* <Window > */}
         {/* <MessagingChannelHeader theme={theme} toggleMobile={toggleMobile} /> */}
         <MessageList 
         
         messageActions={['delete', 'quote', 'react']} 
         />
-        
+        <TypingIndicator />
+
       {/* </Window> */}
       <MessageInput focus />
       {/* <Thread Input={MessagingInput} /> */}
-    </>
+    </div>
   );
 };

@@ -1,5 +1,7 @@
-import { AppBar, Avatar, Box, Button, Toolbar, Typography, useTheme } from "@mui/material";
+import { AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, Switch, Toolbar, Typography, useTheme } from "@mui/material";
+import {VolumeUp, VolumeMute} from '@mui/icons-material';
 import { Fragment, useState } from "react";
+import MenuIcon from '@mui/icons-material/Menu';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
@@ -16,17 +18,25 @@ type DrawerType = 'Salaries' | 'Chat' | undefined
 
 export function MenuBar() {
     const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const { owners, profile, ui } = useSelector((state: RootState) => state);
     const nomIsUsed = useSelector((state: RootState) => {
         if (!profile.ownername) return false
         return state.lots.find(l => l.lotId === profile.ownerId)?.bid?.player
     })
+    const open = Boolean(anchorEl);
     const dispatch = useDispatch();
     const { palette } = useTheme();
 
     const closeDrawer = () => {
         setOpenDrawer(undefined);
     };
+    const mobileMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+      };
+    const handleAudio = (event: React.ChangeEvent<HTMLInputElement>) => {
+        dispatch(updateUI({audioOn: event.target.checked}))
+    }
 
     const addNominationCard = () => {
         dispatch(turnOnNominationModeForThisOwnersLot());
@@ -37,7 +47,51 @@ export function MenuBar() {
                 <Box>
                     <AppBar position="static" color="primary">
                         <Toolbar style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: 40, paddingRight: 50 }}>
-                            <div>
+                            {window.innerWidth < 720 ?(
+                            <>
+                                <IconButton
+                                    size="large"
+                                    edge="start"
+                                    color="inherit"
+                                    aria-label="open drawer"
+                                    sx={{ mr: 2 }}
+                                    onClick={mobileMenuClick}
+                                >
+                                    <MenuIcon/>
+                                </IconButton>
+                                <Menu
+                                    id="basic-menu"
+                                    anchorEl={anchorEl}
+                                    open={open}
+                                    onClose={() => setAnchorEl(null)}
+                                    MenuListProps={{
+                                    //'aria-labelledby': 'basic-button',
+                                    }}
+                                >
+                                    <MenuItem onClick={() => {
+                                        setOpenDrawer('Salaries')
+                                        setAnchorEl(null)
+                                        }}>Salary Caps</MenuItem>
+                                    <MenuItem onClick={() => {
+                                        setOpenDrawer('Chat')
+                                        setAnchorEl(null)
+                                        }}>{openDrawer == 'Chat' ? 'Close Chat' : 'Open Chat'}</MenuItem>
+                                    {!nomIsUsed && <MenuItem onClick={() => {
+                                        addNominationCard()
+                                        setAnchorEl(null)
+                                        }}>Nominate a Player</MenuItem>}
+                                    <MenuItem>
+                                        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 8}}>
+                                            <VolumeMute />
+                                            <Switch defaultChecked color='default' onChange={handleAudio}/>
+                                            <VolumeUp />
+                                        </div>
+                                    </MenuItem>
+                                </Menu>
+                            </>
+                            )
+                            :
+                            (<div style={{ display: 'flex', flexDirection: 'row', flex: 1}}>
                                 <Button color="inherit"
                                     onClick={() => setOpenDrawer('Salaries')}>
                                     Salary Caps
@@ -53,7 +107,12 @@ export function MenuBar() {
                                     <Button color='inherit' onClick={() => addNominationCard()}>
                                         Nominate a Player
                                     </Button>}
-                            </div>
+                                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 8}}>
+                                    <VolumeMute />
+                                    <Switch defaultChecked color='default' onChange={handleAudio}/>
+                                    <VolumeUp />
+                                </div>
+                            </div>)}
                             {!profile.ownerId &&
                                 <div>
                                     <Button color="inherit" onClick={() => dispatch(updateUI({ modal: 'signIn' }))}>

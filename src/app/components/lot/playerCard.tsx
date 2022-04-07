@@ -1,7 +1,7 @@
 import { Autocomplete, Divider, TextField } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { FreeAgent } from '../../redux/reducers/FreeAgentReducer';
-import { Bid } from '../../redux/reducers/LotReducer';
+import { Bid, Lot } from '../../redux/reducers/LotReducer';
 import { RootState } from '../../store';
 import { BioAndHistory } from './bioAndHistory';
 import { BidInfo } from './bidInfo';
@@ -13,12 +13,11 @@ import { useState } from 'react';
 import { selectPlayerToNominate } from '../../redux/actions/LotActions';
 
 interface PlayerCardProps {
-  player?: FreeAgent
-  bidInfo?: Bid
-  lotId: number
+  lot: Lot
 }
 
-export const PlayerCard = ({ player, bidInfo, lotId }: PlayerCardProps) => {
+export const PlayerCard = ({ lot }: PlayerCardProps) => {
+  console.log('playerCard rerendered')
   const { freeAgents } = useSelector((state: RootState) => state);
   const [selectedPlayer, setSelectedPlayer] = useState<FreeAgent>();
   const {isMobile} = useSelector((state: RootState) => state.ui)
@@ -31,25 +30,27 @@ export const PlayerCard = ({ player, bidInfo, lotId }: PlayerCardProps) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 10}}>
       <div style={{ flex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-        <MemoHeadshot lotId={lotId} img={player?.headshot ?? ''} player={player} />
-        {bidInfo && <BioAndHistory bid={bidInfo} />}
+        <MemoHeadshot lotId={lot.lotId} img={lot.bid?.player?.headshot ?? ''} player={lot.bid?.player} />
+        {lot.bid && <BioAndHistory bid={lot.bid} />}
       </div>
       <div style={{ flexDirection: 'column', flex: 3 }}>
-        {bidInfo?.bidId && player ?
+        {lot.bid?.bidId && lot.bid.player ?
           <div style={{ }}>
             <div>
               <PlayerInfo
-                team={player.team}
-                firstName={player.firstName}
-                lastName={player.lastName}
-                position={player.position} />
+                team={lot.bid.player.team}
+                firstName={lot.bid.player.firstName}
+                lastName={lot.bid.player.lastName}
+                position={lot.bid.player.position} />
             </div>
             <Divider variant='middle' />
             <div>
               <BidInfo
-                bidYears={bidInfo.bidLength}
-                bidSalary={bidInfo.bidSalary}
-                highBidder={bidInfo.ownername}
+                bidYears={lot.bid.bidLength}
+                bidSalary={lot.bid.bidSalary}
+                highBidder={lot.bid.ownername}
+                lotId={lot.lotId}
+                isFresh={lot.isFresh}
               />
             </div>
           </div>

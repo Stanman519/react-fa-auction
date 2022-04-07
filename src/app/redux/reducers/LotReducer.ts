@@ -15,6 +15,7 @@ export interface Lot {
     lotId: number
     bid?: Bid
     newNom: boolean
+    isFresh?: boolean
 }
 
 const defaultState = Array.from(Array(13).keys()).map(l => { return { lotId: l + 1, newNom: false}}) as Lot[]

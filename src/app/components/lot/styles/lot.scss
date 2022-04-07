@@ -2,7 +2,6 @@
     display: flex;
     flex-direction: column;
     border-radius: 15px;
-    border-width: 2px;
     background: rgb(242, 240, 240);
     padding: 10px;
     margin: 16px;
@@ -37,3 +36,32 @@
     display: flex;
     justify-content: center;
 }
+.noti-text {
+    margin: 0;
+    -webkit-animation: color_change 0.5s infinite alternate;
+    -moz-animation: color_change 0.5s infinite alternate;
+    -ms-animation: color_change 0.5s infinite alternate;
+    -o-animation: color_change 0.5s infinite alternate;
+    animation: color_change 0.5s infinite alternate;
+   }
+   
+   @-webkit-keyframes color_change {
+    from { color: black; }
+    to { color: green; }
+   }
+   @-moz-keyframes color_change {
+    from { color: black; }
+    to { color: green; }
+   }
+   @-ms-keyframes color_change {
+    from { color: black; }
+    to { color: green; }
+   }
+   @-o-keyframes color_change {
+    from { color: black; }
+    to { color: green; }
+   }
+   @keyframes color_change {
+    from { color: black; }
+    to { color: green; }
+   }

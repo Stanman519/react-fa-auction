@@ -82,8 +82,8 @@ const makeNewNom = async (bid: Bid): Promise<Response> => {
     })
 }
 
-const getFullPlayerBio = async (lastYear: number, id: string, position: string, firstName: string, lastName: string): Promise<Response> => {
-    return await fetch(`${URL}/FreeAgency/year/${lastYear}/playerId/${id}/position/${position}/firstName/${firstName}/lastName/${lastName}`)
+const getFullPlayerBio = async (lastYear: number, id: string, position: string, firstName: string, lastName: string, actionShot: boolean) : Promise<Response> => {
+    return await fetch(`${URL}/FreeAgency/year/${lastYear}/playerId/${id}/position/${position}/firstName/${firstName}/lastName/${lastName}?hasAction=${actionShot}`)
 }
 
 const getBidHistoryByPlayerId = async (mflId: string): Promise<Response> => {

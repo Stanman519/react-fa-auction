@@ -10,6 +10,7 @@ export interface FreeAgent{
     height?: number
     weight?: number
     headshot?: string
+    actionShot?: string
     mflId: string
 }
 

@@ -47,12 +47,15 @@ export const updateLotWithFreshBid = (bid: Bid) => async (
     const { lots } = getState();
     const updated = [...lots];
     const newLotIndex = updated.findIndex(l => l.lotId == bid.lotId);
-    if (newLotIndex < 0) return; // i was checking for !updated[newLotIndex].bid here but i dont know why. took out because it was breaking nominations
+    if (newLotIndex < 0) return; 
+        
+    // i was checking for !updated[newLotIndex].bid here but i dont know why. took out because it was breaking nominations
     //const updatedBid = {...bid, player: updated[newLotIndex].bid?.player } as Bid 
     // this was here to just update bids but it was breaking nominations - (and now we are missing headshot and team and position)
     // once update api to get full player back to send with bid response, check if it is okay with bids
 
-    updated[newLotIndex] = {lotId: bid.lotId, newNom: false, bid: bid} as Lot
+    updated[newLotIndex] = {lotId: bid.lotId, newNom: false, bid: bid, isFresh: true} as Lot
+    //TODO: how can i add animation or sound here to show new bid -- add a flag on client side only to say isHotChange
     dispatch(updateLots(updated));
 }
 
@@ -68,7 +71,20 @@ export const turnOnNominationModeForThisOwnersLot = () => async (
     if (thisPlayersLotIndex < 0) return;
     updatedLots[thisPlayersLotIndex].newNom = true;
     dispatch(updateLots(updatedLots))
+    
 }
+
+export const makeThisLotStale = (id: number) => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const lots = getState().lots
+    let lotsToUpdate = [...lots]
+    const lotIndex = lotsToUpdate.findIndex(l => l.lotId === id)
+    lotsToUpdate[lotIndex].isFresh = false
+    dispatch(updateLots(lotsToUpdate))
+}
+
 
 export const makeNewBid = (bid: Bid) => async ( 
     dispatch: Function,
