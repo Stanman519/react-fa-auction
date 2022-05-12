@@ -1,7 +1,8 @@
 import { Action } from "@reduxjs/toolkit";
 import Cookies from "universal-cookie/es6";
-import AuctionApiSvc from "../../services/AuctionApiSvc";
+import AuctionApiSvc, { PlayerTipRequest } from "../../services/AuctionApiSvc";
 import Owner from "../reducers/OwnerReducer";
+import { RootState } from "../reducers/RootReducer";
 import { updateUI } from "./UiActions";
 
 
@@ -32,4 +33,14 @@ export const submitLogin = (username:string, password: string) => async(
         dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
     }
 
+}
+
+export const askCapn = (mflId: string, position: string, age: number) => async(
+    dispatch: Function,
+    getState: () => RootState
+) => {
+    const { ownerId } = getState().profile
+    const askRequest = {mflId, position, age, ownerId} as PlayerTipRequest
+    const tip = await AuctionApiSvc.askCapn(askRequest);
+    
 }

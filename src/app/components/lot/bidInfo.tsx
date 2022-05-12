@@ -1,8 +1,11 @@
-import { Divider, Tooltip } from "@mui/material";
-import { useEffect, useState } from "react";
+import { LoadingButton } from "@mui/lab";
+import { Button, Dialog, DialogActions, DialogContent, Divider, Slide, Tooltip, Typography } from "@mui/material";
+import { useEffect, forwardRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import UIfx from 'uifx'
 import { makeThisLotStale } from "../../redux/actions/LotActions";
+import { TransitionProps } from "@mui/material/transitions";
+import { updateUI } from "../../redux/actions/UiActions";
 import { RootState } from "../../store";
 
 
@@ -14,11 +17,32 @@ interface BidInfoProps {
     isFresh?: boolean
 }
 
+const Transition = forwardRef(function Transition(
+    props: TransitionProps & {
+        children: React.ReactElement<any, any>;
+    },
+    ref: React.Ref<unknown>,
+) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
+
+
 export const BidInfo = ({ bidYears, bidSalary, highBidder, isFresh, lotId }: BidInfoProps): JSX.Element => {
     const dispatch = useDispatch()
+    const capnWarning = process.env.PUBLIC_URL + '/ask_capn.jpg';
+    const [confirmModal, setConfirmModal] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>();
     const { audioOn } = useSelector((state: RootState) => state.ui);
     const notification = require('../../../assets/sounds/Blow.mp3');
     const beep = new UIfx(notification, { volume: 1 })
+
+    const handleSubmission = () => {
+        setIsLoading(true);
+        dispatch(askCapn({
+            
+        })
+    }
+
     useEffect(() => {
         let timer: any
         if (isFresh) {
@@ -32,7 +56,7 @@ export const BidInfo = ({ bidYears, bidSalary, highBidder, isFresh, lotId }: Bid
         };
     }, [isFresh])
     return (
-        <>
+        <div>
         <Tooltip title="Current highest bid" arrow placement='bottom'>
             <div style={{
                 minHeight: 50,
@@ -49,6 +73,31 @@ export const BidInfo = ({ bidYears, bidSalary, highBidder, isFresh, lotId }: Bid
             </div>
             
         </Tooltip>
-        </>
+        <Button onClick={() => dispatch(setConfirmModal(true))}>ASK CAP'N</Button>
+        <Dialog
+                open={confirmModal}
+                TransitionComponent={Transition}
+                keepMounted
+            >
+                <DialogContent style={{ paddingTop: 10 }}>
+                    <div>
+                        <img src={capnWarning} style={{ maxHeight: '30%', maxWidth: '30%', aspectRatio: 'auto' }} />
+                    </div>
+                    <Typography variant="h5" style={{ marginBottom: 5, textAlign: 'center' }}>
+                        You have used 0 of your 3 free contract tips from me. Do you want to use one for this player?
+                    </Typography> 
+                    <Typography variant="h5" style={{ marginBottom: 5, textAlign: 'center' }}>
+                        You have used all of your free contract tips.
+                    </Typography>
+                    <Typography variant="h5" style={{ marginBottom: 5, textAlign: 'center' }}>
+                        You can get unlimited contract tips from me by sending $3 to the commish!
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button color='primary' onClick={() => setConfirmModal(false)} size='large' variant='contained'>Cancel</Button>
+                    <LoadingButton loading={isLoading} color='success' style={{ marginLeft: 8 }} size='large' variant='contained' onClick={() => handleSubmission()}>Submit</LoadingButton>
+                </DialogActions>
+            </Dialog>
+        </div>
     );
 };

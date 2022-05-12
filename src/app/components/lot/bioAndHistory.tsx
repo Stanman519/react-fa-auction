@@ -175,7 +175,7 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
 
                 <ButtonGroup sx={{ display: 'flex', width: '100%' }} aria-label="small button group">
                     <Button sx={{ flex: 1 }} onClick={() => loadBio()}>Bio</Button>
-                    {bid?.expires && <Button sx={{ flex: 2 }} onClick={() => loadHistory()}>Bid History</Button>}
+                    {bid?.expires && <Button sx={{ flex: 2, lineHeight: '14px' }} onClick={() => loadHistory()}>Bid History</Button>}
                 </ButtonGroup>
 
             </div>

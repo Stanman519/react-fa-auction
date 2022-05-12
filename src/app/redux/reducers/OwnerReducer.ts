@@ -8,6 +8,9 @@ export default interface Owner {
     capRoom: number
     yearsLeft: number
     token: string
+    isPremium: boolean
+    friendlyName: string
+    playerTips: string[]
 }
 
 

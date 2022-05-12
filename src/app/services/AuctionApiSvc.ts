@@ -15,18 +15,12 @@ export interface PageLoad {
 export interface ErrorResponse {
     friendlyMessage: string
 }
-
-// const getInitialFreeAgents = async (): Promise<Response> => {
-//     return await fetch(`${URL}/FreeAgency/players/nominate`);
-// }
-
-// const loadLots = async (): Promise<Response> => {
-//     return await fetch(`${URL}/FreeAgency/lots`);
-// }
-
-// const loadOwners = async (): Promise<Response> => {
-//     return await fetch(`${URL}/FreeAgency/owners`);
-// }
+export interface PlayerTipRequest {
+    mflId: string
+    ownerId: number
+    position: string
+    age: number
+}
 
 const makeNewBid = async (bid: Bid): Promise<Response> => {
     const body = JSON.stringify({
@@ -144,6 +138,16 @@ const sendWin = async (bid: Bid): Promise<Response> => {
     return res;
 }
 
+const askCapn = async (PlayerTipRequest: PlayerTipRequest): Promise<Response> => {
+    const json = JSON.stringify(PlayerTipRequest)
+    const res = await fetch(`${URL}/tip`, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: json
+        })
+    return res;
+}
+
 
 export default {
     pageLoad,
@@ -154,5 +158,6 @@ export default {
     handleErrorResponse,
     makeNewBid,
     makeNewNom,
-    sendWin
+    sendWin,
+    askCapn
 }
