@@ -1,3 +1,4 @@
+import { PlayerTipResponse } from "../../services/AuctionApiSvc";
 import { OwnerAction, UPDATE_OWNERS } from "../actions/OwnerActions";
 
 
@@ -8,9 +9,9 @@ export default interface Owner {
     capRoom: number
     yearsLeft: number
     token: string
-    isPremium: boolean
-    friendlyName: string
-    playerTips: string[]
+    premium: boolean
+    displayName: string
+    tipsUsed: PlayerTipResponse[]
 }
 
 

@@ -26,6 +26,7 @@ export const getInitialData = (cookie: string = "") => async (
         dispatch(updateUI({isLoading: 'fullscreen'}))
         const initData = await AuctionApiSvc.pageLoad(cookie);
         //const initData = await res.json() 
+        console.log('init', initData)
         dispatch(updateFreeAgents(initData.freeAgents));
         dispatch(updateLots(initData.lots))
         dispatch(updateOwners(initData.owners));

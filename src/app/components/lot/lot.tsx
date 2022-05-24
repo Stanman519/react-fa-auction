@@ -24,7 +24,6 @@ export const LotBody = ({lot}: LotProps): JSX.Element => {
   }
 
   useEffect(() => {
-    console.log(lot.isFresh)
 }, [lot.isFresh])
 
   return (

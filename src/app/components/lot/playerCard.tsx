@@ -17,7 +17,6 @@ interface PlayerCardProps {
 }
 
 export const PlayerCard = ({ lot }: PlayerCardProps) => {
-  console.log('playerCard rerendered')
   const { freeAgents } = useSelector((state: RootState) => state);
   const [selectedPlayer, setSelectedPlayer] = useState<FreeAgent>();
   const {isMobile} = useSelector((state: RootState) => state.ui)
@@ -45,13 +44,7 @@ export const PlayerCard = ({ lot }: PlayerCardProps) => {
             </div>
             <Divider variant='middle' />
             <div>
-              <BidInfo
-                bidYears={lot.bid.bidLength}
-                bidSalary={lot.bid.bidSalary}
-                highBidder={lot.bid.ownername}
-                lotId={lot.lotId}
-                isFresh={lot.isFresh}
-              />
+              <BidInfo lot={lot}/>
             </div>
           </div>
           :

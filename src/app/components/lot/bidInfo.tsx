@@ -7,14 +7,13 @@ import { makeThisLotStale } from "../../redux/actions/LotActions";
 import { TransitionProps } from "@mui/material/transitions";
 import { updateUI } from "../../redux/actions/UiActions";
 import { RootState } from "../../store";
+import { askCapn } from "../../redux/actions/LoginActions";
+import { Lot } from "../../redux/reducers/LotReducer";
+import { useSelect } from "@mui/base";
 
 
 interface BidInfoProps {
-    bidYears: number
-    bidSalary: number
-    highBidder: string
-    lotId: number
-    isFresh?: boolean
+    lot: Lot
 }
 
 const Transition = forwardRef(function Transition(
@@ -27,10 +26,17 @@ const Transition = forwardRef(function Transition(
 });
 
 
-export const BidInfo = ({ bidYears, bidSalary, highBidder, isFresh, lotId }: BidInfoProps): JSX.Element => {
+export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
     const dispatch = useDispatch()
     const capnWarning = process.env.PUBLIC_URL + '/ask_capn.jpg';
+    const { profile } = useSelector((state: RootState) => state)
+    
     const [confirmModal, setConfirmModal] = useState<boolean>(false);
+    const [hasAsked, setHasAsked] = useState<boolean>(profile?.tipsUsed?.some(p => p.mflId == lot.bid?.player?.mflId))
+    let tip = hasAsked ? profile.tipsUsed.find(t => t.mflId == lot.bid?.player.mflId) : undefined
+    console.log('tipsused', profile.tipsUsed)
+    console.log('player', lot?.bid?.player)
+    console.log('has asked? ', profile?.tipsUsed?.some(p => p.mflId === lot.bid?.player?.mflId))
     const [isLoading, setIsLoading] = useState<boolean>();
     const { audioOn } = useSelector((state: RootState) => state.ui);
     const notification = require('../../../assets/sounds/Blow.mp3');
@@ -38,42 +44,54 @@ export const BidInfo = ({ bidYears, bidSalary, highBidder, isFresh, lotId }: Bid
 
     const handleSubmission = () => {
         setIsLoading(true);
-        dispatch(askCapn({
-            
-        })
+        dispatch(askCapn(lot?.bid?.player?.mflId!, lot?.bid?.player?.position!, lot?.bid?.player?.age!))
+        setHasAsked(true)
+        setIsLoading(false)
+        setConfirmModal(false)
+    }
+    const checkProfileForPremium = () => {
+        console.warn('premium?:', profile.premium)
+        profile.premium ? handleSubmission() : setConfirmModal(true)
     }
 
     useEffect(() => {
         let timer: any
-        if (isFresh) {
+        if (lot?.isFresh) {
             if (audioOn) beep.play()
             timer = setTimeout(() => {
-                dispatch(makeThisLotStale(lotId))
+                dispatch(makeThisLotStale(lot?.lotId))
             }, 3500)
         }
         return () => {
             if (timer) clearTimeout(timer)
         };
-    }, [isFresh])
+    }, [lot?.isFresh])
     return (
         <div>
-        <Tooltip title="Current highest bid" arrow placement='bottom'>
+        <Tooltip title="Current highest bid" arrow placement='right'>
             <div style={{
                 minHeight: 50,
                 flexDirection: 'row',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-around', marginTop: 10
             }}>
                     <div/>
-                    <div className={isFresh ? 'noti-text' : "bid-info-text"} >{highBidder}</div>
+                    <div className={lot?.isFresh ? 'noti-text' : "bid-info-text"} >{lot?.bid?.ownername}</div>
                     <Divider orientation="vertical" variant='middle' flexItem />
-                    <div className={isFresh ? 'noti-text' : "bid-info-text"}>{bidYears} {bidYears === 1 ? 'year' : 'years'}</div>
+                    <div className={lot?.isFresh ? 'noti-text' : "bid-info-text"}>{lot?.bid?.bidLength} {lot?.bid?.bidLength === 1 ? 'year' : 'years'}</div>
                     <Divider orientation="vertical" variant='middle' flexItem />
-                    <div className={isFresh ? 'noti-text' : "bid-info-text"}>${bidSalary}</div>
+                    <div className={lot?.isFresh ? 'noti-text' : "bid-info-text"}>${lot?.bid?.bidSalary}</div>
                     <div/>
             </div>
             
         </Tooltip>
-        <Button onClick={() => dispatch(setConfirmModal(true))}>ASK CAP'N</Button>
+        <Divider variant='middle' flexItem />
+        {hasAsked ? 
+            <div style={{fontSize: 'medium', padding:12}}>Cap'n suggests: ${tip?.suggestion}, {tip?.yearMin}{tip?.yearMin != tip?.yearMax ? `-${tip?.yearMax} years`: ''}</div> 
+            :
+         <Button 
+         style={{borderWidth: 1, margin: 8, width: '80%'}} 
+         onClick={() => checkProfileForPremium()}>ASK CAP'N</Button>
+        }
         <Dialog
                 open={confirmModal}
                 TransitionComponent={Transition}
@@ -83,19 +101,18 @@ export const BidInfo = ({ bidYears, bidSalary, highBidder, isFresh, lotId }: Bid
                     <div>
                         <img src={capnWarning} style={{ maxHeight: '30%', maxWidth: '30%', aspectRatio: 'auto' }} />
                     </div>
-                    <Typography variant="h5" style={{ marginBottom: 5, textAlign: 'center' }}>
-                        You have used 0 of your 3 free contract tips from me. Do you want to use one for this player?
-                    </Typography> 
-                    <Typography variant="h5" style={{ marginBottom: 5, textAlign: 'center' }}>
-                        You have used all of your free contract tips.
-                    </Typography>
-                    <Typography variant="h5" style={{ marginBottom: 5, textAlign: 'center' }}>
-                        You can get unlimited contract tips from me by sending $3 to the commish!
-                    </Typography>
+                        <div>
+                            <Typography variant="h5" style={{ marginBottom: 5, textAlign: 'center' }}>
+                                You have used {profile.tipsUsed.length} of your 3 free contract tips from me. {profile.tipsUsed.length < 3 ? 'Do you want to use one for this player?' : ''}
+                            </Typography> 
+                            <Typography variant="h6" style={{ marginBottom: 5, textAlign: 'center' }}>
+                                You can get unlimited contract tips from me by sending $3 to the commish!
+                            </Typography>
+                        </div>
                 </DialogContent>
                 <DialogActions>
                     <Button color='primary' onClick={() => setConfirmModal(false)} size='large' variant='contained'>Cancel</Button>
-                    <LoadingButton loading={isLoading} color='success' style={{ marginLeft: 8 }} size='large' variant='contained' onClick={() => handleSubmission()}>Submit</LoadingButton>
+                    <LoadingButton loading={isLoading} disabled={profile.tipsUsed.length > 2 && !profile.premium} color='success' style={{ marginLeft: 8 }} size='large' variant='contained' onClick={() => handleSubmission()}>Submit</LoadingButton>
                 </DialogActions>
             </Dialog>
         </div>

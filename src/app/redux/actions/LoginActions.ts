@@ -1,6 +1,6 @@
 import { Action } from "@reduxjs/toolkit";
 import Cookies from "universal-cookie/es6";
-import AuctionApiSvc, { PlayerTipRequest } from "../../services/AuctionApiSvc";
+import AuctionApiSvc, { PlayerTipRequest, PlayerTipResponse } from "../../services/AuctionApiSvc";
 import Owner from "../reducers/OwnerReducer";
 import { RootState } from "../reducers/RootReducer";
 import { updateUI } from "./UiActions";
@@ -39,8 +39,10 @@ export const askCapn = (mflId: string, position: string, age: number) => async(
     dispatch: Function,
     getState: () => RootState
 ) => {
-    const { ownerId } = getState().profile
-    const askRequest = {mflId, position, age, ownerId} as PlayerTipRequest
-    const tip = await AuctionApiSvc.askCapn(askRequest);
-    
+    const { profile } = getState()
+    const askRequest = {mflId, position, age, ownerId: profile.ownerId} as PlayerTipRequest
+    const res = await AuctionApiSvc.askCapn(askRequest);
+    const tip = await AuctionApiSvc.handleErrorResponse(res) as PlayerTipResponse;
+
+    dispatch(loadAuthenticatedAccount({...profile, tipsUsed: [...profile.tipsUsed, tip]}))
 }

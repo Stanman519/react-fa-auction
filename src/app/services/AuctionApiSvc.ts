@@ -21,6 +21,13 @@ export interface PlayerTipRequest {
     position: string
     age: number
 }
+export interface PlayerTipResponse {
+    mflId: string
+    ownerId: number
+    suggestion: number
+    yearMin: number
+    yearMax: number
+}
 
 const makeNewBid = async (bid: Bid): Promise<Response> => {
     const body = JSON.stringify({
@@ -140,7 +147,7 @@ const sendWin = async (bid: Bid): Promise<Response> => {
 
 const askCapn = async (PlayerTipRequest: PlayerTipRequest): Promise<Response> => {
     const json = JSON.stringify(PlayerTipRequest)
-    const res = await fetch(`${URL}/tip`, {
+    const res = await fetch(`${URL}/FreeAgency/tip`, {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: json

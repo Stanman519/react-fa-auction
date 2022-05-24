@@ -39,11 +39,8 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
             setIsLoading(true)
             setShowBio(true)
             const hasAction: boolean = bid.player.actionShot ? true : false
-            console.log('hasaction', hasAction)
-            console.log('action shot', bid.player.actionShot)
             const res = await AuctionApiSvc.getFullPlayerBio(lastYr, bid.player.mflId, bid.player.position, bid.player.firstName, bid.player.lastName, hasAction);
             const bioRes = await AuctionApiSvc.handleErrorResponse(res) as PlayerBio;
-            console.log(bioRes)
             setBio({...bioRes, actionShot: hasAction ? bid.player.actionShot ?? '' : bioRes.actionShot});
             setIsLoading(false);
         }

@@ -103,7 +103,6 @@ export const submitWin = (bid: Bid) => async (
     dispatch: Function,
     getState: () => RootState
 ) : Promise<any> => {
-    console.log('bid', bid)
     const oldLots = getState().lots;
     let lots = [...oldLots]
     try {
