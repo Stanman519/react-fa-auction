@@ -16,7 +16,6 @@ export function Headshot({ img, lotId, player }: { img?: string, lotId: number, 
             <div style={{ backgroundImage: `url('${teamLogo}')`, backgroundSize: 'contain', backgroundRepeat: 'no-repeat', margin: -5}}>
                 <img className='headshot' src={img ? img : capnMug} />
             </div>
-            
         }
         </>
     );
