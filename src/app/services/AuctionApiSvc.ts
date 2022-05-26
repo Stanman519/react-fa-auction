@@ -105,10 +105,14 @@ const login = async (ownername: string, password: string): Promise<Owner> => {
 const register = async (name: string, username: string, password: string): Promise<Response> => {
     const res = await fetch(`${URL}/FreeAgency/register`, {
         method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+          },
         body: JSON.stringify({
             email: name,
             ownername: username,
-            password: password
+            password: password,
+            tipsUsed: []
         }) 
     })
     return res;

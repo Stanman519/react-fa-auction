@@ -75,7 +75,7 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-around', marginTop: 10
             }}>
                     <div/>
-                    <div className={lot?.isFresh ? 'noti-text' : "bid-info-text"} >{lot?.bid?.ownername}</div>
+                    <div className={lot?.isFresh ? 'noti-text' : "bid-info-text"}>{lot?.bid?.ownername}</div>
                     <Divider orientation="vertical" variant='middle' flexItem />
                     <div className={lot?.isFresh ? 'noti-text' : "bid-info-text"}>{lot?.bid?.bidLength} {lot?.bid?.bidLength === 1 ? 'year' : 'years'}</div>
                     <Divider orientation="vertical" variant='middle' flexItem />
@@ -103,7 +103,7 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
                     </div>
                         <div>
                             <Typography variant="h5" style={{ marginBottom: 5, textAlign: 'center' }}>
-                                You have used {profile.tipsUsed.length} of your 3 free contract tips from me. {profile.tipsUsed.length < 3 ? 'Do you want to use one for this player?' : ''}
+                                You have {profile.tipsUsed.length < 1 ? 'not' : ''} used your free contract tip from me. {profile.tipsUsed.length < 1 ? 'Do you want to use it for this player?' : ''}
                             </Typography> 
                             <Typography variant="h6" style={{ marginBottom: 5, textAlign: 'center' }}>
                                 You can get unlimited contract tips from me by sending $3 to the commish!
@@ -111,8 +111,11 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
                         </div>
                 </DialogContent>
                 <DialogActions>
-                    <Button color='primary' onClick={() => setConfirmModal(false)} size='large' variant='contained'>Cancel</Button>
-                    <LoadingButton loading={isLoading} disabled={profile.tipsUsed.length > 2 && !profile.premium} color='success' style={{ marginLeft: 8 }} size='large' variant='contained' onClick={() => handleSubmission()}>Submit</LoadingButton>
+                    <Button color='primary' onClick={() => setConfirmModal(false)} 
+                    size='large' variant='contained'>Cancel</Button>
+                    <LoadingButton loading={isLoading} disabled={profile.tipsUsed.length > 0 && !profile.premium} 
+                    color='success' style={{ marginLeft: 8 }} size='large' variant='contained' 
+                    onClick={() => handleSubmission()}>Submit</LoadingButton>
                 </DialogActions>
             </Dialog>
         </div>
