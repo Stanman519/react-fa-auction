@@ -112,10 +112,10 @@ export const submitWin = (bid: Bid) => async (
         console.log('e', e.data)
         dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
     }
-    console.log('lots', lots)
+
     const lotToCleanIndex = lots.findIndex(lot => lot.lotId === bid.lotId)
     if (lotToCleanIndex >= 0) {
-        console.log('whats going on here')
+
         lots[lotToCleanIndex] = {lotId: lots[lotToCleanIndex].lotId, bid: undefined, newNom: false} as Lot
         dispatch(updateLots(lots))
     }

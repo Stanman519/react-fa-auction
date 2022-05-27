@@ -34,9 +34,7 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
     const [confirmModal, setConfirmModal] = useState<boolean>(false);
     const [hasAsked, setHasAsked] = useState<boolean>(profile?.tipsUsed?.some(p => p.mflId == lot.bid?.player?.mflId))
     let tip = hasAsked ? profile.tipsUsed.find(t => t.mflId == lot.bid?.player.mflId) : undefined
-    console.log('tipsused', profile.tipsUsed)
-    console.log('player', lot?.bid?.player)
-    console.log('has asked? ', profile?.tipsUsed?.some(p => p.mflId === lot.bid?.player?.mflId))
+
     const [isLoading, setIsLoading] = useState<boolean>();
     const { audioOn } = useSelector((state: RootState) => state.ui);
     const notification = require('../../../assets/sounds/Blow.mp3');
