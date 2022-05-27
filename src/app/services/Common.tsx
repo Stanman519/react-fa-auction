@@ -32,7 +32,7 @@ export const checkValidity = (profile: Owner, newBid: number, newYears: number, 
         validity.isValid = false;
         validity.violations.push("You are not logged in.")
     }
-    if((newBid + bidsOnBoard) < profile.capRoom ){
+    if((newBid + bidsOnBoard) > profile.capRoom ){
         validity.isValid = false
         validity.violations.push("This and your current high bids would put you over the cap.")
     }
