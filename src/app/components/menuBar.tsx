@@ -20,6 +20,9 @@ export function MenuBar() {
     const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const { owners, profile, ui } = useSelector((state: RootState) => state);
+    const highBidsOnTheBoard = useSelector((state: RootState) => state.lots
+                .filter(l => l.bid?.ownerId === profile.ownerId).map(b => b.bid?.bidSalary)
+                .reduce((prev, curr) => prev! + curr!, 0));
     const nomIsUsed = useSelector((state: RootState) => {
         if (!profile.ownername) return false
         return state.lots.find(l => l.lotId === profile.ownerId)?.bid?.player
@@ -137,8 +140,12 @@ export function MenuBar() {
                         <List>
                             {owners.map((o, index) => (
                                 <ListItem key={o.ownerId} style={{ backgroundColor: index % 2 === 0 ? palette.background.default : palette.background.paper }}>
+                                    
                                     <Avatar style={{ marginRight: 8 }} sx={{ height: 50, width: 50 }} alt="" src={ownerMap.find(owner => owner.id === o.ownerId)?.avatar} />
-                                    <ListItemText style={{}} primary={o.ownername} secondary={`$${o.capRoom}`} />
+                                    <div style={{flexDirection: 'column'}}>
+                                        <ListItemText style={{}} primary={`${o.ownername} - $${o.capRoom}`} secondary={highBidsOnTheBoard ?? 0 > 0 ? `outstanding bids: $${highBidsOnTheBoard}`: ''} />
+                                    </div>
+                                
                                 </ListItem>
                             ))}
                             <Divider />

@@ -25,6 +25,9 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
     const [bidLength, setBidLength] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>();
     const { profile } = useSelector((state: RootState) => state);
+    const highBidsOnTheBoard = useSelector((state: RootState) => state.lots
+                .filter(l => l.bid?.ownerId === profile.ownerId).map(b => b.bid?.bidSalary)
+                .reduce((prev, curr) => prev! + curr!, 0));
     const [confirmModal, setConfirmModal] = useState<boolean>(false);
     const theme = useTheme();
     const dispatch = useDispatch();
@@ -33,7 +36,7 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
         if (getValidity().isValid) setConfirmModal(true)
     }
     const getValidity = () => checkValidity(profile, bidSalary ? bidSalary : 0, bidLength ? bidLength : 0,
-        lot.bid?.player.mflId ?? "", lot.bid?.bidSalary ?? 0, lot.bid?.bidLength ?? 0);
+        lot.bid?.player.mflId ?? "", lot.bid?.bidSalary ?? 0, lot.bid?.bidLength ?? 0, highBidsOnTheBoard);
 
     const handleSubmission = () => {
         if (bidMode && lot.bid) {
