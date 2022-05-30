@@ -5,11 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import UIfx from 'uifx'
 import { makeThisLotStale } from "../../redux/actions/LotActions";
 import { TransitionProps } from "@mui/material/transitions";
-import { updateUI } from "../../redux/actions/UiActions";
 import { RootState } from "../../store";
 import { askCapn } from "../../redux/actions/LoginActions";
 import { Lot } from "../../redux/reducers/LotReducer";
-import { useSelect } from "@mui/base";
 
 
 interface BidInfoProps {
@@ -30,15 +28,22 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
     const dispatch = useDispatch()
     const capnWarning = process.env.PUBLIC_URL + '/ask_capn.jpg';
     const { profile } = useSelector((state: RootState) => state)
-    
     const [confirmModal, setConfirmModal] = useState<boolean>(false);
     const [hasAsked, setHasAsked] = useState<boolean>(profile?.tipsUsed?.some(p => p.mflId == lot.bid?.player?.mflId))
-    let tip = hasAsked ? profile.tipsUsed.find(t => t.mflId == lot.bid?.player.mflId) : undefined
+    let tip = hasAsked ? profile.tipsUsed?.find(t => t.mflId == lot.bid?.player.mflId) : undefined
 
     const [isLoading, setIsLoading] = useState<boolean>();
     const { audioOn } = useSelector((state: RootState) => state.ui);
     const notification = require('../../../assets/sounds/Blow.mp3');
     const beep = new UIfx(notification, { volume: 1 })
+
+    const isEligibleForFreeTip = (): boolean => {
+        if (profile.premium) return true
+        if (!profile.tipsUsed) return false
+        if (profile.tipsUsed.length === 0) return true
+        return false;
+    }
+
 
     const handleSubmission = () => {
         setIsLoading(true);
@@ -101,7 +106,7 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
                     </div>
                         <div>
                             <Typography variant="h5" style={{ marginBottom: 5, textAlign: 'center' }}>
-                                You have {profile.tipsUsed.length < 1 ? 'not' : ''} used your free contract tip from me. {profile.tipsUsed.length < 1 ? 'Do you want to use it for this player?' : ''}
+                                You have {isEligibleForFreeTip() ? 'not' : ''} used your free contract tip from me. {isEligibleForFreeTip() ? 'Do you want to use it for this player?' : ''}
                             </Typography> 
                             <Typography variant="h6" style={{ marginBottom: 5, textAlign: 'center' }}>
                                 You can get unlimited contract tips from me by sending $3 to the commish!
@@ -111,7 +116,7 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
                 <DialogActions>
                     <Button color='primary' onClick={() => setConfirmModal(false)} 
                     size='large' variant='contained'>Cancel</Button>
-                    <LoadingButton loading={isLoading} disabled={profile.tipsUsed.length > 0 && !profile.premium} 
+                    <LoadingButton loading={isLoading} disabled={!isEligibleForFreeTip()} 
                     color='success' style={{ marginLeft: 8 }} size='large' variant='contained' 
                     onClick={() => handleSubmission()}>Submit</LoadingButton>
                 </DialogActions>

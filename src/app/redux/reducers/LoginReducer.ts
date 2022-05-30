@@ -5,7 +5,17 @@ import Owner from "./OwnerReducer";
 
 
 
-const defaultState = {} as Owner
+const defaultState = {
+    ownerId: 0,
+    ownername: '',
+    password: '',
+    capRoom: 0,
+    yearsLeft: 0,
+    token: '',
+    premium: false,
+    displayName: '',
+    tipsUsed: []
+} as Owner
 
 
 export const loginReducer = (state = defaultState, action: LoginAction): Owner => {
