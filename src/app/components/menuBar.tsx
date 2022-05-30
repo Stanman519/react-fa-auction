@@ -43,8 +43,8 @@ export function MenuBar() {
         dispatch(turnOnNominationModeForThisOwnersLot());
     }
 
-    const highBidsOnTheBoard = (ownerId: number): number => {
-        return lots.filter(l => l.bid?.ownerId === ownerId).map(b => b.bid?.bidSalary)
+    const highBidsOnTheBoard = (ownername: string): number => {
+        return lots.filter(l => l.bid?.ownername === ownername).map(b => b.bid?.bidSalary)
             .reduce((prev, curr) => prev! + curr!, 0) ?? 0;
     }
     return (
@@ -146,7 +146,7 @@ export function MenuBar() {
                                     
                                     <Avatar style={{ marginRight: 8 }} sx={{ height: 50, width: 50 }} alt="" src={ownerMap.find(owner => owner.id === o.ownerId)?.avatar} />
                                     <div style={{flexDirection: 'column'}}>
-                                        <ListItemText style={{}} primary={`${o.ownername} - $${o.capRoom}`} secondary={highBidsOnTheBoard(o.ownerId) ?? 0 > 0 ? `outstanding bids: $${highBidsOnTheBoard(o.ownerId)}`: ''} />
+                                        <ListItemText style={{}} primary={`${o.ownername} - $${o.capRoom}`} secondary={highBidsOnTheBoard(o.ownername) ?? 0 > 0 ? `outstanding bids: $${highBidsOnTheBoard(o.ownername)}`: ''} />
                                     </div>
                                 
                                 </ListItem>
