@@ -19,10 +19,8 @@ type DrawerType = 'Salaries' | 'Chat' | undefined
 export function MenuBar() {
     const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const { owners, profile, ui } = useSelector((state: RootState) => state);
-    const highBidsOnTheBoard = useSelector((state: RootState) => state.lots
-                .filter(l => l.bid?.ownerId === profile.ownerId).map(b => b.bid?.bidSalary)
-                .reduce((prev, curr) => prev! + curr!, 0));
+    const { owners, profile, ui, lots } = useSelector((state: RootState) => state);
+
     const nomIsUsed = useSelector((state: RootState) => {
         if (!profile.ownername) return false
         return state.lots.find(l => l.lotId === profile.ownerId)?.bid?.player
@@ -43,6 +41,11 @@ export function MenuBar() {
 
     const addNominationCard = () => {
         dispatch(turnOnNominationModeForThisOwnersLot());
+    }
+
+    const highBidsOnTheBoard = (ownerId: number): number => {
+        return lots.filter(l => l.bid?.ownerId === ownerId).map(b => b.bid?.bidSalary)
+            .reduce((prev, curr) => prev! + curr!, 0) ?? 0;
     }
     return (
         <div style={{ flex: 1 }}>
@@ -75,10 +78,10 @@ export function MenuBar() {
                                         setOpenDrawer('Salaries')
                                         setAnchorEl(null)
                                         }}>Salary Caps</MenuItem>
-                                    <MenuItem onClick={() => {
+                                    {profile.ownername && <MenuItem onClick={() => {
                                         setOpenDrawer('Chat')
                                         setAnchorEl(null)
-                                        }}>{openDrawer == 'Chat' ? 'Close Chat' : 'Open Chat'}</MenuItem>
+                                        }}>{openDrawer == 'Chat' ? 'Close Chat' : 'Open Chat'}</MenuItem>}
                                     {!nomIsUsed && <MenuItem onClick={() => {
                                         addNominationCard()
                                         setAnchorEl(null)
@@ -99,13 +102,13 @@ export function MenuBar() {
                                     onClick={() => setOpenDrawer('Salaries')}>
                                     Salary Caps
                                 </Button>
-                                <Button color="inherit"
+                                {profile.ownername && <Button color="inherit"
                                     onClick={() => {
                                         //dispatch()
                                         setOpenDrawer('Chat')
                                         }}>
                                     {openDrawer == 'Chat' ? 'Close Chat' : 'Open Chat'}
-                                </Button>
+                                </Button>}
                                 {!nomIsUsed &&
                                     <Button color='inherit' onClick={() => addNominationCard()}>
                                         Nominate a Player
@@ -143,7 +146,7 @@ export function MenuBar() {
                                     
                                     <Avatar style={{ marginRight: 8 }} sx={{ height: 50, width: 50 }} alt="" src={ownerMap.find(owner => owner.id === o.ownerId)?.avatar} />
                                     <div style={{flexDirection: 'column'}}>
-                                        <ListItemText style={{}} primary={`${o.ownername} - $${o.capRoom}`} secondary={highBidsOnTheBoard ?? 0 > 0 ? `outstanding bids: $${highBidsOnTheBoard}`: ''} />
+                                        <ListItemText style={{}} primary={`${o.ownername} - $${o.capRoom}`} secondary={highBidsOnTheBoard(o.ownerId) ?? 0 > 0 ? `outstanding bids: $${highBidsOnTheBoard(o.ownerId)}`: ''} />
                                     </div>
                                 
                                 </ListItem>

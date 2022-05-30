@@ -46,6 +46,7 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
 
 
     const handleSubmission = () => {
+        if (!profile.ownername) return;
         setIsLoading(true);
         dispatch(askCapn(lot?.bid?.player?.mflId!, lot?.bid?.player?.position!, lot?.bid?.player?.age!))
         setHasAsked(true)
@@ -53,7 +54,7 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
         setConfirmModal(false)
     }
     const checkProfileForPremium = () => {
-        console.warn('premium?:', profile.premium)
+        if (!profile.ownername) return
         profile.premium ? handleSubmission() : setConfirmModal(true)
     }
 
