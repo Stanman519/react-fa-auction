@@ -64,7 +64,7 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
             if (audioOn) beep.play()
             timer = setTimeout(() => {
                 dispatch(makeThisLotStale(lot?.lotId))
-            }, 3500)
+            }, 10000)
         }
         return () => {
             if (timer) clearTimeout(timer)
