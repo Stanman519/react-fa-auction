@@ -24,7 +24,6 @@ function App() {
   const { modal, error, errorText, isLoading, chatOpen } = useSelector((state: RootState) => state.ui)
   // const width = useRef(0);
   const cookies = new Cookies();
-
   // const setWidth = (newWidth: number) => {
   //   console.log('width re render', newWidth)
   //   if(newWidth == 0) return;
@@ -34,11 +33,13 @@ function App() {
 
   useEffect(() => {
     cookies.get('token') ? dispatch(getInitialData(cookies.get('token'))) : dispatch(getInitialData())
+
     dispatch(signalR())
     //window.addEventListener("resize", () => setWidth(window.innerWidth))
     return () => {
       //window.removeEventListener("resize", () => setWidth(window.innerWidth))
         ChatClient.getInstance().chatInstance.disconnectUser();
+
 
     }
   }, [])

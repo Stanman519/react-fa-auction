@@ -25,8 +25,14 @@
     margin: 0px;
 }
 .player-name-text{
-    line-height: 0;
+
+    font-size: 4vw;
 }
+@media screen and (min-width: 900px) {
+    .player-name-text {
+       font-size: 36px;
+    }
+  }
 .bid-info-text{
     font-weight: normal;
     margin: 0;
