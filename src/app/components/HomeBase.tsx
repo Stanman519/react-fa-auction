@@ -3,7 +3,9 @@ import { useDispatch } from "react-redux";
 import { loadDataForHomeBase } from "../redux/actions/TransactionActions";
 import GeneralApiSvc from "../services/GeneralApiSvc";
 import DeadCapTable from "./nonAuction/DeadCapTable";
-import CapDetails from "./nonAuction/DeadCapTable";
+import { TeamCapDetails } from "./nonAuction/teamCapDetails";
+import TriTable from "./nonAuction/TriTable";
+
 
 
 const HomeBase = () => {
@@ -12,15 +14,15 @@ const HomeBase = () => {
         dispatch(loadDataForHomeBase())
     }, [])    
     return(
-        <div className="background">
-          <div className="App">
-            <div className="left-side">
+        <div>
+          <div style={{display: 'flex', flexDirection: 'row'}}>
+            <div style={{display: 'flex', flexDirection: 'column', flex: 3}}>
               <DeadCapTable/>
-              {/* <TriTable /> */}
+              <TriTable />
             </div>
-              <div className="right-side">
-                <CapDetails /> 
-              </div>
+            <div style={{ flex: 1}}>
+              <TeamCapDetails />
+            </div>
           </div>
         </div>
     );

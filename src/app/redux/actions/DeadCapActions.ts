@@ -14,8 +14,8 @@ export interface DeadCapAction extends Action {
 
 
 
-export const updateDeadCapInfo = (state: DeadCapState) => {
-    return { type: UPDATE_DEAD_CAP_INFO, state };
+export const updateDeadCapInfo = (state: DeadCapState) : DeadCapAction => {
+    return { type: UPDATE_DEAD_CAP_INFO, payload: state };
 }
 
 
@@ -23,7 +23,7 @@ export const selectTeam = (teamId: number) => async (
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
-    let cap = getState().deadCap
-    dispatch(updateDeadCapInfo({ ...cap, selectedTeam: teamId }))
+    const deadCap = getState().deadCap
+    dispatch(updateDeadCapInfo({ ...deadCap, selectedTeam: teamId }))
 
 }

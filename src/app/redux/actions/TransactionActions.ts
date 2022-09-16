@@ -8,8 +8,8 @@ export interface TransactionAction extends Action {
     payload: Transaction[]
 }
 
-export function loadTransactions(transactions: Transaction[]){
-    return { type: "LOAD_TRANSACTIONS", transactions };
+export const loadTransactions = (transactions: Transaction[]) : TransactionAction => {
+    return { type: "LOAD_TRANSACTIONS", payload: transactions };
 }
 
 

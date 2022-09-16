@@ -7259,10 +7259,10 @@ node-releases@^2.0.6:
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-2.0.6.tgz#8a7088c63a55e493845683ebf3c828d8c51c5503"
   integrity sha512-PiVXnNuFm5+iYkLBNeq5211hvO38y63T0i2KKh2KnUs3RpzJ+JtODFjkD8yjLwnDkTYF1eKXheUwdssR+NRZdg==
 
-node@14.15.1:
-  version "14.15.1"
-  resolved "https://registry.yarnpkg.com/node/-/node-14.15.1.tgz#e67d7a725719bd6a61b7b55299cd90e61c4298fe"
-  integrity sha512-BeTf2muiTEC7o3w0sUJ83GHORQ+FLNZCouQUM3VJk3LKf1keQ6ldghELrOo6nBUNZBBS5I++pgDSYPhHWcpp8w==
+node@16.17.0:
+  version "16.17.0"
+  resolved "https://registry.yarnpkg.com/node/-/node-16.17.0.tgz#4d90554fc05b826c407ac2a7ebe7c65fc96a5a1f"
+  integrity sha512-cyEAIiYkXkEX4cDr6h35SkLVWavJt4EKzP4XFw1u8Uh6m1F+ZWtZ0puu6kmuBYJYU8L25AcXLhplSi3tbfX3Yw==
   dependencies:
     node-bin-setup "^1.0.0"
 
@@ -8580,7 +8580,7 @@ react-transition-group@^4.4.5:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react-virtuoso@^2.10.2, react-virtuoso@^2.3.1:
+react-virtuoso@^2.10.2:
   version "2.16.6"
   resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-2.16.6.tgz#61533bf7428e446a0586acbcffe540dd8e19a5a3"
   integrity sha512-xpm/edDfrX2auYjnTmzdzpyxppsIvkEWtBgy1In/qMmJHMuXwhTSszCX2zsUs5SbwNCiEAbXjV7Qg1iXVa/QsA==
@@ -8588,12 +8588,21 @@ react-virtuoso@^2.10.2, react-virtuoso@^2.3.1:
     "@virtuoso.dev/react-urx" "^0.2.12"
     "@virtuoso.dev/urx" "^0.2.12"
 
-react@^18.1.0:
-  version "18.2.0"
-  resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
-  integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
+react-virtuoso@^2.3.1:
+  version "2.17.1"
+  resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-2.17.1.tgz#5f1f9163f4ef30a2f553e43a33dd7f574e4f17e5"
+  integrity sha512-4inE+O5/SZmzk3vTRB6e26Uev8uFLxqmiiFZV662i/DuHaEG+hU/FwyDtkddCDL8sw7pTVwBZz18188Itvch7Q==
+  dependencies:
+    "@virtuoso.dev/react-urx" "^0.2.12"
+    "@virtuoso.dev/urx" "^0.2.12"
+
+react@17.0.2:
+  version "17.0.2"
+  resolved "https://registry.yarnpkg.com/react/-/react-17.0.2.tgz#d0b5cc516d29eb3eee383f75b62864cfb6800037"
+  integrity sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==
   dependencies:
     loose-envify "^1.1.0"
+    object-assign "^4.1.1"
 
 read-cache@^1.0.0:
   version "1.0.0"

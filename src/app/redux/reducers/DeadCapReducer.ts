@@ -11,7 +11,7 @@ const defaultState: DeadCapState = {
 }
 
 export const deadCapReducer = (state: DeadCapState = defaultState, action: DeadCapAction): DeadCapState => {
-    if (action.type === 'UPDATE_DEAD_CAP_INFO'){
+    if (action.type === UPDATE_DEAD_CAP_INFO){
         return action.payload;
     }
     return state

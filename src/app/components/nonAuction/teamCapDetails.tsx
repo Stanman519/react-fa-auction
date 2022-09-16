@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import '../styles/CapDetails.css';
 import { RootState } from '../../redux/reducers/RootReducer.js';
-import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, CircularProgress } from '@mui/material';
+import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, CircularProgress, Accordion, AccordionDetails, AccordionSummary, Typography, Avatar, List, ListItemAvatar, ListItemText, Divider, Card, CardContent } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { loadTransactions } from '../../redux/actions/TransactionActions';
 
 
 
-export const CapDetails = () => {
-    const { selectedTeam, franchises } = useSelector((state: RootState) => state.franchises);
+export const TeamCapDetails = () => {
+    const { selectedTeam, deadCap } = useSelector((state: RootState) => state.deadCap);
     const { transactions } = useSelector((state: RootState) => state);
     const FINAL_RELEVANT_YEAR = new Date().getFullYear() + 5
     const YEAR_RANGE = (): number[] => {
         let x = []
-        for (let i = 2020; i < FINAL_RELEVANT_YEAR; i++){
+        for (let i = 2020; i < FINAL_RELEVANT_YEAR; i++) {
             x.push(i)
         }
         return x
@@ -21,7 +21,7 @@ export const CapDetails = () => {
     const filterPlayersForYear = (year: number) => {
         if (!selectedTeam) return [];
         return transactions.filter(t =>
-            t.franchiseId === selectedTeam.franchiseId && t.yearOfTransaction <= year &&
+            t.franchiseId === selectedTeam && t.yearOfTransaction <= year &&
             (t.yearOfTransaction + t.years) > year)
     }
 
@@ -29,34 +29,45 @@ export const CapDetails = () => {
 
     }, []);
     return (
-        <div className="component">
-            <p className="details-title"> {selectedTeam?.teamname}'s Penalties </p>
-            <TableContainer className="details-table">
-                <Table>
-                        { YEAR_RANGE().map(y => {
-                            return (
-                            <>
-                                <TableHead>
-                                    <TableRow className="horizontal-year">
-                                        <TableCell></TableCell>
-                                        <TableCell className="year">{y}</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {filterPlayersForYear(y).map(t => (
-                                        <TableRow key={t.transactionId}>
-                                            <TableCell className="player-penalty-text">{t.playerName}</TableCell>
-                                            <TableCell className="player-penalty-text">${t.amount}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </>
+        <Card style={{marginTop: 110}}>
+            <CardContent>
+                {selectedTeam ?
+                    <div>
+                        <Typography variant={'h6'}> {deadCap.find(t => t.franchiseId === selectedTeam)?.team}'s Penalties </Typography>
+                        <div>
+                            {YEAR_RANGE().map(y =>
+                                <Accordion>
+                                    <AccordionSummary
+                                        expandIcon={<ExpandMoreIcon />}
+                                        aria-controls="panel1a-content"
+                                        id="panel1a-header"
+                                    >
+                                        <Typography>{y}</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <List>
+                                            {filterPlayersForYear(y).map(t => (
+                                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                    <ListItemAvatar>
+                                                        <Avatar>{t.position}</Avatar>
+                                                    </ListItemAvatar>
+                                                    <ListItemText primary={t.playerName} secondary={`$${t.amount}`} style={{ textAlign: 'left' }} />
+                                                    <Divider />
+                                                </div>
+                                            ))}
+                                        </List>
+
+                                    </AccordionDetails>
+                                </Accordion>
                             )
-                        })
-                        }
-                </Table>
-            </TableContainer>
-        </div>
+                            }
+                        </div>
+                    </div> :
+                    <Typography variant={'h6'}> Select a team to view player details. </Typography>
+
+                }
+            </CardContent>
+        </Card>
     );
-} 
+}
 

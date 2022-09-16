@@ -1,22 +1,21 @@
 .tritable-text{
-
-    color: #AFBDD1;
     font-family: "Roboto";
     font-style: normal;
     font-weight: 500;
     font-size: 14px;
-    line-height: 30px;
     text-align: center;
     padding-left: 12px;
     padding-right: 12px;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    background-color: 'pink';
 }
 .team-text{
-    color: #AFBDD1;
     font-family: "Roboto";
     font-style: normal;
     font-weight: 500;
     font-size: 14px;
-    line-height: 18px;
     text-align: left;
     padding-left: 12px;
     padding-right: 30px;
@@ -25,21 +24,21 @@
     margin-top: 45px;
     margin-left: 35px;
 }
-/* .row{
+.row{
     background-color: #283142;
     border: 6px solid #313C4E;
     box-sizing: border-box;
     border-radius: 4px;
-} */
+}
 .total{
-    color: #9975D2;
-    line-height: 6px;
+    color: #851b08;
+    margin-bottom: 0px;
 }
 
-/* .component{
+.component{
     background: #283142;
     border-radius: 4px;
-} */
+} 
 .horizontal{
     border-bottom: 1px solid #D9DAE1;
 }
@@ -47,17 +46,23 @@
     border-right: 1px solid #D9DAE1;
 }
 .year-text{
-    color: #AFBDD1;
     font-family: "Roboto";
     font-style: normal;
     font-weight: 500;
     font-size: 16px;
-    line-height: 30px;
+    line-height: 20px;
     border-bottom: none;
 }
-.tri-scroll {
-    height: 35vh;     
-    overflow-y: auto;    
-    overflow-x: hidden;
-    margin-right: 200px;
- }
+.title{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 30px;
+    letter-spacing: 0.15px;
+}
+// .tri-scroll {
+//     height: 35vh;     
+//     overflow-y: auto;    
+//     overflow-x: hidden;
+//     margin-right: 200px;
+//  }
