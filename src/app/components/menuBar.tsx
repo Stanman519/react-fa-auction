@@ -13,17 +13,24 @@ import { ownerMap } from "../services/Common";
 import { turnOnNominationModeForThisOwnersLot } from "../redux/actions/LotActions";
 import { updateUI } from "../redux/actions/UiActions";
 import { FAChatWindow } from "./chat";
+import { LeagueLoginInfo } from "../redux/reducers/OwnerReducer";
+import { useAuth0 } from "@auth0/auth0-react";
 
 type DrawerType = 'Salaries' | 'Chat' | undefined
 
 export function MenuBar() {
     const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const { owners, profile, ui, lots } = useSelector((state: RootState) => state);
+    const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
+    const owners = useSelector((state: RootState) => state.owners.filter(o => o.leagues.map(l => l.league.leagueId).includes(currentLeague?.league.leagueId ?? 0)));
+    const lots = useSelector((state: RootState) => state.lots.filter(l => l.leagueId === currentLeague?.league.leagueId ?? 0));
+    const { user } = useAuth0();
+    const avatar = user?.picture
+    console.log('avatar', avatar)
 
     const nomIsUsed = useSelector((state: RootState) => {
-        if (!profile.ownername) return false
-        return state.lots.find(l => l.lotId === profile.ownerId)?.bid?.player
+        if (!owner.ownername) return false
+        return state.lots.find(l => l.lotId === owner.ownerId)?.bid?.player
     })
     const open = Boolean(anchorEl);
     const dispatch = useDispatch();
@@ -78,7 +85,7 @@ export function MenuBar() {
                                         setOpenDrawer('Salaries')
                                         setAnchorEl(null)
                                         }}>Salary Caps</MenuItem>
-                                    {profile.ownername && <MenuItem onClick={() => {
+                                    {owner.ownername && <MenuItem onClick={() => {
                                         setOpenDrawer('Chat')
                                         setAnchorEl(null)
                                         }}>{openDrawer == 'Chat' ? 'Close Chat' : 'Open Chat'}</MenuItem>}
@@ -102,7 +109,7 @@ export function MenuBar() {
                                     onClick={() => setOpenDrawer('Salaries')}>
                                     Salary Caps
                                 </Button>
-                                {profile.ownername && <Button color="inherit"
+                                {owner.ownername && <Button color="inherit"
                                     onClick={() => {
                                         //dispatch()
                                         setOpenDrawer('Chat')
@@ -119,7 +126,7 @@ export function MenuBar() {
                                     <VolumeUp />
                                 </div>
                             </div>)}
-                            {!profile.ownerId &&
+                            {!owner.ownerId &&
                                 <div>
                                     <Button color="inherit" onClick={() => dispatch(updateUI({ modal: 'signIn' }))}>
                                         LOGIN
@@ -144,9 +151,9 @@ export function MenuBar() {
                             {owners.map((o, index) => (
                                 <ListItem key={o.ownerId} style={{ backgroundColor: index % 2 === 0 ? palette.background.default : palette.background.paper }}>
                                     
-                                    <Avatar style={{ marginRight: 8 }} sx={{ height: 50, width: 50 }} alt="" src={ownerMap.find(owner => owner.id === o.ownerId)?.avatar} />
+                                    <Avatar style={{ marginRight: 8 }} sx={{ height: 50, width: 50 }} alt={user?.name} src={avatar} />
                                     <div style={{flexDirection: 'column'}}>
-                                        <ListItemText style={{}} primary={`${o.ownername} - $${o.capRoom}`} secondary={highBidsOnTheBoard(o.ownername) ?? 0 > 0 ? `outstanding bids: $${highBidsOnTheBoard(o.ownername)}`: ''} />
+                                        <ListItemText style={{}} primary={`${o.ownername} - $${o.leagues}`} secondary={highBidsOnTheBoard(o.ownername) ?? 0 > 0 ? `outstanding bids: $${highBidsOnTheBoard(o.ownername)}`: ''} />
                                     </div>
                                 
                                 </ListItem>

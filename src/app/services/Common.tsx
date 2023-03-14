@@ -1,5 +1,5 @@
 import { profileEnd } from "console";
-import Owner from "../redux/reducers/OwnerReducer";
+import Owner, { LeagueLoginInfo } from "../redux/reducers/OwnerReducer";
 
 interface OwnerLookup{
     name: string
@@ -23,16 +23,16 @@ export interface BidValidity{
 
 const file = process.env.PUBLIC_URL + '/avatars/';
 
-export const lastYear = 2021;
+export const lastYear = 2022;
 
 
-export const checkValidity = (profile: Owner, newBid: number, newYears: number, mflId: string, oldBid: number = 0, oldYears: number = 0, bidsOnBoard: number = 0): BidValidity => {
+export const checkValidity = (league: LeagueLoginInfo, newBid: number, newYears: number, mflId: number, oldBid: number = 0, oldYears: number = 0, bidsOnBoard: number = 0): BidValidity => {
     let validity: BidValidity = { isValid: true, violations: [] } 
-    if(!profile.ownername){
+    if(!league){
         validity.isValid = false;
         validity.violations.push("You are not logged in.")
     }
-    if((newBid + bidsOnBoard) > profile.capRoom ){
+    if((newBid + bidsOnBoard) > league.capRoom ){
         validity.isValid = false
         validity.violations.push("This and your current high bids would put you over the cap.")
     }

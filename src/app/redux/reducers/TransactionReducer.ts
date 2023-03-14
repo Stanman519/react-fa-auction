@@ -43,6 +43,7 @@ export interface DeadCapInfo {
     franchiseId: number
     amount: Record<string, number>
     team: string
+    startingYear: number
 }
 
 const defaultState = [] as Transaction[]

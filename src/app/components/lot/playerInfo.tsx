@@ -1,6 +1,6 @@
 import { Chip, Typography } from "@mui/material";
 import { tmColorMap } from "../../services/Common";
-import './styles/lot.scss';
+
 
 
 interface PlayerInfoProps {

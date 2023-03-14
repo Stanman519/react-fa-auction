@@ -7,7 +7,6 @@ import { BioAndHistory } from './bioAndHistory';
 import { BidInfo } from './bidInfo';
 import { Headshot, MemoHeadshot } from './headshot';
 import { PlayerInfo } from './playerInfo';
-import './styles/lot.scss';
 import { tmColorMap } from '../../services/Common';
 import { useState } from 'react';
 import { selectPlayerToNominate } from '../../redux/actions/LotActions';

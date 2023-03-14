@@ -3,7 +3,7 @@ import { FreeAgent } from "../redux/reducers/FreeAgentReducer";
 import { Bid, Lot } from "../redux/reducers/LotReducer";
 import Owner from "../redux/reducers/OwnerReducer";
 
-const URL = process.env.REACT_APP_AUCTION_API_URL;
+export const URL = process.env.REACT_APP_AUCTION_API_URL;
 const env = process.env.NODE_ENV;
 
 export interface PageLoad {
@@ -83,11 +83,11 @@ const makeNewNom = async (bid: Bid): Promise<Response> => {
     })
 }
 
-const getFullPlayerBio = async (lastYear: number, id: string, position: string, firstName: string, lastName: string, actionShot: boolean) : Promise<Response> => {
-    return await fetch(`${URL}/FreeAgency/year/${lastYear}/playerId/${id}/position/${position}/firstName/${firstName}/lastName/${lastName}?hasAction=${actionShot}`)
+const getFullPlayerBio = async (lastYear: number, id: number, position: string, firstName: string, lastName: string, actionShot: boolean, leagueId: number = 13894) : Promise<Response> => {
+    return await fetch(`${URL}/FreeAgency/leagues/${leagueId}/year/${lastYear}/playerId/${id}/position/${position}/firstName/${firstName}/lastName/${lastName}?hasAction=${actionShot}`)
 }
 
-const getBidHistoryByPlayerId = async (mflId: string): Promise<Response> => {
+const getBidHistoryByPlayerId = async (mflId: number): Promise<Response> => {
     return await fetch(`${URL}/FreeAgency/players/${mflId}/bid-history`)
 }
 
@@ -118,8 +118,8 @@ const register = async (name: string, username: string, password: string): Promi
     return res;
 }
 
-const pageLoad = async (cookie: string = ""): Promise<PageLoad> => {
-    const rest = await axios.get(`${URL}/FreeAgency/page-load`, 
+const pageLoad = async (cookie: string = "", leagueId: number = 13894): Promise<PageLoad> => {
+    const rest = await axios.get(`${URL}/FreeAgency//leagues/${leagueId}page-load`, 
     {
         params: { loginInfo: cookie }
     }).catch(error => {

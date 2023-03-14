@@ -12,8 +12,14 @@ import { submitLogin } from '../../redux/actions/LoginActions';
 import { useDispatch } from 'react-redux';
 import { useTheme } from '@mui/material';
 import { updateUI } from '../../redux/actions/UiActions';
+import { Route } from '../../services/Routing';
+import { loadDataForHomeBase } from '../../redux/actions/TransactionActions';
 
-export default function SignIn() {
+interface SignInProps{
+    origin: Route
+}
+
+export default function SignIn({origin}: SignInProps) {
     const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
     const dispatch = useDispatch();
@@ -69,7 +75,11 @@ export default function SignIn() {
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
-                        onClick={() => dispatch(submitLogin(username, password))}
+                        onClick={() => {
+                            //dispatch(submitLogin(username, password))
+
+                            //dispatch(loadDataForHomeBase(`${username},${password}`))
+                        }}
                         disabled={!username || !password}
                     >
                         Sign In

@@ -33,7 +33,7 @@ export const GiphyContext = React.createContext(
 export const FAChatWindow = (): JSX.Element | null => {
 
 
-    const user = useSelector((state: RootState) => state.profile)
+    const user = useSelector((state: RootState) => state.profile.owner)
     const [channel, setChannel] = useState<any>(ChatClient.getInstance().chatInstance.activeChannels['messaging:chat']);
     const [isMobileNavVisible, setMobileNav] = useState(false);
     const [giphyState, setGiphyState] = useState(false);
@@ -51,16 +51,16 @@ export const FAChatWindow = (): JSX.Element | null => {
                     name: user.ownername,
                     role: 'admin',
                     image: img,
-                }, user.token))
+                }, user.streamToken))
                 setChatClient(chatClientToUpdate.chatInstance)
             }
         }
-        if (user.token && !chatIsInitialized) {
+        if (user.streamToken && !chatIsInitialized) {
             chatSetup()
             setChatIsInitialized(true);
         }
 
-    }, [user.token])
+    }, [user.streamToken])
 
     const toggleMobile = () => setMobileNav(!isMobileNavVisible);
     const giphyContextValue = { giphyState, setGiphyState };

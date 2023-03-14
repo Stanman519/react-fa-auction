@@ -35,10 +35,10 @@ function AuctionHome() {
 
   return (
     <div className="App" style={{backgroundColor: theme.palette.background.default}}>
-      
-      <div className='menu-container'>
-        <MenuBar/>
-      </div>
+                <div className='menu-container'>
+            <MenuBar/>
+          </div>
+
       <div style={{display: 'flex', justifyContent: 'center'}}>
         {isLoading == 'fullscreen' ?
           <div>
@@ -66,7 +66,7 @@ function AuctionHome() {
         onClose={() => dispatch(updateUI({modal: undefined, isMobile }))}
       >
         <>
-          {modal === 'signIn' && <SignIn />}
+          {modal === 'signIn' && <SignIn origin={'auction'} />}
           {modal === 'register' && <Register />}
         </>
       </Modal>

@@ -34,7 +34,7 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
         setShowHistory(true);
     }
     const loadBio = async () => {
-        if (!bio || !bid.expires) {
+        if (!bio || !bid.expires || bid.player.mflId) {
             // NEED TO FIGURE OUT IF THIS IS A NEW NOM BECAUSE WE DON't hit this block
             setIsLoading(true)
             setShowBio(true)

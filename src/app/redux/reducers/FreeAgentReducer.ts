@@ -11,7 +11,9 @@ export interface FreeAgent{
     weight?: number
     headshot?: string
     actionShot?: string
-    mflId: string
+    mflId: number
+    salary?: number
+    length?: number
 }
 
 export interface PlayerBio{

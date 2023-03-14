@@ -9,6 +9,7 @@ export interface Bid {
     ownerId: number
     expires?: Date
     lotId?: number
+    leagueId: number
     player: FreeAgent
 }
 export interface Lot {
@@ -16,6 +17,7 @@ export interface Lot {
     bid?: Bid
     newNom: boolean
     isFresh?: boolean
+    leagueId: number
 }
 
 const defaultState = Array.from(Array(13).keys()).map(l => { return { lotId: l + 1, newNom: false}}) as Lot[]

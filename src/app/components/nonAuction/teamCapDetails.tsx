@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/reducers/RootReducer.js';
-import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, CircularProgress, Accordion, AccordionDetails, AccordionSummary, Typography, Avatar, List, ListItemAvatar, ListItemText, Divider, Card, CardContent } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Typography, Avatar, List, ListItemAvatar, ListItemText, Divider, Card, CardContent } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { loadTransactions } from '../../redux/actions/TransactionActions';
 
 
 
-export const TeamCapDetails = () => {
+export const TeamCapDetails = ({height}: {height: number}) => {
     const { selectedTeam, deadCap } = useSelector((state: RootState) => state.deadCap);
     const { transactions } = useSelector((state: RootState) => state);
     const FINAL_RELEVANT_YEAR = new Date().getFullYear() + 5
@@ -29,38 +28,43 @@ export const TeamCapDetails = () => {
 
     }, []);
     return (
-        <Card style={{marginTop: 110}}>
-            <CardContent>
+        <Card style={{display: 'flex', flexDirection: 'column', overflow: 'hidden', height: height}}>
+            <CardContent style={{overflowY: 'auto'}} >
                 {selectedTeam ?
                     <div>
-                        <Typography variant={'h6'}> {deadCap.find(t => t.franchiseId === selectedTeam)?.team}'s Penalties </Typography>
-                        <div>
-                            {YEAR_RANGE().map(y =>
-                                <Accordion>
-                                    <AccordionSummary
-                                        expandIcon={<ExpandMoreIcon />}
-                                        aria-controls="panel1a-content"
-                                        id="panel1a-header"
-                                    >
-                                        <Typography>{y}</Typography>
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                        <List>
-                                            {filterPlayersForYear(y).map(t => (
-                                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                                    <ListItemAvatar>
-                                                        <Avatar>{t.position}</Avatar>
-                                                    </ListItemAvatar>
-                                                    <ListItemText primary={t.playerName} secondary={`$${t.amount}`} style={{ textAlign: 'left' }} />
-                                                    <Divider />
-                                                </div>
-                                            ))}
-                                        </List>
+                        <Typography variant={'h6'}> {deadCap.find(t => t.franchiseId === selectedTeam)?.team}'s Cap Adjustments </Typography>
+                        <div style={{overflow: 'auto'}}>
+                            {YEAR_RANGE().map(y => {
+                                let players = filterPlayersForYear(y)
+                                if (players.length > 0) {
+                                    return (
+                                        <Accordion>
+                                            <AccordionSummary
+                                                expandIcon={<ExpandMoreIcon />}
+                                                aria-controls="panel1a-content"
+                                                id="panel1a-header"
+                                            >
+                                                <Typography>{y}</Typography>
+                                            </AccordionSummary>
+                                            <AccordionDetails>
+                                                <List>
+                                                    {players.map(t => (
+                                                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} key={`${t.transactionId}-${y}`}>
+                                                            <ListItemAvatar>
+                                                                <Avatar>{t.position}</Avatar>
+                                                            </ListItemAvatar>
+                                                            <ListItemText primary={t.playerName} secondary={`$${t.amount}`} style={{ textAlign: 'left' }} />
+                                                            <Divider />
+                                                        </div>
+                                                    ))}
+                                                </List>
 
-                                    </AccordionDetails>
-                                </Accordion>
-                            )
+                                            </AccordionDetails>
+                                        </Accordion>)
+                                }
+                            })
                             }
+                            
                         </div>
                     </div> :
                     <Typography variant={'h6'}> Select a team to view player details. </Typography>

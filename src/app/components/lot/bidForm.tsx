@@ -7,8 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { makeNewBid, makeNewNomination } from "../../redux/actions/LotActions";
 import { Lot } from "../../redux/reducers/LotReducer";
 import { RootState } from "../../redux/reducers/RootReducer";
-import { checkValidity } from "../../services/Common";
-import './styles/lot.scss';
+import { BidValidity, checkValidity } from "../../services/Common";
 
 const Transition = forwardRef(function Transition(
     props: TransitionProps & {
@@ -24,26 +23,36 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
     const [bidSalary, setBidSalary] = useState<number>(0);
     const [bidLength, setBidLength] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>();
-    const { profile } = useSelector((state: RootState) => state);
+    const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
+    // const leagueOwnerData = owner.leagues.find(l => l.league.leagueId === currentLeague?.league.leagueId)
     const highBidsOnTheBoard = useSelector((state: RootState) => state.lots
-                .filter(l => l.bid?.ownerId === profile.ownerId).map(b => b.bid?.bidSalary)
+                .filter(l => l.bid?.ownerId === owner.ownerId).map(b => b.bid?.bidSalary)
                 .reduce((prev, curr) => prev! + curr!, 0));
     const [confirmModal, setConfirmModal] = useState<boolean>(false);
     const theme = useTheme();
     const dispatch = useDispatch();
     
     const fauxButtonDisable = () => {
-        if (getValidity().isValid) setConfirmModal(true)
+        if (!currentLeague) {
+            setConfirmModal(false)
+            return;
+        }
+        if (getValidity()?.isValid) setConfirmModal(true)
     }
-    const getValidity = () => checkValidity(profile, bidSalary ? bidSalary : 0, bidLength ? bidLength : 0,
-        lot.bid?.player.mflId ?? "", lot.bid?.bidSalary ?? 0, lot.bid?.bidLength ?? 0, highBidsOnTheBoard);
+    const getValidity = () => {
+        if (!currentLeague) return { violations: ["You are not logged in."]} as BidValidity
+        return checkValidity(currentLeague, bidSalary ? bidSalary : 0, bidLength ? bidLength : 0,
+        lot.bid?.player.mflId ?? 0, lot.bid?.bidSalary ?? 0, lot.bid?.bidLength ?? 0, highBidsOnTheBoard)
+    };
 
     const handleSubmission = () => {
+        if (!currentLeague) return;
         if (bidMode && lot.bid) {
             setIsLoading(true);
             dispatch(makeNewBid({
-                ownerId: profile.ownerId,
-                ownername: profile.ownername,
+                leagueId: currentLeague.league.leagueId,
+                ownerId: owner.ownerId,
+                ownername: owner.ownername,
                 bidSalary: bidSalary ?? 0,
                 bidLength: bidLength ?? 0,
                 lotId: lot.lotId,
@@ -55,8 +64,9 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
         } else if (lot.bid) {
             setIsLoading(true);
             dispatch(makeNewNomination({
-                ownerId: profile.ownerId,
-                ownername: profile.ownername,
+                leagueId: currentLeague.league.leagueId,
+                ownerId: owner.ownerId,
+                ownername: owner.ownername,
                 bidSalary: bidSalary ?? 0,
                 bidLength: bidLength ?? 0,
                 lotId: lot.lotId,
@@ -85,15 +95,19 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
                     className='number-input'
                     label='Salary' type='number' InputProps={{ inputProps: { min: 0, max: 500 } }} />
                 <Tooltip 
-                title={getValidity().violations.length > 0 ?
-                    getValidity().violations.map(v =>
+                title={ 
+                
+                    (getValidity().violations.length ?? 0) > 0 ?
+                    getValidity()?.violations.map(v =>
                         <div style={{ alignItems: 'center', display: 'flex' }} key={v}>
                             <Cancel fontSize={'small'} color={'warning'} /><span>{v}</span>
-                        </div>) : ""} 
+                        </div>) 
+                        : ""
+                    } 
                 arrow placement='bottom'>
                     <Button
                         onClick={() => fauxButtonDisable()}
-                        disableRipple={!getValidity().isValid} // need to do this because tooltip won't work if disabled is a property
+                        disableRipple={!getValidity()?.isValid} // need to do this because tooltip won't work if disabled is a property
                         style={{ flex: 1, marginLeft: 10, marginRight: 10 }} size='large' variant='contained'>
                         <h3 style={{ margin: 0 }}>{bidMode ? 'BID' : 'NOMINATE'}</h3>
                     </Button>

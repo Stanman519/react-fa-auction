@@ -24,15 +24,16 @@ export const selectPlayerToNominate = (selectedPlayer: FreeAgent | null) => asyn
     getState: () => RootState
 ): Promise<any> => {
     const { lots } = getState()
-    const { profile } = getState()
-    if (!profile || lots.length === 0 || !selectedPlayer) return;
+    const { owner, currentLeague } = getState().profile
+    if (!owner.ownername || lots.length === 0 || !selectedPlayer || !currentLeague) return;
     let updatedLots = [...lots];
-    const  thisPlayersLotIndex = updatedLots.findIndex(l => l.lotId == profile.ownerId);
+    const  thisPlayersLotIndex = updatedLots.findIndex(l => l.lotId == owner.ownerId);
     if (thisPlayersLotIndex < 0 ) return;
     const newBid: Bid = { 
+        leagueId: currentLeague.league.leagueId,
         player: selectedPlayer,
-        ownername: profile.ownername,
-        ownerId: profile.ownerId,
+        ownername: owner.ownername,
+        ownerId: owner.ownerId,
         bidLength: 0,
         bidSalary: 0
     }
@@ -67,7 +68,7 @@ export const turnOnNominationModeForThisOwnersLot = () => async (
     const { profile } = getState()
     let updatedLots = [...lots];
     if (!profile || lots.length === 0) return;
-    const  thisPlayersLotIndex = updatedLots.findIndex(l => l.lotId == profile.ownerId);
+    const  thisPlayersLotIndex = updatedLots.findIndex(l => l.lotId == profile.owner.ownerId);
     if (thisPlayersLotIndex < 0) return;
     updatedLots[thisPlayersLotIndex].newNom = true;
     dispatch(updateLots(updatedLots))

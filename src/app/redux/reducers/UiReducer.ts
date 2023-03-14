@@ -25,6 +25,9 @@ export type ErrorTypes = 'snackbar' | undefined;
 export type Modals = 
   'signIn' | 
   'register' | 
+  'taxi-confirm' |
+  'buyout-confirm' |
+  'tag-confirm' |
   undefined;
 
 export type SnackBars =  undefined; 

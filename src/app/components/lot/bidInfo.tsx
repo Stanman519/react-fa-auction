@@ -6,7 +6,7 @@ import UIfx from 'uifx'
 import { makeThisLotStale } from "../../redux/actions/LotActions";
 import { TransitionProps } from "@mui/material/transitions";
 import { RootState } from "../../store";
-import { askCapn } from "../../redux/actions/LoginActions";
+//import { askCapn } from "../../redux/actions/LoginActions";
 import { Lot } from "../../redux/reducers/LotReducer";
 
 
@@ -27,36 +27,36 @@ const Transition = forwardRef(function Transition(
 export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
     const dispatch = useDispatch()
     const capnWarning = process.env.PUBLIC_URL + '/ask_capn.jpg';
-    const { profile } = useSelector((state: RootState) => state)
+    const profile = useSelector((state: RootState) => state.profile.owner)
     const [confirmModal, setConfirmModal] = useState<boolean>(false);
-    const [hasAsked, setHasAsked] = useState<boolean>(profile?.tipsUsed?.some(p => p.mflId == lot.bid?.player?.mflId))
-    let tip = hasAsked ? profile.tipsUsed?.find(t => t.mflId == lot.bid?.player.mflId) : undefined
+    //const [hasAsked, setHasAsked] = useState<boolean>(profile?.tipsUsed?.some(p => p.mflId == lot.bid?.player?.mflId))
+    //let tip = hasAsked ? profile.tipsUsed?.find(t => t.mflId == lot.bid?.player.mflId) : undefined
 
     const [isLoading, setIsLoading] = useState<boolean>();
     const { audioOn } = useSelector((state: RootState) => state.ui);
     const notification = require('../../../assets/sounds/Blow.mp3');
     const beep = new UIfx(notification, { volume: 1 })
 
-    const isEligibleForFreeTip = (): boolean => {
-        if (profile.premium) return true
-        if (!profile.tipsUsed) return false
-        if (profile.tipsUsed.length === 0) return true
-        return false;
-    }
+    // const isEligibleForFreeTip = (): boolean => {
+    //     if (profile.premium) return true
+    //     if (!profile.tipsUsed) return false
+    //     if (profile.tipsUsed.length === 0) return true
+    //     return false;
+    // }
 
 
-    const handleSubmission = () => {
-        if (!profile.ownername) return;
-        setIsLoading(true);
-        dispatch(askCapn(lot?.bid?.player?.mflId!, lot?.bid?.player?.position!, lot?.bid?.player?.age!))
-        setHasAsked(true)
-        setIsLoading(false)
-        setConfirmModal(false)
-    }
-    const checkProfileForPremium = () => {
-        if (!profile.ownername) return
-        profile.premium ? handleSubmission() : setConfirmModal(true)
-    }
+    // const handleSubmission = () => {
+    //     if (!profile.ownername) return;
+    //     setIsLoading(true);
+    //     dispatch(askCapn(lot?.bid?.player?.mflId!, lot?.bid?.player?.position!, lot?.bid?.player?.age!))
+    //     setHasAsked(true)
+    //     setIsLoading(false)
+    //     setConfirmModal(false)
+    // }
+    // const checkProfileForPremium = () => {
+    //     if (!profile.ownername) return
+    //     profile.premium ? handleSubmission() : setConfirmModal(true)
+    // }
 
     useEffect(() => {
         let timer: any
@@ -89,14 +89,14 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
             
         </Tooltip>
         <Divider variant='middle' flexItem />
-        {hasAsked ? 
+        {/* {hasAsked ? 
             <div style={{fontSize: 'medium', padding:12}}>Cap'n suggests: ${tip?.suggestion}, {tip?.yearMin}{tip?.yearMin != tip?.yearMax ? `-${tip?.yearMax} years`: ''}</div> 
             :
          <Button 
          style={{borderWidth: 1, margin: 8, width: '80%'}} 
          onClick={() => checkProfileForPremium()}>ASK CAP'N</Button>
-        }
-        <Dialog
+        } */}
+        {/* <Dialog
                 open={confirmModal}
                 TransitionComponent={Transition}
                 keepMounted
@@ -121,7 +121,7 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
                     color='success' style={{ marginLeft: 8 }} size='large' variant='contained' 
                     onClick={() => handleSubmission()}>Submit</LoadingButton>
                 </DialogActions>
-            </Dialog>
+            </Dialog> */}
         </div>
     );
 };

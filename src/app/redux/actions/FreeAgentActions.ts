@@ -1,7 +1,7 @@
 import { Action } from "@reduxjs/toolkit";
 import AuctionApiSvc from "../../services/AuctionApiSvc";
 import { FreeAgent } from "../reducers/FreeAgentReducer";
-import { loadAuthenticatedAccount } from "./LoginActions";
+import { updateLoginInfo } from "./LoginActions";
 import { updateLots } from "./LotActions";
 import { updateOwners } from "./OwnerActions";
 import { updateUI } from "./UiActions";
@@ -29,7 +29,7 @@ export const getInitialData = (cookie: string = "") => async (
         dispatch(updateFreeAgents(initData.freeAgents));
         dispatch(updateLots(initData.lots))
         dispatch(updateOwners(initData.owners));
-        if(initData.profile) dispatch(loadAuthenticatedAccount(initData.profile));
+        if(initData.profile) dispatch(updateLoginInfo({owner: initData.profile}));
         dispatch(updateUI({isLoading: undefined}))
     } catch (error: any){
         dispatch(updateUI({ isLoading: undefined, error: 'snackbar', errorText: error.message }));

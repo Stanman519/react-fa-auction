@@ -1,6 +1,8 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import { Action } from "@reduxjs/toolkit";
 import Cookies from "universal-cookie/es6";
 import AuctionApiSvc, { PlayerTipRequest, PlayerTipResponse } from "../../services/AuctionApiSvc";
+import { LoginState } from "../reducers/LoginReducer";
 import Owner from "../reducers/OwnerReducer";
 import { RootState } from "../reducers/RootReducer";
 import { updateUI } from "./UiActions";
@@ -9,10 +11,10 @@ import { updateUI } from "./UiActions";
 export const UPDATE_LOGIN = 'UPDATE_LOGIN';
 
 export interface LoginAction extends Action {
-    payload: Owner
+    payload: LoginState
 }
 
-export const loadAuthenticatedAccount = (profile: Owner): LoginAction => {
+export const updateLoginInfo = (profile: LoginState): LoginAction => {
     return {
         type: UPDATE_LOGIN,
         payload: profile
@@ -21,28 +23,55 @@ export const loadAuthenticatedAccount = (profile: Owner): LoginAction => {
 
 export const submitLogin = (username:string, password: string) => async(
     dispatch: Function,
+    
 ) => {
     try {
         const cookies = new Cookies();
         const login = await AuctionApiSvc.login(username, password)
-        dispatch(loadAuthenticatedAccount(login))
+        //console.log('loginleagues', login.leagues)
+        const currentLeague = login.leagues.length > 0 ? login.leagues[0] : undefined
+        dispatch(updateLoginInfo({owner: login, currentLeague}))
         dispatch(updateUI({modal: undefined}))
         cookies.set('token', `${login.ownername},${login.password}`)
     } catch (e: any) { 
-        console.log('e', e.data)
+        //console.log('e', e.data)
         dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
     }
 
 }
 
-export const askCapn = (mflId: string, position: string, age: number) => async(
+export const loginAuthUserWithRedirect = () => async(
     dispatch: Function,
     getState: () => RootState
-) => {
-    const { profile } = getState()
-    const askRequest = {mflId, position, age, ownerId: profile.ownerId} as PlayerTipRequest
-    const res = await AuctionApiSvc.askCapn(askRequest);
-    const tip = await AuctionApiSvc.handleErrorResponse(res) as PlayerTipResponse;
+    ) => {
+        try {
+            const login = getState().profile
+            const { loginWithRedirect, user } = useAuth0();
+            loginWithRedirect()
 
-    dispatch(loadAuthenticatedAccount({...profile, tipsUsed: [...profile.tipsUsed, tip]}))
-}
+            // call api, does db owner exist with this userid?
+                // if not, create one?
+            // if so, return the user
+
+
+
+
+            dispatch(updateLoginInfo({...login, authUser: user}))
+        } catch (e: any) { 
+            //console.log('e', e.data)
+            dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
+        }
+    
+    }
+
+// export const askCapn = (mflId: string, position: string, age: number) => async(
+//     dispatch: Function,
+//     getState: () => RootState
+// ) => {
+//     const { profile } = getState()
+//     const askRequest = {mflId, position, age, ownerId: profile.ownerId} as PlayerTipRequest
+//     const res = await AuctionApiSvc.askCapn(askRequest);
+//     const tip = await AuctionApiSvc.handleErrorResponse(res) as PlayerTipResponse;
+
+//     dispatch(updateLoginInfo({...profile, tipsUsed: [...profile.tipsUsed, tip]}))
+// }
