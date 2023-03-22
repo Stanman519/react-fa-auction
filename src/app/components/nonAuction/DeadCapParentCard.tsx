@@ -1,11 +1,9 @@
-// import '../../styles/CapDetails.css';
-// import '../../styles/DeadCapTable.css';
 import { Card, CardContent } from '@mui/material';
 import DeadCapTable from './DeadCapTable';
-import { TeamCapDetails } from './TeamCapDetails';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
+import { TeamCapDetails } from './TeamCapDetails';
 
 export default function DeadCapParentCard() {
     const [height, setHeight] = useState(0)
