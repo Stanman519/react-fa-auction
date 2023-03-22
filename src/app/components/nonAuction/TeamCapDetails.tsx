@@ -49,7 +49,7 @@ export const TeamCapDetails = ({height}: {height: number}) => {
                                             <AccordionDetails>
                                                 <List>
                                                     {players.map(t => (
-                                                        <div key={t.} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} key={`${t.transactionId}-${y}`}>
+                                                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} key={`${t.transactionId}-${y}`}>
                                                             <ListItemAvatar>
                                                                 <Avatar>{t.position}</Avatar>
                                                             </ListItemAvatar>
