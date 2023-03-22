@@ -1,6 +1,6 @@
 import { Autocomplete, Divider, TextField } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { FreeAgent } from '../../redux/reducers/FreeAgentReducer';
+import { PlayerDTO } from '../../redux/reducers/FreeAgentReducer';
 import { Bid, Lot } from '../../redux/reducers/LotReducer';
 import { RootState } from '../../store';
 import { BioAndHistory } from './bioAndHistory';
@@ -17,10 +17,10 @@ interface PlayerCardProps {
 
 export const PlayerCard = ({ lot }: PlayerCardProps) => {
   const { freeAgents } = useSelector((state: RootState) => state);
-  const [selectedPlayer, setSelectedPlayer] = useState<FreeAgent>();
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerDTO>();
   const {isMobile} = useSelector((state: RootState) => state.ui)
   const dispatch = useDispatch();
-  const selectPlayerForNom = (player: FreeAgent) => {
+  const selectPlayerForNom = (player: PlayerDTO) => {
     setSelectedPlayer(player)
     dispatch(selectPlayerToNominate(player))
   }
@@ -52,7 +52,7 @@ export const PlayerCard = ({ lot }: PlayerCardProps) => {
               disablePortal
               id="free-agent-selection"
               options={freeAgents}
-              value={selectedPlayer ?? {firstName: '', lastName: ''} as FreeAgent}
+              value={selectedPlayer ?? {firstName: '', lastName: ''} as PlayerDTO}
               onChange={(event: any, newValue) => {
                 if (newValue) selectPlayerForNom(newValue)
               }}

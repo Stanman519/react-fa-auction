@@ -6,10 +6,12 @@ import { lastYear } from "../../services/Common";
 import { useState } from "react";
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { TogglePlayerCardButton } from "./TogglePlayerCardButton";
+import { updateUI } from "../../redux/actions/UiActions";
+import { ConfirmModal } from "../ConfirmModal";
 
 const BuyoutTile = () => {
     const dispatch = useDispatch();
-    const { modal } = useSelector((state: RootState) => state.ui)
+    const showModal = useSelector((state: RootState) => state.ui.modal === 'buyout-confirm')
     const { profile } = useSelector((state: RootState) => state)
     const [selectedPlayerIndex, setSelectedPlayerIndex] = useState<number | undefined>(undefined)
     const theme = useTheme();
@@ -17,18 +19,15 @@ const BuyoutTile = () => {
 
 
     return (
-
+<>
+        {showModal && <ConfirmModal isOpen={showModal} actionButtonLabel={"SUBMIT"} mainText={"Are you sure you want to use your buyout? You only get 1 every season and it costs $15 IRL!"} onAction={() => console.log('ok')} />}
         <Card style={{ margin: 16, display: 'flex', flexDirection: 'column' }}>
             <div>
-            <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 8, marginRight: 8}}>
-                    <div style={{ flex: 1.25 }}/>
-                    <div style={{ display: 'flex', flex: 2, flexDirection: 'row', justifyContent: 'space-around' }}>
-                        <div style={{ flex: 1}}>
-                            <div>Salary</div>
-                        </div>
-                        <div style={{ flex: 1}}>
-                            <div>Years Left</div>
-                        </div>
+            <div  className="flex flex-row ml-2 mr-5 flex-1 " >
+                    <div className="w-3/4"/>
+                    <div className="flex flex-col lg:flex-row w-1/4 content-center justify-center">
+                            <div className="whitespace-nowrap text-sm text-right">SALARY</div>
+                            <div className="whitespace-nowrap text-sm text-right">YEARS LEFT</div>
                     </div>
                 </div>
                 {cutCandidates.map((p, index) => {
@@ -46,8 +45,9 @@ const BuyoutTile = () => {
                 }
 
             </div>
-            {selectedPlayerIndex != undefined &&
-                <Button style={{ backgroundColor: 'green', margin: 12 }} >
+            {selectedPlayerIndex !== undefined &&
+                <Button style={{ backgroundColor: 'green', margin: 12 }} 
+                onClick={() => dispatch(updateUI({modal: 'buyout-confirm'}))}>
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                         <AttachMoneyIcon style={{ color: 'white' }} />
                         <div style={{ color: 'white' }}>BUYOUT THIS PLAYER</div>
@@ -55,6 +55,7 @@ const BuyoutTile = () => {
 
                 </Button>}
         </Card>
+        </>
     );
 }
 

@@ -1,11 +1,11 @@
 import { Chip,Card } from "@mui/material";
-import { FreeAgent } from "../../redux/reducers/FreeAgentReducer";
-import { tmColorMap, lastYear } from "../../services/Common";
-
+import { PlayerDTO } from "../../redux/reducers/FreeAgentReducer";
+import { tmColorMap } from "../../services/Common";
+import '../../styles/index.css'
 
 
 interface PlayerToggleButtonProps {
-    player: FreeAgent
+    player: PlayerDTO
     attribute1?: string | number
     attribute2?: string | number
     onSelect: () => void
@@ -18,28 +18,32 @@ export const TogglePlayerCardButton = ({player, attribute1, attribute2, onSelect
             <Card 
             
             onClick={onSelect}
-            sx={{ margin: '8px', cursor: 'pointer', display: 'flex', flexDirection: 'row', flex: 1, borderColor: 'red', borderWidth: isSelected ? '4px' : 0, borderStyle: 'solid'}} >
+            sx={{ margin: '8px', cursor: 'pointer', display: 'flex', flexDirection: 'row',  alignItems: 'center',
+                flex: 1, borderColor: 'red', borderWidth: isSelected ? '4px' : 0, borderStyle: 'solid'}} >
+                <div className="h-28 flex flex-row">
+                    <img className="max-h-full max-w-full aspect-[150/109]" src={player.headshot}  />                    
+                </div>
+                <div className="flex flex-row flex-1">
 
-                <img src={player.headshot} style={{ maxHeight: '10%', maxWidth: '10%', aspectRatio: 'auto', objectFit: 'cover', marginRight: 10 }} />
-                <div style={{ display: 'flex', flexDirection: 'row', flex: 1, height: 100 }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: 6, paddingBottom: 6 }}>
-                        <div>{player.fullName}</div>
-                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                            <Chip label={player.position}
-                                style={{ backgroundColor: tmColorMap.find(tm => tm.team === player.team)?.primary, color: 'white', alignSelf: 'center', fontSize: 14, fontWeight: 'bold', padding: 6 }} />
+                        <div className="flex flex-col w-1/2 " >
+                            <div className="lg:text-4xl">{player.fullName}</div>
+                            <div className="flex flex-row content-center">
+                                <Chip label={`${player.team} ${player.position}`}
+                                    style={{ backgroundColor: tmColorMap.find(tm => tm.team === player.team)?.primary, 
+                                    color: 'white', alignSelf: 'center', fontSize: 14, fontWeight: 'bold', padding: 6 }} />
 
-                            <div style={{ marginLeft: 10 }}>{player.team}</div>
-                        </div>
+                                {/* <div style={{ marginLeft: 10 }}>{}</div> */}
+                            </div>
+
+                    </div>
+
+                    <div className="flex flex-col lg:flex-row lg:text-2xl leading-none flex-1 justify-around content-center">
+                        {attribute1 && <div className="self-center">{attribute1}</div>}
+                        {attribute2 && <div className="self-center">{attribute2}</div>}
                     </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', flex: 2, alignItems: 'center' }}>
-                    {attribute1 && <div>
-                        <div style={{ }}>{attribute1}</div>
-                    </div>}
-                    {attribute2 &&<div>
-                        <div style={{  }}>{attribute2}</div>
-                    </div>}
-                </div>
+
+
 
 
 

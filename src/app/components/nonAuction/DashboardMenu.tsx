@@ -3,7 +3,6 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import { useDispatch, useSelector } from "react-redux";
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -12,16 +11,15 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
-import { RootState } from '../../store';
 import { useAuth0 } from '@auth0/auth0-react';
 
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const pages = ['Leagues', 'Games', 'Auction'];
+const settings = ['Logout'];
 
 function ResponsiveAppBar() {
-    //const {profile} = useSelector((state: RootState) => state)
-    const { user} = useAuth0();
+  //const {profile} = useSelector((state: RootState) => state)
+  const { user } = useAuth0();
+  console.log(user)
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const logo = process.env.PUBLIC_URL + '/stanfan-logo-white.png';
@@ -31,6 +29,10 @@ function ResponsiveAppBar() {
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
+
+  React.useEffect(() => {
+
+  }, [user])
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
@@ -43,8 +45,8 @@ function ResponsiveAppBar() {
   return (
     <AppBar position="static">
       <Container maxWidth="xl" >
-        <Toolbar disableGutters style={{maxHeight: 40}}>
-        <img src={logo} style={{ maxHeight: 20, aspectRatio: 'auto', marginRight: 20 }}/>
+        <Toolbar disableGutters style={{ maxHeight: 40 }}>
+          <img src={user?.picture} referrerPolicy="no-referrer" style={{ height: 0, width: 0 }} />
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
@@ -81,7 +83,7 @@ function ResponsiveAppBar() {
               ))}
             </Menu>
           </Box>
-          
+          <img src={logo} style={{ maxHeight: 20, aspectRatio: 'auto', marginRight: 20 }} />
 
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
@@ -92,6 +94,7 @@ function ResponsiveAppBar() {
               >
                 {page}
               </Button>
+
             ))}
           </Box>
 

@@ -1,7 +1,6 @@
 import { Action } from "@reduxjs/toolkit";
-import React from "react";
 import AuctionApiSvc from "../../services/AuctionApiSvc";
-import { FreeAgent } from "../reducers/FreeAgentReducer";
+import { PlayerDTO } from "../reducers/FreeAgentReducer";
 import { Lot, Bid } from "../reducers/LotReducer";
 import { RootState } from "../reducers/RootReducer";
 import { updateUI } from "./UiActions";
@@ -19,7 +18,7 @@ export const updateLots = (lots: Lot[]): LotAction => {
     }
 }
 
-export const selectPlayerToNominate = (selectedPlayer: FreeAgent | null) => async ( 
+export const selectPlayerToNominate = (selectedPlayer: PlayerDTO | null) => async ( 
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
@@ -27,7 +26,7 @@ export const selectPlayerToNominate = (selectedPlayer: FreeAgent | null) => asyn
     const { owner, currentLeague } = getState().profile
     if (!owner.ownername || lots.length === 0 || !selectedPlayer || !currentLeague) return;
     let updatedLots = [...lots];
-    const  thisPlayersLotIndex = updatedLots.findIndex(l => l.lotId == owner.ownerId);
+    const  thisPlayersLotIndex = updatedLots.findIndex(l => l.lotId=== owner.ownerId);
     if (thisPlayersLotIndex < 0 ) return;
     const newBid: Bid = { 
         leagueId: currentLeague.league.leagueId,
@@ -47,7 +46,7 @@ export const updateLotWithFreshBid = (bid: Bid) => async (
 ): Promise<any> => {
     const { lots } = getState();
     const updated = [...lots];
-    const newLotIndex = updated.findIndex(l => l.lotId == bid.lotId);
+    const newLotIndex = updated.findIndex(l => l.lotId=== bid.lotId);
     if (newLotIndex < 0) return; 
         
     // i was checking for !updated[newLotIndex].bid here but i dont know why. took out because it was breaking nominations
@@ -68,7 +67,7 @@ export const turnOnNominationModeForThisOwnersLot = () => async (
     const { profile } = getState()
     let updatedLots = [...lots];
     if (!profile || lots.length === 0) return;
-    const  thisPlayersLotIndex = updatedLots.findIndex(l => l.lotId == profile.owner.ownerId);
+    const  thisPlayersLotIndex = updatedLots.findIndex(l => l.lotId=== profile.owner.ownerId);
     if (thisPlayersLotIndex < 0) return;
     updatedLots[thisPlayersLotIndex].newNom = true;
     dispatch(updateLots(updatedLots))

@@ -7,6 +7,8 @@ import { updateUI } from "./UiActions";
 import { updateLoginInfo } from "./LoginActions";
 import Cookies from "universal-cookie/es6";
 import { User } from "@auth0/auth0-react";
+import { LeagueLoginInfo } from "../reducers/OwnerReducer";
+import { PlayerDTO } from "../reducers/FreeAgentReducer";
 
 export interface TransactionAction extends Action {
     payload: Transaction[]
@@ -22,21 +24,10 @@ export const loadDataForHomeBase = (authUser: User) => async (
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
-    let user, pass
-    // if (!isCookie) {
-    //     var userpass = token.split(",")
-    //     user = userpass[0]
-    //     pass = userpass[1]
-    //     pass = btoa(pass)
-    //     token = `${user},${pass}`
-    // } //else {
-    //     var userpass = token.split(",")
-    //     user = userpass[0]
-    //     pass = userpass[1]
-    // }
+
     const dashboard = await GeneralApiSvc.fetchDashboardInitialLoad("", authUser)
     if (dashboard) {
-        const cookies = new Cookies();
+        //const cookies = new Cookies();
         // cookies.set('token', `${dashboard.profile.ownername},${dashboard.profile.password}`)
         const currentLeague = dashboard.profile.leagues.length > 0 ? dashboard.profile.leagues[0] : undefined
         console.log(currentLeague?.taxiPlayers)
@@ -48,6 +39,71 @@ export const loadDataForHomeBase = (authUser: User) => async (
     else {
         dispatch(updateUI({modal: 'signIn'}))
     }
+}
 
-    
+
+export const submitFranchiseTag = (leagueId: number, mflPlayerId: number, mflFranchiseId: number, tagSalary: number) => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const { profile } = getState()
+    const requestBody = {leagueId, mflFranchiseId, mflPlayerId, tagSalary}
+    if (!profile.currentLeague) return
+    try {
+        const res = await GeneralApiSvc.postFranchiseTagPlayer(requestBody)
+        //const newTags = profile.currentLeague?.tagCandidates.filter(t => t.player.mflId !== mflPlayerId) ?? []
+        const newLeague: LeagueLoginInfo = {...profile.currentLeague}
+        if (!newLeague) return
+        newLeague.tagCandidates = []
+        dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
+
+    } catch (e: any)
+    {
+
+    }
+    dispatch(updateUI({modal: undefined}))
+}
+
+export const submitBuyout = (leagueId: number, player: PlayerDTO, mflFranchiseId: number, rebate: number) => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const { profile } = getState()
+    const requestBody = {leagueId, player, mflFranchiseId, rebate}
+    if (!profile.currentLeague) return
+    try {
+        await GeneralApiSvc.postBuyoutPlayer(requestBody)
+        const newLeague: LeagueLoginInfo = {...profile.currentLeague}
+        if (!newLeague) return
+        newLeague.cutCandidates = []
+        dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
+
+    } catch (e: any)
+    {
+
+    }
+    dispatch(updateUI({modal: undefined}))
+}
+
+export const submitTaxiCut = (leagueId: number, player: PlayerDTO, mflFranchiseId: number, rebate: number) => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const { profile } = getState()
+    const requestBody = {leagueId, player, mflFranchiseId, rebate}
+    if (!profile.currentLeague) return
+    try {
+        const res = await GeneralApiSvc.postTaxiCut(requestBody)
+        dispatch(updateUI({modal: undefined}))
+        const newTaxi = profile.currentLeague?.taxiPlayers.filter(t => t.mflId !== player.mflId) ?? []
+        const newLeague: LeagueLoginInfo = {...profile.currentLeague}
+        if (!newLeague) return
+        newLeague.taxiPlayers = newTaxi
+        dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
+
+    } catch (e: any)
+    {
+
+    }
+    dispatch(updateUI({modal: undefined}))
 }

@@ -1,6 +1,6 @@
 import { FreeAgentAction, UPDATE_FREE_AGENTS } from "../actions/FreeAgentActions";
 
-export interface FreeAgent{
+export interface PlayerDTO{
     firstName: string
     lastName: string
     fullName: string
@@ -41,7 +41,7 @@ export interface BioPositionRank{
     rank: number
 }
 
-export const freeAgentReducer = (state = [] as FreeAgent[], action: FreeAgentAction): FreeAgent[] => {
+export const freeAgentReducer = (state = [] as PlayerDTO[], action: FreeAgentAction): PlayerDTO[] => {
     switch (action.type) {
         case UPDATE_FREE_AGENTS:
             return action.payload;

@@ -1,9 +1,8 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Action } from "@reduxjs/toolkit";
 import Cookies from "universal-cookie/es6";
-import AuctionApiSvc, { PlayerTipRequest, PlayerTipResponse } from "../../services/AuctionApiSvc";
+import AuctionApiSvc from "../../services/AuctionApiSvc";
 import { LoginState } from "../reducers/LoginReducer";
-import Owner from "../reducers/OwnerReducer";
 import { RootState } from "../reducers/RootReducer";
 import { updateUI } from "./UiActions";
 
@@ -40,20 +39,20 @@ export const submitLogin = (username:string, password: string) => async(
 
 }
 
-export const loginAuthUserWithRedirect = () => async(
+export const loginAuthUserWithRedirect = () => async (
     dispatch: Function,
     getState: () => RootState
     ) => {
         try {
             const login = getState().profile
             const { loginWithRedirect, user } = useAuth0();
-            loginWithRedirect()
+            await loginWithRedirect()
 
             // call api, does db owner exist with this userid?
                 // if not, create one?
             // if so, return the user
-
-
+            
+            console.log('auth user....', user)
 
 
             dispatch(updateLoginInfo({...login, authUser: user}))

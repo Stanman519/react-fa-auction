@@ -1,13 +1,13 @@
 import axios from "axios";
-import { FreeAgent } from "../redux/reducers/FreeAgentReducer";
+import { PlayerDTO } from "../redux/reducers/FreeAgentReducer";
 import { Bid, Lot } from "../redux/reducers/LotReducer";
 import Owner from "../redux/reducers/OwnerReducer";
 
 export const URL = process.env.REACT_APP_AUCTION_API_URL;
-const env = process.env.NODE_ENV;
+//const env = process.env.NODE_ENV;
 
 export interface PageLoad {
-    freeAgents: FreeAgent[],
+    freeAgents: PlayerDTO[],
     owners: Owner[],
     lots: Lot[],
     profile?: Owner
@@ -42,7 +42,7 @@ const makeNewBid = async (bid: Bid): Promise<Response> => {
             lastName: bid.player.lastName,
         }
     }  as Bid)
-    return await fetch(`${URL}/FreeAgency/bid`, {
+    return await fetch(`${URL}/free-agency/bid`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
@@ -63,7 +63,7 @@ const makeNewBid = async (bid: Bid): Promise<Response> => {
 }
 
 const makeNewNom = async (bid: Bid): Promise<Response> => {
-    return await fetch(`${URL}/FreeAgency/nominate`, {
+    return await fetch(`${URL}/free-agency/nominate`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
@@ -84,15 +84,15 @@ const makeNewNom = async (bid: Bid): Promise<Response> => {
 }
 
 const getFullPlayerBio = async (lastYear: number, id: number, position: string, firstName: string, lastName: string, actionShot: boolean, leagueId: number = 13894) : Promise<Response> => {
-    return await fetch(`${URL}/FreeAgency/leagues/${leagueId}/year/${lastYear}/playerId/${id}/position/${position}/firstName/${firstName}/lastName/${lastName}?hasAction=${actionShot}`)
+    return await fetch(`${URL}/free-agency/leagues/${leagueId}/year/${lastYear}/playerId/${id}/position/${position}/firstName/${firstName}/lastName/${lastName}?hasAction=${actionShot}`)
 }
 
 const getBidHistoryByPlayerId = async (mflId: number): Promise<Response> => {
-    return await fetch(`${URL}/FreeAgency/players/${mflId}/bid-history`)
+    return await fetch(`${URL}/free-agency/players/${mflId}/bid-history`)
 }
 
 const login = async (ownername: string, password: string): Promise<Owner> => {
-    const res = await axios.post(`${URL}/FreeAgency/login`, 
+    const res = await axios.post(`${URL}/free-agency/login`, 
             {
                 ownername: ownername,
                 password: password
@@ -103,7 +103,7 @@ const login = async (ownername: string, password: string): Promise<Owner> => {
 }
 
 const register = async (name: string, username: string, password: string): Promise<Response> => {
-    const res = await fetch(`${URL}/FreeAgency/register`, {
+    const res = await fetch(`${URL}/free-agency/register`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
@@ -119,7 +119,7 @@ const register = async (name: string, username: string, password: string): Promi
 }
 
 const pageLoad = async (cookie: string = "", leagueId: number = 13894): Promise<PageLoad> => {
-    const rest = await axios.get(`${URL}/FreeAgency//leagues/${leagueId}page-load`, 
+    const rest = await axios.get(`${URL}/free-agency/leagues/${leagueId}/page-load`, 
     {
         params: { loginInfo: cookie }
     }).catch(error => {
@@ -141,7 +141,7 @@ async function handleErrorResponse<Type>(response: Response): Promise<Type | voi
 
 const sendWin = async (bid: Bid): Promise<Response> => {
     const json = JSON.stringify(bid)
-    const res = await fetch(`${URL}/FreeAgency/win`, {
+    const res = await fetch(`${URL}/free-agency/win`, {
         method: 'PUT',
         headers: { "Content-Type": "application/json" },
         body: json
@@ -151,7 +151,7 @@ const sendWin = async (bid: Bid): Promise<Response> => {
 
 const askCapn = async (PlayerTipRequest: PlayerTipRequest): Promise<Response> => {
     const json = JSON.stringify(PlayerTipRequest)
-    const res = await fetch(`${URL}/FreeAgency/tip`, {
+    const res = await fetch(`${URL}/free-agency/tip`, {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: json

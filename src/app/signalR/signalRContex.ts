@@ -1,13 +1,10 @@
 import {
     JsonHubProtocol,
     HubConnectionState,
-    HubConnectionBuilder,
-    LogLevel
-  } from '@microsoft/signalr';
-import React from 'react';
+    HubConnectionBuilder  } from '@microsoft/signalr';
 import { useDispatch } from 'react-redux';
   
-  const isDev = process.env.NODE_ENV === 'development';
+  //const isDev = process.env.NODE_ENV === 'development';
   
   const startSignalRConnection = async (connection :any) => {
     try {

@@ -28,11 +28,11 @@ export const TeamCapDetails = ({height}: {height: number}) => {
 
     }, []);
     return (
-        <Card style={{display: 'flex', flexDirection: 'column', overflow: 'hidden', height: height}}>
+        <Card className="flex flex-col" >
             <CardContent style={{overflowY: 'auto'}} >
                 {selectedTeam ?
                     <div>
-                        <Typography variant={'h6'}> {deadCap.find(t => t.franchiseId === selectedTeam)?.team}'s Cap Adjustments </Typography>
+                        <Typography className="text-center" variant={'h6'}> {deadCap.find(t => t.franchiseId === selectedTeam)?.team}'s Cap Adjustments </Typography>
                         <div style={{overflow: 'auto'}}>
                             {YEAR_RANGE().map(y => {
                                 let players = filterPlayersForYear(y)

@@ -1,4 +1,3 @@
-import '../../App.css';
 import { LotBody } from '../components/lot/lot';
 import { useEffect, useRef, useState } from 'react';
 import { getInitialData } from '../redux/actions/FreeAgentActions';
@@ -40,11 +39,11 @@ function AuctionHome() {
           </div>
 
       <div style={{display: 'flex', justifyContent: 'center'}}>
-        {isLoading == 'fullscreen' ?
+        {isLoading === 'fullscreen' ?
           <div>
             <Backdrop
               sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-              open={isLoading == 'fullscreen'}
+              open={isLoading === 'fullscreen'}
             >
               <CircularProgress size={100} />
             </Backdrop>
@@ -53,7 +52,7 @@ function AuctionHome() {
             {newNom.length > 0 && newNom.map(l => <LotBody lot={l} key={l.lotId}/>)}
             {activeLots.map(l => <LotBody lot={l} key={l.lotId}/>)}
           </div>}
-        {newNom.length === 0 && activeLots.length === 0 && isLoading != 'fullscreen' && 
+        {newNom.length === 0 && activeLots.length === 0 && isLoading !== 'fullscreen' && 
         <div style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
           <NoActiveAuctions />
         </div>

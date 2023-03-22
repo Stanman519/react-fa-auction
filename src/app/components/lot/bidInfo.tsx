@@ -29,8 +29,8 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
     const capnWarning = process.env.PUBLIC_URL + '/ask_capn.jpg';
     const profile = useSelector((state: RootState) => state.profile.owner)
     const [confirmModal, setConfirmModal] = useState<boolean>(false);
-    //const [hasAsked, setHasAsked] = useState<boolean>(profile?.tipsUsed?.some(p => p.mflId == lot.bid?.player?.mflId))
-    //let tip = hasAsked ? profile.tipsUsed?.find(t => t.mflId == lot.bid?.player.mflId) : undefined
+    //const [hasAsked, setHasAsked] = useState<boolean>(profile?.tipsUsed?.some(p => p.mflId=== lot.bid?.player?.mflId))
+    //let tip = hasAsked ? profile.tipsUsed?.find(t => t.mflId=== lot.bid?.player.mflId) : undefined
 
     const [isLoading, setIsLoading] = useState<boolean>();
     const { audioOn } = useSelector((state: RootState) => state.ui);
@@ -90,7 +90,7 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
         </Tooltip>
         <Divider variant='middle' flexItem />
         {/* {hasAsked ? 
-            <div style={{fontSize: 'medium', padding:12}}>Cap'n suggests: ${tip?.suggestion}, {tip?.yearMin}{tip?.yearMin != tip?.yearMax ? `-${tip?.yearMax} years`: ''}</div> 
+            <div style={{fontSize: 'medium', padding:12}}>Cap'n suggests: ${tip?.suggestion}, {tip?.yearMin}{tip?.yearMin !== tip?.yearMax ? `-${tip?.yearMax} years`: ''}</div> 
             :
          <Button 
          style={{borderWidth: 1, margin: 8, width: '80%'}} 

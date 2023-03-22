@@ -31,7 +31,7 @@
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.0",
     "react-router-dom": "^6.8.1",
-    "react-scripts": "5.0.0",
+    "react-scripts": "^5.0.1",
     "react-signalr": "^0.2.8",
     "stream-chat": "^6.2.0",
     "stream-chat-react": "^7.0.0",
@@ -41,7 +41,8 @@
     "universal-cookie": "^4.0.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "watch:css": "postcss src/app/styles/index.tailwind.css -o src/app/styles/index.css -w",
+    "start": "react-scripts start & yarn run watch:css ",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -62,6 +63,9 @@
     ]
   },
   "devDependencies": {
-    "@types/react-sound": "^1.2.3"
+    "@types/react-sound": "^1.2.3",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.2.7"
   }
 }

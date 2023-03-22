@@ -1,6 +1,6 @@
 import { Action } from "@reduxjs/toolkit";
 import AuctionApiSvc from "../../services/AuctionApiSvc";
-import { FreeAgent } from "../reducers/FreeAgentReducer";
+import { PlayerDTO } from "../reducers/FreeAgentReducer";
 import { updateLoginInfo } from "./LoginActions";
 import { updateLots } from "./LotActions";
 import { updateOwners } from "./OwnerActions";
@@ -9,10 +9,10 @@ import { updateUI } from "./UiActions";
 export const UPDATE_FREE_AGENTS = 'UPDATE_FREE_AGENTS';
 
 export interface FreeAgentAction extends Action {
-    payload: FreeAgent[]
+    payload: PlayerDTO[]
 }
 
-export const updateFreeAgents = (freeAgents: FreeAgent[]): FreeAgentAction => {
+export const updateFreeAgents = (freeAgents: PlayerDTO[]): FreeAgentAction => {
     return {
         type: UPDATE_FREE_AGENTS,
         payload: freeAgents

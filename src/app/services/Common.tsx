@@ -48,7 +48,7 @@ export const checkValidity = (league: LeagueLoginInfo, newBid: number, newYears:
         validity.isValid = false
         validity.violations.push("Salary and years must be whole numbers over 0.");
     }
-    if(newBid == 1 && newYears > 1) {
+    if(newBid=== 1 && newYears > 1) {
         validity.isValid = false
         validity.violations.push("$1 salaries must be 1 year.");
     }
@@ -136,13 +136,13 @@ export const getRankStringSuffix = (i: number) =>  {
     if (!i) return "-"
     var j = i % 10,
         k = i % 100;
-    if (j == 1 && k != 11) {
+    if (j=== 1 && k !== 11) {
         return i + "st";
     }
-    if (j == 2 && k != 12) {
+    if (j=== 2 && k !== 12) {
         return i + "nd";
     }
-    if (j == 3 && k != 13) {
+    if (j=== 3 && k !== 13) {
         return i + "rd";
     }
     return i + "th";

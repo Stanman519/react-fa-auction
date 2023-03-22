@@ -1,8 +1,6 @@
 import { User } from "@auth0/auth0-react";
-import { AuthUser } from "../../components/login/AuthModel";
 import { LoginAction, UPDATE_LOGIN } from "../actions/LoginActions";
-import { OwnerAction, UPDATE_OWNERS } from "../actions/OwnerActions";
-import Owner, { LeagueInfo, LeagueLoginInfo } from "./OwnerReducer";
+import Owner, { LeagueLoginInfo } from "./OwnerReducer";
 
 export interface LoginState {
     owner: Owner

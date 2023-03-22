@@ -1,6 +1,5 @@
-import { PlayerTipResponse } from "../../services/AuctionApiSvc";
 import { OwnerAction, UPDATE_OWNERS } from "../actions/OwnerActions";
-import { FreeAgent } from "./FreeAgentReducer";
+import { PlayerDTO } from "./FreeAgentReducer";
 
 
 export default interface Owner {
@@ -23,8 +22,8 @@ export interface LeagueLoginInfo {
     teamName: string
     league: LeagueInfo
     tagCandidates: TagCandidate[]
-    taxiPlayers: FreeAgent[]
-    cutCandidates: FreeAgent[]
+    taxiPlayers: PlayerDTO[]
+    cutCandidates: PlayerDTO[]
 }
 
 export interface LeagueInfo {
@@ -34,7 +33,7 @@ export interface LeagueInfo {
 
 export interface TagCandidate{
     lastSeasonSalary: number
-    player: FreeAgent
+    player: PlayerDTO
     tagAmount: number
 }
 

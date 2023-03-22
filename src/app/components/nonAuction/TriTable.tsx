@@ -81,7 +81,7 @@ export default function TriTable() {
                             </Table>
                         </TableContainer>
                     </> :
-                    <div>Tri-Year Trophy <span style={{fontSize: 10}}>presented by Taco Bell</span> standings will appear when the next cycle begins</div>
+                    <div className="text-center">Tri-Year Trophy <span style={{fontSize: 10}}>presented by Taco Bell</span> standings will appear when the next cycle begins</div>
                     :
                     <CircularProgress />
                 }

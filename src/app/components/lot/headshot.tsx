@@ -1,13 +1,13 @@
 import { Avatar } from "@mui/material";
 import { memo } from "react";
-import { FreeAgent } from "../../redux/reducers/FreeAgentReducer";
+import { PlayerDTO } from "../../redux/reducers/FreeAgentReducer";
 import { ownerMap, tmColorMap } from "../../services/Common";
 
 
-export function Headshot({ img, lotId, player }: { img?: string, lotId: number, player?: FreeAgent }): JSX.Element {
+export function Headshot({ img, lotId, player }: { img?: string, lotId: number, player?: PlayerDTO }): JSX.Element {
     const capnMug = process.env.PUBLIC_URL + '/capnMug.jpg';
-    const avatar = ownerMap.find(o => o.id == lotId)?.avatar;
-    const teamLogo = tmColorMap.find(tm => tm.team == player?.team)?.logo;
+    const avatar = ownerMap.find(o => o.id=== lotId)?.avatar;
+    const teamLogo = tmColorMap.find(tm => tm.team=== player?.team)?.logo;
     return (
         <>
         {

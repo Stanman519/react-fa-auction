@@ -62,10 +62,10 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
                             {bidHistory.map(p =>
                                 <ListItem key={p.bidId}>
                                     <ListItemAvatar>
-                                        <Avatar src={ownerMap.find(o => o.id == p.ownerId)?.avatar ?? ''}/>
+                                        <Avatar src={ownerMap.find(o => o.id=== p.ownerId)?.avatar ?? ''}/>
                                     </ListItemAvatar>
                                     <ListItemText
-                                        primary={`$${p.bidSalary}, ${p.bidLength} ${p.bidLength == 1 ? 'year' : 'years'}`}
+                                        primary={`$${p.bidSalary}, ${p.bidLength} ${p.bidLength=== 1 ? 'year' : 'years'}`}
                                         secondary={`${getLocalBidTimeStamp(new Date(p.expires ?? ""))}`}
                                     />
                                 </ListItem>)}
@@ -95,7 +95,7 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
                                         <Divider /> 
                                         <ListItem >
                                             <ListItemText>
-                                                <Typography variant="h5"> {tmColorMap.find(tm => tm.team == bio.team)?.nickname ?? "Free Agent"} {bio?.position}</Typography>
+                                                <Typography variant="h5"> {tmColorMap.find(tm => tm.team=== bio.team)?.nickname ?? "Free Agent"} {bio?.position}</Typography>
                                             </ListItemText>
                                         </ListItem>
                                         <Divider /> 

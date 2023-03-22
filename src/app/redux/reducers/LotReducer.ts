@@ -1,5 +1,5 @@
 import { LotAction, UPDATE_LOTS } from "../actions/LotActions";
-import { FreeAgent } from "./FreeAgentReducer";
+import { PlayerDTO } from "./FreeAgentReducer";
 
 export interface Bid {
     bidId?: number
@@ -10,7 +10,7 @@ export interface Bid {
     expires?: Date
     lotId?: number
     leagueId: number
-    player: FreeAgent
+    player: PlayerDTO
 }
 export interface Lot {
     lotId: number

@@ -18,8 +18,6 @@ import TaxiSquadTile from "./nonAuction/TaxiSquadTile";
 
 
 const HomeBase = () => {
-  const cookies = new Cookies();
-  const dispatch = useDispatch();
   const { modal } = useSelector((state: RootState) => state.ui)
   const { currentLeague } = useSelector((state: RootState) => state.profile)
   const { user } = useAuth0();
@@ -28,36 +26,40 @@ const HomeBase = () => {
   const [tabs, setTabs] = useState([{ label: 'LEAGUE INFO', value: 'league' }])
 
   useEffect(() => {
-      if (!currentLeague) return
-      if (currentLeague.cutCandidates.length > 0 && !tabs.find(t => t.value == 'buyouts')) setTabs(tabs.concat({ label: 'BUYOUTS', value: 'buyouts' }))
-      if (currentLeague.taxiPlayers.length > 0  && !tabs.find(t => t.value == 'taxi')) setTabs(tabs.concat({ label: 'TAXI CUTS', value: 'taxi' }))
-      if (currentLeague.tagCandidates.length > 0 && !tabs.find(t => t.value == 'tags')) setTabs(tabs.concat({ label: 'FRANCHISE TAGS', value: 'tags' }))
-    }, [currentLeague, tabs])
+    if (!currentLeague) return
+    if (currentLeague.cutCandidates.length > 0 && !tabs.find(t => t.value === 'buyouts')) setTabs(tabs.concat({ label: 'BUYOUTS', value: 'buyouts' }))
+    if (currentLeague.taxiPlayers.length > 0 && !tabs.find(t => t.value === 'taxi')) setTabs(tabs.concat({ label: 'TAXI CUTS', value: 'taxi' }))
+    if (currentLeague.tagCandidates.length > 0 && !tabs.find(t => t.value === 'tags')) setTabs(tabs.concat({ label: 'FRANCHISE TAGS', value: 'tags' }))
+  }, [currentLeague, tabs])
 
   useEffect(() => {
-      if (!user) nav('/')
-    }, [])
+    if (!user) nav('/')
+  }, [])
 
   return (
     <div >
       <DashboardMenu />
-      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 20 }}>
-        <ConfirmModal isOpen={false} actionButtonLabel="submit" mainText="hi" onAction={() => console.log('hi')} />
-        <div>
-          <div>Dashboard for {currentLeague?.teamName}</div>
-          <DashboardTabNav onChange={(newTab) => setTab(newTab)} tabs={tabs} />
-          {tab == 'league' &&
+      <div className="flex flex-col items-center pt-4" >
+
+        {currentLeague?.teamName &&
+          <div className="text-2xl pb-4 m-1 text-center">Dashboard for {currentLeague?.teamName}</div>}
+        {tabs.length > 1 && <DashboardTabNav onChange={(newTab) => setTab(newTab)} tabs={tabs} />}
+
+        <div className="min-w-full">
+          {tab === 'league' &&
             <div>
               <DeadCapParentCard />
-              <div style={{ margin: 16 }}>
+              <div className="m-1">
                 <TriTable />
               </div>
             </div>}
-            {tab == 'tags' &&<FranchiseTags />}
-            {tab == 'taxi' && <TaxiSquadTile />}
-            {tab == 'buyouts' && <BuyoutTile />} 
+          {tab === 'tags' && <FranchiseTags />}
+          {tab === 'taxi' && <TaxiSquadTile />}
+          {tab === 'buyouts' && <BuyoutTile />}
         </div>
+
       </div>
+
 
     </div>
   );

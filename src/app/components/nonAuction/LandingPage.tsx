@@ -6,7 +6,7 @@ import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 export const LandingPage = () => {
 
-
+    const logo = './stanfan-color-logo.png'
     const dispatch = useDispatch();
     const nav = useNavigate()
     const { user, isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
@@ -28,5 +28,11 @@ export const LandingPage = () => {
         checkUser()
     }, [isAuthenticated, loginWithRedirect, isLoading, user])
     return (
-        < Button onClick={() => loginWithRedirect()}> Log In</Button >
+        <div className='flex flex-row justify-center content-center max-w-full min-h-full'>
+            <div className='flex-col justify-center content-center'>
+                <img className='max-w-md' src={logo} />
+                < Button onClick={() => loginWithRedirect()}> Log In</Button >
+            </div>
+        </div>
+
         )}

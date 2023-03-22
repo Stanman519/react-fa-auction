@@ -1,18 +1,15 @@
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import { useTheme } from '@mui/material';
 import AuctionHome from './app/components/AuctionHome';
 import HomeBase from './app/components/HomeBase';
+//import "./index.css"
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { MenuBar } from './app/components/menuBar';
 import Auth0ProviderWithHistory from './app/auth/auth0-provider-with-history';
 import { LandingPage } from './app/components/nonAuction/LandingPage';
 
 
 function App() {
   const theme = useTheme()
-  const dispatch = useDispatch();
-  const auctionIsActive = false;
 
   useEffect(() => {
 
@@ -21,7 +18,7 @@ function App() {
   }, [])
 
   return (
-    <div className="App" style={{ backgroundColor: theme.palette.background.default }}>
+    <div className="min-h-screen max-w-screen" style={{ backgroundColor: theme.palette.background.default }}>
 
       <BrowserRouter>
         <Auth0ProviderWithHistory

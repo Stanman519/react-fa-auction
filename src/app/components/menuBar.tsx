@@ -1,4 +1,4 @@
-import { AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, Switch, Toolbar, Typography, useTheme } from "@mui/material";
+import { AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, Switch, Toolbar, useTheme } from "@mui/material";
 import {VolumeUp, VolumeMute} from '@mui/icons-material';
 import { Fragment, useState } from "react";
 import MenuIcon from '@mui/icons-material/Menu';
@@ -9,11 +9,9 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
-import { ownerMap } from "../services/Common";
 import { turnOnNominationModeForThisOwnersLot } from "../redux/actions/LotActions";
 import { updateUI } from "../redux/actions/UiActions";
 import { FAChatWindow } from "./chat";
-import { LeagueLoginInfo } from "../redux/reducers/OwnerReducer";
 import { useAuth0 } from "@auth0/auth0-react";
 
 type DrawerType = 'Salaries' | 'Chat' | undefined
@@ -22,7 +20,7 @@ export function MenuBar() {
     const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
-    const owners = useSelector((state: RootState) => state.owners.filter(o => o.leagues.map(l => l.league.leagueId).includes(currentLeague?.league.leagueId ?? 0)));
+    const owners = useSelector((state: RootState) => state.owners.filter(o => o?.leagues.map(l => l.league.leagueId).includes(currentLeague?.league.leagueId ?? 0)));
     const lots = useSelector((state: RootState) => state.lots.filter(l => l.leagueId === currentLeague?.league.leagueId ?? 0));
     const { user } = useAuth0();
     const avatar = user?.picture
@@ -88,7 +86,7 @@ export function MenuBar() {
                                     {owner.ownername && <MenuItem onClick={() => {
                                         setOpenDrawer('Chat')
                                         setAnchorEl(null)
-                                        }}>{openDrawer == 'Chat' ? 'Close Chat' : 'Open Chat'}</MenuItem>}
+                                        }}>{openDrawer=== 'Chat' ? 'Close Chat' : 'Open Chat'}</MenuItem>}
                                     {!nomIsUsed && <MenuItem onClick={() => {
                                         addNominationCard()
                                         setAnchorEl(null)
@@ -114,7 +112,7 @@ export function MenuBar() {
                                         //dispatch()
                                         setOpenDrawer('Chat')
                                         }}>
-                                    {openDrawer == 'Chat' ? 'Close Chat' : 'Open Chat'}
+                                    {openDrawer=== 'Chat' ? 'Close Chat' : 'Open Chat'}
                                 </Button>}
                                 {!nomIsUsed &&
                                     <Button color='inherit' onClick={() => addNominationCard()}>
@@ -138,7 +136,7 @@ export function MenuBar() {
                 </Box>
                 <Drawer
                     anchor={'left'}
-                    open={openDrawer == 'Salaries'}
+                    open={openDrawer=== 'Salaries'}
                     onClose={() => closeDrawer()}
                 >
                     <Box
@@ -153,7 +151,7 @@ export function MenuBar() {
                                     
                                     <Avatar style={{ marginRight: 8 }} sx={{ height: 50, width: 50 }} alt={user?.name} src={avatar} />
                                     <div style={{flexDirection: 'column'}}>
-                                        <ListItemText style={{}} primary={`${o.ownername} - $${o.leagues}`} secondary={highBidsOnTheBoard(o.ownername) ?? 0 > 0 ? `outstanding bids: $${highBidsOnTheBoard(o.ownername)}`: ''} />
+                                        <ListItemText style={{}} primary={`${o.ownername} - $${o?.leagues}`} secondary={highBidsOnTheBoard(o.ownername) ?? 0 > 0 ? `outstanding bids: $${highBidsOnTheBoard(o.ownername)}`: ''} />
                                     </div>
                                 
                                 </ListItem>
@@ -168,7 +166,7 @@ export function MenuBar() {
                         sx: { width: "40%", minWidth: 350}
                       }}
                     anchor={'left'}
-                    open={openDrawer == 'Chat'}
+                    open={openDrawer=== 'Chat'}
                     onClose={() => closeDrawer()}
                 >
                     {/* <Box
