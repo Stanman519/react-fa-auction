@@ -1,11 +1,8 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import TriTable from "./nonAuction/TriTable";
-import Cookies from 'universal-cookie/es6';
 import { RootState } from "../store";
 import DeadCapParentCard from "./nonAuction/DeadCapParentCard";
-import TeamManagementCard from "./nonAuction/TeamManagementCard";
 import DashboardMenu from "./nonAuction/DashboardMenu";
-import { ConfirmModal } from "./ConfirmModal";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";

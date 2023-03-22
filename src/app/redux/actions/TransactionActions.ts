@@ -5,7 +5,6 @@ import { RootState } from "../reducers/RootReducer";
 import { updateDeadCapInfo } from "./DeadCapActions";
 import { updateUI } from "./UiActions";
 import { updateLoginInfo } from "./LoginActions";
-import Cookies from "universal-cookie/es6";
 import { User } from "@auth0/auth0-react";
 import { LeagueLoginInfo } from "../reducers/OwnerReducer";
 import { PlayerDTO } from "../reducers/FreeAgentReducer";
@@ -27,8 +26,6 @@ export const loadDataForHomeBase = (authUser: User) => async (
 
     const dashboard = await GeneralApiSvc.fetchDashboardInitialLoad("", authUser)
     if (dashboard) {
-        //const cookies = new Cookies();
-        // cookies.set('token', `${dashboard.profile.ownername},${dashboard.profile.password}`)
         const currentLeague = dashboard.profile.leagues.length > 0 ? dashboard.profile.leagues[0] : undefined
         console.log(currentLeague?.taxiPlayers)
         dispatch(loadTransactions(dashboard.leagueTransactions))

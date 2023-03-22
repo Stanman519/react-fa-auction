@@ -1,6 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Action } from "@reduxjs/toolkit";
-import Cookies from "universal-cookie/es6";
 import AuctionApiSvc from "../../services/AuctionApiSvc";
 import { LoginState } from "../reducers/LoginReducer";
 import { RootState } from "../reducers/RootReducer";
@@ -25,13 +24,12 @@ export const submitLogin = (username:string, password: string) => async(
     
 ) => {
     try {
-        const cookies = new Cookies();
+
         const login = await AuctionApiSvc.login(username, password)
         //console.log('loginleagues', login.leagues)
         const currentLeague = login.leagues.length > 0 ? login.leagues[0] : undefined
         dispatch(updateLoginInfo({owner: login, currentLeague}))
         dispatch(updateUI({modal: undefined}))
-        cookies.set('token', `${login.ownername},${login.password}`)
     } catch (e: any) { 
         //console.log('e', e.data)
         dispatch(updateUI({ error: 'snackbar', errorText: e.message}))

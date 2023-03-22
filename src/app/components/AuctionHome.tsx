@@ -8,7 +8,7 @@ import { Alert, Backdrop, CircularProgress, Modal, Snackbar, useTheme } from '@m
 import Register from '../components/login/register';
 import SignIn from '../components/login/signIn';
 import { updateUI } from '../redux/actions/UiActions';
-import Cookies from 'universal-cookie/es6';
+
 import signalR from '../signalR/socketMiddleware';
 import { NoActiveAuctions } from './noActiveAuctions';
 import { FAChatWindow } from './chat';
@@ -21,10 +21,10 @@ function AuctionHome() {
   const newNom = useSelector((state: RootState)=> state.lots.filter(l => l.newNom))
   const {isMobile} = useSelector((state: RootState) => state.ui)
   const { modal, error, errorText, isLoading, chatOpen } = useSelector((state: RootState) => state.ui)
-  const cookies = new Cookies();
+
 
   useEffect(() => {
-    cookies.get('token') ? dispatch(getInitialData(cookies.get('token'))) : dispatch(getInitialData())
+    dispatch(getInitialData())
     dispatch(signalR())
     return () => {
         ChatClient.getInstance().chatInstance.disconnectUser();
