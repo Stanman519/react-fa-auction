@@ -24,7 +24,6 @@ export function MenuBar() {
     const lots = useSelector((state: RootState) => state.lots.filter(l => l.leagueId === currentLeague?.league.leagueId ?? 0));
     const { user } = useAuth0();
     const avatar = user?.picture
-    console.log('avatar', avatar)
 
     const nomIsUsed = useSelector((state: RootState) => {
         if (!owner.ownername) return false

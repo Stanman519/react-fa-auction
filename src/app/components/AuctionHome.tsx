@@ -39,11 +39,11 @@ function AuctionHome() {
           </div>
 
       <div style={{display: 'flex', justifyContent: 'center'}}>
-        {isLoading === 'fullscreen' ?
+        {isLoading === 'full-screen' ?
           <div>
             <Backdrop
               sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-              open={isLoading === 'fullscreen'}
+              open={isLoading === 'full-screen'}
             >
               <CircularProgress size={100} />
             </Backdrop>
@@ -52,7 +52,7 @@ function AuctionHome() {
             {newNom.length > 0 && newNom.map(l => <LotBody lot={l} key={l.lotId}/>)}
             {activeLots.map(l => <LotBody lot={l} key={l.lotId}/>)}
           </div>}
-        {newNom.length === 0 && activeLots.length === 0 && isLoading !== 'fullscreen' && 
+        {newNom.length === 0 && activeLots.length === 0 && isLoading !== 'full-screen' && 
         <div style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
           <NoActiveAuctions />
         </div>

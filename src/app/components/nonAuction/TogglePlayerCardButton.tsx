@@ -26,7 +26,7 @@ export const TogglePlayerCardButton = ({player, attribute1, attribute2, onSelect
                 <div className="flex flex-row flex-1">
 
                         <div className="flex flex-col w-1/2 " >
-                            <div className="lg:text-4xl">{player.fullName}</div>
+                            <div className="md:text-2xl lg:text-4xl">{player.fullName}</div>
                             <div className="flex flex-row content-center">
                                 <Chip label={`${player.team} ${player.position}`}
                                     style={{ backgroundColor: tmColorMap.find(tm => tm.team === player.team)?.primary, 
@@ -37,7 +37,7 @@ export const TogglePlayerCardButton = ({player, attribute1, attribute2, onSelect
 
                     </div>
 
-                    <div className="flex flex-col lg:flex-row lg:text-2xl leading-none flex-1 justify-around content-center">
+                    <div className="flex flex-col lg:flex-row md:text-xl lg:text-2xl leading-none flex-1 justify-around content-center">
                         {attribute1 && <div className="self-center">{attribute1}</div>}
                         {attribute2 && <div className="self-center">{attribute2}</div>}
                     </div>

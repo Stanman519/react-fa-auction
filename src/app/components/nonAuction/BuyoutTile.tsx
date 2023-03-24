@@ -2,32 +2,34 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useTheme } from '@mui/material/styles';
 import { Button, Card } from '@mui/material';
-import { lastYear } from "../../services/Common";
 import { useState } from "react";
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { TogglePlayerCardButton } from "./TogglePlayerCardButton";
 import { updateUI } from "../../redux/actions/UiActions";
 import { ConfirmModal } from "../ConfirmModal";
-
+import { submitBuyout } from "../../redux/actions/TransactionActions";
 const BuyoutTile = () => {
     const dispatch = useDispatch();
     const showModal = useSelector((state: RootState) => state.ui.modal === 'buyout-confirm')
-    const { profile } = useSelector((state: RootState) => state)
+    const { currentLeague } = useSelector((state: RootState) => state.profile)
     const [selectedPlayerIndex, setSelectedPlayerIndex] = useState<number | undefined>(undefined)
     const theme = useTheme();
-    const cutCandidates = profile.owner.leagues.find(l => l.league.leagueId === profile.currentLeague?.league.leagueId)?.cutCandidates ?? []
+    const cutCandidates = currentLeague?.cutCandidates ?? []
 
 
     return (
-<>
-        {showModal && <ConfirmModal isOpen={showModal} actionButtonLabel={"SUBMIT"} mainText={"Are you sure you want to use your buyout? You only get 1 every season and it costs $15 IRL!"} onAction={() => console.log('ok')} />}
-        <Card style={{ margin: 16, display: 'flex', flexDirection: 'column' }}>
+<div className="m-4 flex justify-center">
+        {showModal && selectedPlayerIndex && selectedPlayerIndex >= 0 && cutCandidates[selectedPlayerIndex!].salary &&
+        <ConfirmModal isOpen={showModal} actionButtonLabel={"SUBMIT"} 
+            mainText={"Are you sure you want to use your buyout? You only get 1 every season and it costs $15 IRL!"} 
+            onAction={() => dispatch(submitBuyout(currentLeague?.league.leagueId ?? 0, cutCandidates[selectedPlayerIndex!], currentLeague?.mflfranchiseid ?? 0, (cutCandidates[selectedPlayerIndex!].salary! * 0.4 )))} />}
+        <Card className="max-w-4xl flex-1">
             <div>
-            <div  className="flex flex-row ml-2 mr-5 flex-1 " >
-                    <div className="w-3/4"/>
-                    <div className="flex flex-col lg:flex-row w-1/4 content-center justify-center">
-                            <div className="whitespace-nowrap text-sm text-right">SALARY</div>
-                            <div className="whitespace-nowrap text-sm text-right">YEARS LEFT</div>
+            <div  className="flex flex-row ml-2 mr-3 flex-1 "  >
+                    <div className="w-3/4 lg:w-3/5"/>
+                    <div className="flex flex-col lg:flex-row w-1/4 lg:w-2/5 justify-around">
+                            <div className="whitespace-nowrap text-sm lg:text-xl">SALARY</div>
+                            <div className="whitespace-nowrap text-sm lg:text-xl">YEARS LEFT</div>
                     </div>
                 </div>
                 {cutCandidates.map((p, index) => {
@@ -46,16 +48,18 @@ const BuyoutTile = () => {
 
             </div>
             {selectedPlayerIndex !== undefined &&
-                <Button style={{ backgroundColor: 'green', margin: 12 }} 
+            <div className="flex flex-row justify-center content-center m-3" >
+                <Button className="w-full" style={{ backgroundColor: 'crimson' }} 
                 onClick={() => dispatch(updateUI({modal: 'buyout-confirm'}))}>
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <AttachMoneyIcon style={{ color: 'white' }} />
-                        <div style={{ color: 'white' }}>BUYOUT THIS PLAYER</div>
+                   <div className="flex flex-row justify-center content-center pl-3 pr-4 pt-2 pb-2 ">
+                            <DeleteOutlineIcon style={{ color: 'white', marginRight: 8, alignSelf: 'center' }} />                        
+                        <div className="lg:text-2xl text-white">BUYOUT THIS PLAYER</div>
                     </div>
 
-                </Button>}
+                </Button>
+                </div>}
         </Card>
-        </>
+        </div>
     );
 }
 

@@ -9,9 +9,7 @@ import '../../styles/TriTable.css';
 
 export default function TriTable() {
     const ownerList = useSelector((state: RootState) => state.deadCap.deadCap);
-    console.log('ownerList', ownerList)
     const [standings, setStandings] = useState<Standings[]>([]);
-    console.log('standings', standings)
     const [isLoading, setIsLoading] = useState(true);
     const relevantYears = [2020, 2021, 2022];
     const thisYear = lastYear + 1;

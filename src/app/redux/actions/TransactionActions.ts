@@ -23,11 +23,10 @@ export const loadDataForHomeBase = (authUser: User) => async (
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
-
+    dispatch(updateUI({isLoading: 'full-screen'}))
     const dashboard = await GeneralApiSvc.fetchDashboardInitialLoad("", authUser)
     if (dashboard) {
         const currentLeague = dashboard.profile.leagues.length > 0 ? dashboard.profile.leagues[0] : undefined
-        console.log(currentLeague?.taxiPlayers)
         dispatch(loadTransactions(dashboard.leagueTransactions))
         dispatch(updateDeadCapInfo({deadCap: dashboard.teamDeadCaps, selectedTeam: undefined}))
         dispatch(updateLoginInfo({owner: dashboard.profile, currentLeague: currentLeague}))
@@ -36,6 +35,7 @@ export const loadDataForHomeBase = (authUser: User) => async (
     else {
         dispatch(updateUI({modal: 'signIn'}))
     }
+    dispatch(updateUI({isLoading: undefined}))
 }
 
 

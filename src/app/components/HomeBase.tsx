@@ -10,14 +10,15 @@ import DashboardTabNav from "./nonAuction/DashboardTabNav";
 import BuyoutTile from "./nonAuction/BuyoutTile";
 import FranchiseTags from "./nonAuction/FranchiseTags";
 import TaxiSquadTile from "./nonAuction/TaxiSquadTile";
+import { CircularProgress } from "@mui/material";
 
 
 
 
 const HomeBase = () => {
-  const { modal } = useSelector((state: RootState) => state.ui)
   const { currentLeague } = useSelector((state: RootState) => state.profile)
   const { user } = useAuth0();
+  const isLoading = useSelector((state: RootState) => state.ui.isLoading === 'full-screen')
   const nav = useNavigate()
   const [tab, setTab] = useState('league');
   const [tabs, setTabs] = useState([{ label: 'LEAGUE INFO', value: 'league' }])
@@ -34,8 +35,15 @@ const HomeBase = () => {
   }, [])
 
   return (
-    <div >
+    <div>
       <DashboardMenu />
+      {isLoading ? 
+      <div className="flex-1 flex justify-center">
+        <CircularProgress />
+      </div>
+      :
+      <>
+      {currentLeague ?
       <div className="flex flex-col items-center pt-4" >
 
         {currentLeague?.teamName &&
@@ -54,9 +62,11 @@ const HomeBase = () => {
           {tab === 'taxi' && <TaxiSquadTile />}
           {tab === 'buyouts' && <BuyoutTile />}
         </div>
-
-      </div>
-
+      </div> :
+      <div>Your profile was not automatically linked to your MyFantasyLeague Account. Please contact the admin.</div>
+      }
+      </>
+      }
 
     </div>
   );

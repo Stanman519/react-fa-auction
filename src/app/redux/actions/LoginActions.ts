@@ -26,12 +26,10 @@ export const submitLogin = (username:string, password: string) => async(
     try {
 
         const login = await AuctionApiSvc.login(username, password)
-        //console.log('loginleagues', login.leagues)
         const currentLeague = login.leagues.length > 0 ? login.leagues[0] : undefined
         dispatch(updateLoginInfo({owner: login, currentLeague}))
         dispatch(updateUI({modal: undefined}))
     } catch (e: any) { 
-        //console.log('e', e.data)
         dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
     }
 
@@ -45,17 +43,11 @@ export const loginAuthUserWithRedirect = () => async (
             const login = getState().profile
             const { loginWithRedirect, user } = useAuth0();
             await loginWithRedirect()
-
             // call api, does db owner exist with this userid?
                 // if not, create one?
             // if so, return the user
-            
-            console.log('auth user....', user)
-
-
             dispatch(updateLoginInfo({...login, authUser: user}))
         } catch (e: any) { 
-            //console.log('e', e.data)
             dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
         }
     

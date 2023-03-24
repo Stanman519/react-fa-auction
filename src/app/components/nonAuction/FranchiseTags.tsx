@@ -8,31 +8,30 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { TogglePlayerCardButton } from "./TogglePlayerCardButton";
 import { ConfirmModal } from "../ConfirmModal";
 import { updateUI } from "../../redux/actions/UiActions";
+import { submitFranchiseTag } from "../../redux/actions/TransactionActions";
 
 const FranchiseTags = () => {
     const dispatch = useDispatch();
     const confirmModal = useSelector((state: RootState) => state.ui.modal === 'tag-confirm')
-    const { profile } = useSelector((state: RootState) => state)
+    const { currentLeague } = useSelector((state: RootState) => state.profile)
     const [selectedPlayerIndex, setSelectedPlayerIndex] = useState<number | undefined>(undefined)
+    const franchiseId = currentLeague?.mflfranchiseid
+    const tagPlayers = currentLeague?.tagCandidates ?? []
 
-    const tagPlayers = profile.owner.leagues.find(l => l.league.leagueId === profile.currentLeague?.league.leagueId)?.tagCandidates ?? []
-    const theme = useTheme();
 
     return (
-        <div className="m-4">
+        <div className="m-4 flex justify-center">
             {confirmModal && <ConfirmModal
                 isOpen={confirmModal}
                 actionButtonLabel={'submit'}
                 mainText={`Are you sure you want to tag ${tagPlayers[selectedPlayerIndex ?? 0]?.player.fullName}? You can only do this once a season and it cannot be reversed.`}
-                onAction={() => console.log('pop the modal')} />}
-            <Card >
+                onAction={() => dispatch(submitFranchiseTag(currentLeague?.league.leagueId!, tagPlayers[selectedPlayerIndex ?? 0].player.mflId, franchiseId!, tagPlayers[selectedPlayerIndex ?? 0].tagAmount ))} />}
+            <Card className="max-w-3xl flex-1" >
                 <div className="flex flex-col">
                     <div className="flex flex-row ml-2 mr-3 flex-1 ">
                         <div className="w-3/4"/>
                         <div className="flex flex-row w-1/4 justify-center">
-                            <div className=" " >
-                                <div>TAG PRICE</div>
-                            </div>
+                            <div className="flex-1">TAG PRICE</div>
                         </div>
                     </div>
 
@@ -50,13 +49,13 @@ const FranchiseTags = () => {
                     }
                     )}
 
-                    {selectedPlayerIndex !== undefined &&
+                    {selectedPlayerIndex !== undefined && currentLeague?.league.leagueId && franchiseId &&
                     <div className="flex flex-row justify-center content-center m-3" >
-                        <Button className="" style={{ backgroundColor: 'green' }}
+                        <Button className="w-full" style={{ backgroundColor: 'green' }}
                             onClick={() => dispatch(updateUI({ modal: 'tag-confirm' }))}>
-                            <div className="flex flex-row justify-center content-center" >
-                                <AttachMoneyIcon style={{ color: 'white' }} />
-                                <div style={{ color: 'white' }}>FRANCHISE TAG THIS PLAYER</div>
+                            <div className="flex flex-row justify-center content-center pl-3 pr-4 pt-2 pb-2 " >
+                                <AttachMoneyIcon style={{ color: 'white', marginRight: 10, alignSelf: 'center' }} />
+                                <div className="lg:text-2xl text-white">FRANCHISE TAG THIS PLAYER</div>
                             </div>
 
                         </Button>

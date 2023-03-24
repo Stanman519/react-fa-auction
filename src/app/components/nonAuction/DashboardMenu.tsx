@@ -19,7 +19,6 @@ const settings = ['Logout'];
 function ResponsiveAppBar() {
   //const {profile} = useSelector((state: RootState) => state)
   const { user } = useAuth0();
-  console.log(user)
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const logo = process.env.PUBLIC_URL + '/stanfan-logo-white.png';

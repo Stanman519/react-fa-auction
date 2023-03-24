@@ -30,7 +30,6 @@ const fetchDashboardInitialLoad = (cookie: string = "", authUser: User) : Promis
         'content-type': 'application/json'
     },})
         .then((res) => {
-            console.log('res.data', res.data)
             return res.data
         }).catch(() => {
             return undefined
@@ -42,7 +41,6 @@ const postFranchiseTagPlayer = (body: FranchiseTagBody) : Promise<Response> => {
         'content-type': 'application/json'
     },})
         .then((res) => {
-            console.log('res.data', res.data)
             return res.data
         }).catch(() => {
             return undefined
@@ -53,7 +51,6 @@ const postBuyoutPlayer = (body: CutRequestBody) : Promise<Response> => {
         'content-type': 'application/json'
     },})
         .then((res) => {
-            console.log('res.data', res.data)
             return res.data
         }).catch(() => {
             return undefined
@@ -64,7 +61,6 @@ const postTaxiCut = (body: CutRequestBody) : Promise<Response> => {
         'content-type': 'application/json'
     },})
         .then((res) => {
-            console.log('res.data', res.data)
             return res.data
         }).catch(() => {
             return undefined

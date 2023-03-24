@@ -109,7 +109,6 @@ export const submitWin = (bid: Bid) => async (
         const res = await AuctionApiSvc.sendWin(bid)
         const complete = await AuctionApiSvc.handleErrorResponse(res);
     } catch (e: any) { 
-        console.log('e', e.data)
         dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
     }
 

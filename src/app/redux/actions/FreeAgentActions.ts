@@ -23,7 +23,7 @@ export const getInitialData = (cookie: string = "") => async (
     dispatch: Function,
 ): Promise<any> => {
     try{
-        dispatch(updateUI({isLoading: 'fullscreen'}))
+        dispatch(updateUI({isLoading: 'full-screen'}))
         const initData = await AuctionApiSvc.pageLoad(cookie);
 
         dispatch(updateFreeAgents(initData.freeAgents));

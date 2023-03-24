@@ -28,7 +28,7 @@ export const TeamCapDetails = ({height}: {height: number}) => {
 
     }, []);
     return (
-        <Card className="flex flex-col" >
+        <Card className="flex flex-col" style={{maxHeight: height}} >
             <CardContent style={{overflowY: 'auto'}} >
                 {selectedTeam ?
                     <div>

@@ -11,7 +11,7 @@ const defaultState: UIState = {
 };
 
 export interface UIState {
-  isLoading?: string;
+  isLoading?: LoadingStates;
   error?: ErrorTypes;
   errorText?: string;
   modal?: Modals;
@@ -29,6 +29,8 @@ export type Modals =
   'buyout-confirm' |
   'tag-confirm' |
   undefined;
+
+export type LoadingStates = 'full-screen' | 'button' | undefined
 
 export type SnackBars =  undefined; 
 
