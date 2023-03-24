@@ -52,10 +52,10 @@ const HomeBase = () => {
 
         <div className="min-w-full">
           {tab === 'league' &&
-            <div>
+            <div className="flex flex-col content-center">
               <DeadCapParentCard />
-              <div className="m-1">
-                <TriTable />
+              <div className="max-w-5xl flex-1 m-1 self-center" >
+                <TriTable  />
               </div>
             </div>}
           {tab === 'tags' && <FranchiseTags />}

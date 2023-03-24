@@ -38,7 +38,7 @@ export const TeamCapDetails = ({height}: {height: number}) => {
                                 let players = filterPlayersForYear(y)
                                 if (players.length > 0) {
                                     return (
-                                        <Accordion>
+                                        <Accordion key={y}>
                                             <AccordionSummary
                                                 expandIcon={<ExpandMoreIcon />}
                                                 aria-controls="panel1a-content"

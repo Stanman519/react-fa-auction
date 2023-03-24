@@ -24,7 +24,7 @@ export const LandingPage = () => {
     }, [isAuthenticated, loginWithRedirect, isLoading, user])
     return (
         <div className='flex flex-row justify-center content-center max-w-full min-h-full'>
-            <div className='flex-col justify-center content-center'>
+            <div className='flex-col justify-center content-center max-w-screen-sm max-h-screen-sm'>
                 <img className='max-w-md' src={logo} />
                 < Button onClick={() => loginWithRedirect()}> Log In</Button >
             </div>
