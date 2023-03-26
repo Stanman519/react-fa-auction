@@ -87,7 +87,7 @@ export const submitTaxiCut = (leagueId: number, player: PlayerDTO, mflFranchiseI
     getState: () => RootState
 ): Promise<any> => {
     const { profile } = getState()
-    const requestBody = {leagueId, player, mflFranchiseId, rebate}
+    const requestBody = {leagueId, player, mflFranchiseId, rebate }//(Math.round(5.01 * 10) / 10).toFixed(1)
     if (!profile.currentLeague) return
     try {
         const res = await GeneralApiSvc.postTaxiCut(requestBody)
