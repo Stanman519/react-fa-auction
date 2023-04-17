@@ -1,14 +1,14 @@
 import axios from "axios";
 import { PlayerDTO } from "../redux/reducers/FreeAgentReducer";
 import { Bid, Lot } from "../redux/reducers/LotReducer";
-import Owner from "../redux/reducers/OwnerReducer";
+import Owner, { LeagueInfo, LeagueLoginInfo, OpposingFranchiseDTO } from "../redux/reducers/OwnerReducer";
 
 export const URL = process.env.REACT_APP_AUCTION_API_URL;
 //const env = process.env.NODE_ENV;
 
 export interface PageLoad {
     freeAgents: PlayerDTO[],
-    owners: Owner[],
+    owners: OpposingFranchiseDTO[],
     lots: Lot[],
     profile?: Owner
 }
@@ -30,35 +30,12 @@ export interface PlayerTipResponse {
 }
 
 const makeNewBid = async (bid: Bid): Promise<Response> => {
-    const body = JSON.stringify({
-        bidLength: bid.bidLength,
-        bidSalary: bid.bidSalary,
-        ownername: bid.ownername,
-        ownerId: bid.ownerId,
-        lotId: bid.lotId,
-        player: {
-            mflId: bid.player.mflId,
-            firstName: bid.player.firstName,
-            lastName: bid.player.lastName,
-        }
-    }  as Bid)
     return await fetch(`${URL}/free-agency/bid`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
           },
-        body: JSON.stringify({
-                bidLength: bid.bidLength,
-                bidSalary: bid.bidSalary,
-                ownername: bid.ownername,
-                ownerId: bid.ownerId,
-                lotId: bid.lotId,
-                player: {
-                    mflId: bid.player.mflId,
-                    firstName: bid.player.firstName,
-                    lastName: bid.player.lastName,
-                }
-            })
+        body: JSON.stringify(bid)
     })
 }
 
@@ -68,18 +45,7 @@ const makeNewNom = async (bid: Bid): Promise<Response> => {
         headers: {
             "Content-Type": "application/json",
           },
-        body: JSON.stringify({
-            bidLength: bid.bidLength,
-            bidSalary: bid.bidSalary,
-            ownername: bid.ownername,
-            ownerId: bid.ownerId,
-            lotId: bid.lotId,
-            player: {
-                mflId: bid.player.mflId,
-                firstName: bid.player.firstName,
-                lastName: bid.player.lastName,
-            }
-        })
+        body: JSON.stringify(bid)
     })
 }
 

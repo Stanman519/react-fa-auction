@@ -20,14 +20,14 @@ export function MenuBar() {
     const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
-    const owners = useSelector((state: RootState) => state.owners.filter(o => o?.leagues.map(l => l.league.leagueId).includes(currentLeague?.league.leagueId ?? 0)));
+    const owners = useSelector((state: RootState) => state.owners);
     const lots = useSelector((state: RootState) => state.lots.filter(l => l.leagueId === currentLeague?.league.leagueId ?? 0));
     const { user } = useAuth0();
     const avatar = user?.picture
 
     const nomIsUsed = useSelector((state: RootState) => {
         if (!owner.ownername) return false
-        return state.lots.find(l => l.lotId === owner.ownerId)?.bid?.player
+        return state.lots.find(l => l.nominatedBy === currentLeague?.leagueownerid)?.bid?.player
     })
     const open = Boolean(anchorEl);
     const dispatch = useDispatch();
@@ -146,11 +146,11 @@ export function MenuBar() {
                     >
                         <List>
                             {owners.map((o, index) => (
-                                <ListItem key={o.ownerId} style={{ backgroundColor: index % 2 === 0 ? palette.background.default : palette.background.paper }}>
-                                    
-                                    <Avatar style={{ marginRight: 8 }} sx={{ height: 50, width: 50 }} alt={user?.name} src={avatar} />
+                                <ListItem key={o.teamName} style={{ backgroundColor: index % 2 === 0 ? palette.background.default : palette.background.paper }}>
+                                    <img src={o.avatar} referrerPolicy="no-referrer" style={{ height: 0, width: 0 }} />
+                                    <Avatar style={{ marginRight: 8 }} sx={{ height: 50, width: 50 }} alt={o.ownerName} src={o.avatar}  />
                                     <div style={{flexDirection: 'column'}}>
-                                        <ListItemText style={{}} primary={`${o.ownername} - $${o?.leagues}`} secondary={highBidsOnTheBoard(o.ownername) ?? 0 > 0 ? `outstanding bids: $${highBidsOnTheBoard(o.ownername)}`: ''} />
+                                        <ListItemText style={{}} primary={`${o.ownerName} - $${o?.capRoom}`} secondary={highBidsOnTheBoard(o.teamName) ?? 0 > 0 ? `outstanding bids: $${highBidsOnTheBoard(o.teamName)}`: ''} />
                                     </div>
                                 
                                 </ListItem>

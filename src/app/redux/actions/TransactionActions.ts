@@ -24,7 +24,9 @@ export const loadDataForHomeBase = (authUser: User) => async (
     getState: () => RootState
 ): Promise<any> => {
     dispatch(updateUI({isLoading: 'full-screen'}))
+    console.log('usuer', authUser)
     const dashboard = await GeneralApiSvc.fetchDashboardInitialLoad("", authUser)
+    console.log('dash', dashboard)
     if (dashboard) {
         const currentLeague = dashboard.profile.leagues.length > 0 ? dashboard.profile.leagues[0] : undefined
         dispatch(loadTransactions(dashboard.leagueTransactions))

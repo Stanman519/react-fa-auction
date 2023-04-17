@@ -14,12 +14,12 @@ interface PlayerInfoProps {
 export const PlayerInfo = ({team, firstName, lastName, position}: PlayerInfoProps): JSX.Element => {
     const colorTeam = tmColorMap.find(tm => tm.team === team);
     return (
-        <div className='player-info-container' style={{display: 'flex', alignItems: 'center', marginBottom: 6}}>
+        <div className='flex flex-row justify-center items-center mb-1 w-full flex-1'>
             <Chip 
-                label={position} style={{ backgroundColor: colorTeam?.primary, color: 'white', alignSelf: 'center', marginRight: 15, fontSize: 20, fontWeight: 'bold', padding: 10}}/> 
-            <div style={{display: 'flex', marginBottom: 10, flexWrap:'wrap', justifyContent: 'center'}}>
-                <div className='player-name-text' style={{fontWeight: 'normal'}}>{firstName}</div>
-                <div className='player-name-text' style={{fontWeight: 'bold'}}> &nbsp;{lastName}</div>
+                label={position} className="self-center mr-2 text-xl font-bold p-1" style={{ color: 'white', backgroundColor: colorTeam?.primary}}/> 
+            <div className="flex flex-row justify-center flex-wrap">
+                <div className='text-2xl'>{firstName}</div>
+                <div className='text-2xl font-bold'> &nbsp;{lastName}</div>
             </div>
         </div>
     );

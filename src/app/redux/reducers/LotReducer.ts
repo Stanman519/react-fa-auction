@@ -16,6 +16,7 @@ export interface Lot {
     lotId: number
     bid?: Bid
     newNom: boolean
+    nominatedBy: number
     isFresh?: boolean
     leagueId: number
 }

@@ -49,7 +49,6 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
     }
 
 
-    const ownername = ownerMap.find(o => o.id === lot.lotId)?.name ?? '';
     const getTimerColor = (): string => {
         if (!endTime || !remaining) return 'linear-gradient(90deg, rgba(192,192,192,0) 0%, rgba(192,192,192.73) 50%, rgba(192,192,192,0) 100%)'
         if (remaining.hours < 1) return 'linear-gradient(90deg, rgba(255,0,0,0) 0%, rgba(255,0,0,0.73) 50%, rgba(255,0,0,0) 100%)'
@@ -64,10 +63,10 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
     });
 
     return (
-        <div style={{ background: getTimerColor(), marginBottom: 5 }}>
+        <div className="mb-1 flex content-center" style={{ background: getTimerColor() }}>
             {endTime && remaining && 
-                <h2 className='timer-text'>{remaining.hours.toString().padStart(2, '0')}:{remaining.minutes.toString().padStart(2, '0')}:{remaining.seconds.toString().padStart(2, '0')} 
-                </h2>}
+                <div className="text-xl text-center w-full">{remaining.hours.toString().padStart(2, '0')}:{remaining.minutes.toString().padStart(2, '0')}:{remaining.seconds.toString().padStart(2, '0')} 
+                </div>}
         </div>
     );
 }

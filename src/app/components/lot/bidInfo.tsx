@@ -8,6 +8,7 @@ import { TransitionProps } from "@mui/material/transitions";
 import { RootState } from "../../store";
 //import { askCapn } from "../../redux/actions/LoginActions";
 import { Lot } from "../../redux/reducers/LotReducer";
+import "./styles/lot.css"
 
 
 interface BidInfoProps {
@@ -73,11 +74,7 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
     return (
         <div>
         <Tooltip title="Current highest bid" arrow placement='right'>
-            <div style={{
-                minHeight: 50,
-                flexDirection: 'row',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-around', marginTop: 10
-            }}>
+            <div className="flex flex-row items-center justify-around mt-2 mb-2">
                     <div/>
                     <div className={lot?.isFresh ? 'noti-text' : "bid-info-text"}>{lot?.bid?.ownername}</div>
                     <Divider orientation="vertical" variant='middle' flexItem />

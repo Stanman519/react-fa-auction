@@ -17,7 +17,7 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
     const [isLoading, setIsLoading] = useState(false);
     const lastYr: number = lastYear
     const theme = useTheme()
-    const slabWidthMultiplier = window.innerWidth < 720 ? 0.6 : 0.4;
+    const slabWidthMultiplier = window.innerWidth < 720 ? 0.7 : 0.4;
 
     const getLocalBidTimeStamp = (expires: Date) => {
         let dayBefore = new Date(expires);
@@ -171,7 +171,7 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
                 </Drawer>
 
                 <ButtonGroup sx={{ display: 'flex', width: '100%' }} aria-label="small button group">
-                    <Button sx={{ flex: 1 }} onClick={() => loadBio()}>Bio</Button>
+                    <Button  sx={{ flex: 1 }} onClick={() => loadBio()}>Bio</Button>
                     {bid?.expires && <Button sx={{ flex: 2, lineHeight: '14px' }} onClick={() => loadHistory()}>Bid History</Button>}
                 </ButtonGroup>
 

@@ -26,7 +26,8 @@ export interface CutRequestBody{
 
 
 const fetchDashboardInitialLoad = (cookie: string = "", authUser: User) : Promise<Dashboard> => {
-    return axios.post(`${URL}/dashboard/home`, authUser, {headers: {
+    return axios.post(`${URL}/dashboard/home`, 
+    authUser, {headers: {
         'content-type': 'application/json'
     },})
         .then((res) => {

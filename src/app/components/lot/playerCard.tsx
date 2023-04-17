@@ -16,9 +16,11 @@ interface PlayerCardProps {
 }
 
 export const PlayerCard = ({ lot }: PlayerCardProps) => {
+
   const { freeAgents } = useSelector((state: RootState) => state);
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerDTO>();
   const {isMobile} = useSelector((state: RootState) => state.ui)
+  console.log('selected', selectedPlayer)
   const dispatch = useDispatch();
   const selectPlayerForNom = (player: PlayerDTO) => {
     setSelectedPlayer(player)
@@ -26,37 +28,33 @@ export const PlayerCard = ({ lot }: PlayerCardProps) => {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: 10}}>
-      <div style={{ flex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+    <div className="flex flex-row items-center p-4" >
+      <div className="flex flex-col items-center w-1/3" >
         <MemoHeadshot lotId={lot.lotId} img={lot.bid?.player?.headshot ?? ''} player={lot.bid?.player} />
         {lot.bid && <BioAndHistory bid={lot.bid} />}
       </div>
-      <div style={{ flexDirection: 'column', flex: 3 }}>
+      <div className="flex-col w-2/3">
         {lot.bid?.bidId && lot.bid.player ?
           <div style={{ }}>
-            <div>
-              <PlayerInfo
-                team={lot.bid.player.team}
-                firstName={lot.bid.player.firstName}
-                lastName={lot.bid.player.lastName}
-                position={lot.bid.player.position} />
-            </div>
+            <PlayerInfo
+              team={lot.bid.player.team}
+              firstName={lot.bid.player.firstName}
+              lastName={lot.bid.player.lastName}
+              position={lot.bid.player.position} />
             <Divider variant='middle' />
-            <div>
-              <BidInfo lot={lot}/>
-            </div>
+            <BidInfo lot={lot}/>
+
           </div>
           :
           
             <Autocomplete
               disablePortal
-              id="free-agent-selection"
               options={freeAgents}
               value={selectedPlayer ?? {firstName: '', lastName: ''} as PlayerDTO}
               onChange={(event: any, newValue) => {
                 if (newValue) selectPlayerForNom(newValue)
               }}
-              sx={{minWidth: 250, flex: 1, paddingLeft: '10px'}}
+              className="min-w-full ml-1"
               getOptionLabel={(option) => `${option.position ?? ''} ${option.fullName ?? ''}`}
               renderInput={(params) => <TextField {...params} label="Choose a player" />}
             />

@@ -13,19 +13,29 @@ import signalR from '../signalR/socketMiddleware';
 import { NoActiveAuctions } from './noActiveAuctions';
 import { FAChatWindow } from './chat';
 import { ChatClient } from '../services/ChatUtils';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useNavigate } from 'react-router-dom';
 
 function AuctionHome() {
   const theme = useTheme()
   const dispatch = useDispatch();
+  const { user, isAuthenticated, loginWithRedirect } = useAuth0();
   const activeLots = useSelector((state: RootState) => state.lots.filter(l => l.bid && !l.newNom))
-  const newNom = useSelector((state: RootState)=> state.lots.filter(l => l.newNom))
+  const newNom = useSelector((state: RootState)=> state.lots.find(l => l.newNom))
   const {isMobile} = useSelector((state: RootState) => state.ui)
   const { modal, error, errorText, isLoading, chatOpen } = useSelector((state: RootState) => state.ui)
-
+  const navigate = useNavigate()
 
   useEffect(() => {
-    dispatch(getInitialData())
-    dispatch(signalR())
+    const checkUser = async () => {
+      if (isAuthenticated && user?.sub) {
+        dispatch(getInitialData())
+        dispatch(signalR())
+      } else {
+        navigate(`/`, {state: {from: 'auction'}} );
+      }
+  }
+  checkUser()
     return () => {
         ChatClient.getInstance().chatInstance.disconnectUser();
 
@@ -48,11 +58,11 @@ function AuctionHome() {
               <CircularProgress size={100} />
             </Backdrop>
           </div> :
-          <div className='lot-container'>
-            {newNom.length > 0 && newNom.map(l => <LotBody lot={l} key={l.lotId}/>)}
+          <div className='p-2'>
+            {newNom && <LotBody lot={newNom} key={newNom.lotId}/>}
             {activeLots.map(l => <LotBody lot={l} key={l.lotId}/>)}
           </div>}
-        {newNom.length === 0 && activeLots.length === 0 && isLoading !== 'full-screen' && 
+        {!newNom && activeLots.length === 0 && isLoading !== 'full-screen' && 
         <div style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
           <NoActiveAuctions />
         </div>

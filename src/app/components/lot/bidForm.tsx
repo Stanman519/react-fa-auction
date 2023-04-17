@@ -26,7 +26,7 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
     // const leagueOwnerData = owner.leagues.find(l => l.league.leagueId === currentLeague?.league.leagueId)
     const highBidsOnTheBoard = useSelector((state: RootState) => state.lots
-                .filter(l => l.bid?.ownerId === owner.ownerId).map(b => b.bid?.bidSalary)
+                .filter(l => l.bid?.ownerId === currentLeague?.leagueownerid).map(b => b.bid?.bidSalary)
                 .reduce((prev, curr) => prev! + curr!, 0));
     const [confirmModal, setConfirmModal] = useState<boolean>(false);
     const theme = useTheme();
@@ -51,7 +51,7 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
             setIsLoading(true);
             dispatch(makeNewBid({
                 leagueId: currentLeague.league.leagueId,
-                ownerId: owner.ownerId,
+                ownerId: currentLeague.leagueownerid,
                 ownername: owner.ownername,
                 bidSalary: bidSalary ?? 0,
                 bidLength: bidLength ?? 0,
@@ -65,7 +65,7 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
             setIsLoading(true);
             dispatch(makeNewNomination({
                 leagueId: currentLeague.league.leagueId,
-                ownerId: owner.ownerId,
+                ownerId: currentLeague.leagueownerid,
                 ownername: owner.ownername,
                 bidSalary: bidSalary ?? 0,
                 bidLength: bidLength ?? 0,

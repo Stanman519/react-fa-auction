@@ -27,8 +27,9 @@ export const LotBody = ({lot}: LotProps): JSX.Element => {
 }, [lot.isFresh])
 
   return (
-        <div className="lot-frame" 
-        style={{ minHeight: bidMode ? 325 : 0, 
+        <div
+        className="rounded mt-1 mb-1 pb-1"
+        style={{ 
         backgroundColor: theme.palette.background.paper, 
         borderStyle: lot.isFresh ? 'ridge' : 'none',
         borderWidth: 4,

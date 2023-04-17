@@ -14,6 +14,16 @@ export default interface Owner {
     //tipsUsed: PlayerTipResponse[]
 }
 
+export interface OpposingFranchiseDTO {
+    capRoom: number
+    yearsLeft: number
+    mflfranchiseid: number
+    leagueownerid: number
+    teamName: string
+    ownerName: string
+    avatar: string
+}
+
 export interface LeagueLoginInfo {
     capRoom: number
     yearsLeft: number
@@ -38,10 +48,10 @@ export interface TagCandidate{
 }
 
 
-const defaultState = [] as Owner[]
+const defaultState = [] as OpposingFranchiseDTO[]
 
 
-export const ownerReducer = (state = defaultState, action: OwnerAction): Owner[] => {
+export const ownerReducer = (state = defaultState, action: OwnerAction): OpposingFranchiseDTO[] => {
     switch (action.type) {
         case UPDATE_OWNERS:
             return action.payload;
