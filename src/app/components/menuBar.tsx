@@ -13,26 +13,29 @@ import { turnOnNominationModeForThisOwnersLot } from "../redux/actions/LotAction
 import { updateUI } from "../redux/actions/UiActions";
 import { FAChatWindow } from "./chat";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useNavigate } from "react-router-dom";
+import LeagueSwitchMenu from "./menu/LeagueSwitchMenu";
 
 type DrawerType = 'Salaries' | 'Chat' | undefined
 
 export function MenuBar() {
-    const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
     const owners = useSelector((state: RootState) => state.owners);
     const lots = useSelector((state: RootState) => state.lots.filter(l => l.leagueId === currentLeague?.league.leagueId ?? 0));
-    const { user } = useAuth0();
-    const avatar = user?.picture
-
     const nomIsUsed = useSelector((state: RootState) => {
         if (!owner.ownername) return false
         return state.lots.find(l => l.nominatedBy === currentLeague?.leagueownerid)?.bid?.player
     })
+    const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const { user } = useAuth0();
+    const avatar = user?.picture
+    const logo = process.env.PUBLIC_URL + '/stanfan-logo-white.png';
+
     const open = Boolean(anchorEl);
     const dispatch = useDispatch();
     const { palette } = useTheme();
-
+    const navigate = useNavigate();
     const closeDrawer = () => {
         setOpenDrawer(undefined);
     };
@@ -90,18 +93,23 @@ export function MenuBar() {
                                         addNominationCard()
                                         setAnchorEl(null)
                                         }}>Nominate a Player</MenuItem>}
-                                    <MenuItem>
+                                    <MenuItem onClick={() => {
+                                        navigate("/home")
+                                        }}>League Info</MenuItem>
+                                    {/* <MenuItem>
                                         <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 8}}>
                                             <VolumeMute />
                                             <Switch defaultChecked color='default' onChange={handleAudio}/>
                                             <VolumeUp />
                                         </div>
-                                    </MenuItem>
+                                    </MenuItem> */}
                                 </Menu>
+                                <img src={logo} style={{ maxHeight: 20, aspectRatio: 'auto', marginRight: 20 }} />
                             </>
                             )
                             :
-                            (<div style={{ display: 'flex', flexDirection: 'row', flex: 1}}>
+                            (<div style={{ display: 'flex', flexDirection: 'row', flex: 1, alignItems: 'center'}}>
+                                <img src={logo} style={{ maxHeight: 20, aspectRatio: 'auto', marginRight: 20 }} />
                                 <Button color="inherit"
                                     onClick={() => setOpenDrawer('Salaries')}>
                                     Salary Caps
@@ -113,22 +121,27 @@ export function MenuBar() {
                                         }}>
                                     {openDrawer=== 'Chat' ? 'Close Chat' : 'Open Chat'}
                                 </Button>}
+                                <Button color="inherit"
+                                    onClick={() => {
+                                        navigate('/home')
+                                        }}>League Info</Button>
                                 {!nomIsUsed &&
                                     <Button color='inherit' onClick={() => addNominationCard()}>
                                         Nominate a Player
                                     </Button>}
-                                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 8}}>
+                                {owner.leagues.length > 1 && <LeagueSwitchMenu />}
+                                {/* <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 8}}>
                                     <VolumeMute />
                                     <Switch defaultChecked color='default' onChange={handleAudio}/>
                                     <VolumeUp />
-                                </div>
+                                </div> */}
                             </div>)}
-                            {!owner.ownerId &&
+                            {/* {!owner.ownerId &&
                                 <div>
                                     <Button color="inherit" onClick={() => dispatch(updateUI({ modal: 'signIn' }))}>
                                         LOGIN
                                     </Button>
-                                </div>}
+                                </div>} */}
 
                         </Toolbar>
                     </AppBar>

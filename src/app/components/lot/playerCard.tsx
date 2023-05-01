@@ -20,7 +20,6 @@ export const PlayerCard = ({ lot }: PlayerCardProps) => {
   const { freeAgents } = useSelector((state: RootState) => state);
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerDTO>();
   const {isMobile} = useSelector((state: RootState) => state.ui)
-  console.log('selected', selectedPlayer)
   const dispatch = useDispatch();
   const selectPlayerForNom = (player: PlayerDTO) => {
     setSelectedPlayer(player)

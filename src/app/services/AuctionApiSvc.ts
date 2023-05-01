@@ -53,8 +53,8 @@ const getFullPlayerBio = async (lastYear: number, id: number, position: string, 
     return await fetch(`${URL}/free-agency/leagues/${leagueId}/year/${lastYear}/playerId/${id}/position/${position}/firstName/${firstName}/lastName/${lastName}?hasAction=${actionShot}`)
 }
 
-const getBidHistoryByPlayerId = async (mflId: number): Promise<Response> => {
-    return await fetch(`${URL}/free-agency/players/${mflId}/bid-history`)
+const getBidHistoryByPlayerId = async (leagueId: number, mflId: number): Promise<Response> => {
+    return await fetch(`${URL}/free-agency/leagues/${leagueId}/players/${mflId}/bid-history`)
 }
 
 const login = async (ownername: string, password: string): Promise<Owner> => {
@@ -84,7 +84,7 @@ const register = async (name: string, username: string, password: string): Promi
     return res;
 }
 
-const pageLoad = async (cookie: string = "", leagueId: number = 13894): Promise<PageLoad> => {
+const pageLoad = async (cookie: string = "", leagueId: number = 0): Promise<PageLoad> => {
     const rest = await axios.get(`${URL}/free-agency/leagues/${leagueId}/page-load`, 
     {
         params: { loginInfo: cookie }

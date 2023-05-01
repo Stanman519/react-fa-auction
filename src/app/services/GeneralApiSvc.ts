@@ -25,11 +25,12 @@ export interface CutRequestBody{
 }
 
 
-const fetchDashboardInitialLoad = (cookie: string = "", authUser: User) : Promise<Dashboard> => {
+const fetchDashboardInitialLoad = (cookie: string = "", authUser: User, leagueId?: number) : Promise<Dashboard> => {
     return axios.post(`${URL}/dashboard/home`, 
-    authUser, {headers: {
-        'content-type': 'application/json'
-    },})
+    authUser, {
+        params: {leagueId},
+        headers: {'content-type': 'application/json'}
+    })
         .then((res) => {
             return res.data
         }).catch(() => {

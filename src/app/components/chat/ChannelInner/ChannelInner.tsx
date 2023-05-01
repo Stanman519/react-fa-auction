@@ -87,18 +87,21 @@ export const ChannelInner: React.FC<ChannelInnerProps> = (props) => {
   // const actions = ['delete', 'edit', 'flag', 'mute', 'react', 'reply'];
 
   return (
-    <div style={{backgroundColor: 'white'}}>
-      {/* <Window > */}
-        {/* <MessagingChannelHeader theme={theme} toggleMobile={toggleMobile} /> */}
+    <>
+      <Window >
+        <MessagingChannelHeader theme={theme} toggleMobile={toggleMobile} />
         <MessageList 
         
         messageActions={['delete', 'quote', 'react']} 
         />
-        <TypingIndicator />
+        {/* <TypingIndicator /> */}
+        <MessageInput focus />
+      </Window>
 
-      {/* </Window> */}
-      <MessageInput focus />
+
+
+
       {/* <Thread Input={MessagingInput} /> */}
-    </div>
+    </>
   );
 };

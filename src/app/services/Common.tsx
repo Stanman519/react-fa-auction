@@ -60,7 +60,6 @@ export const checkValidity = (league: LeagueLoginInfo, newBid: number, newYears:
         validity.isValid = false
         validity.violations.push("Salaries under $35 can only go up to 3 years.");
     }
-    console.log('mflid', mflId)
     if(!mflId) {
         validity.isValid = false
         validity.violations.push("You must choose a player before bidding.");

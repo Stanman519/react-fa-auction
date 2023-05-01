@@ -18,9 +18,9 @@ import type {
   ReactionType,
   UserType,
 } from '../../chat';
-import { ChannelInfoIcon, ChannelSaveIcon } from '../../../../assets';
+import { ChannelInfoIcon, ChannelSaveIcon, HamburgerIcon } from '../../../../assets';
 
-const AvatarGroup = ({ members }: { members: ChannelMemberResponse[] }) => {
+export const AvatarGroup = ({ members }: { members: ChannelMemberResponse[] }) => {
   if (members.length >= 4) {
     return (
       <div className='messaging__channel-header__avatars four'>
@@ -46,7 +46,8 @@ type Props = {
 
 const MessagingChannelHeader: React.FC<Props> = (props) => {
   const { theme, toggleMobile } = props;
-
+  const [isEditing, setIsEditing] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const { client } = useChatContext<
     AttachmentType,
     ChannelType,
@@ -66,41 +67,58 @@ const MessagingChannelHeader: React.FC<Props> = (props) => {
     ReactionType,
     UserType
   >();
-
   const [channelName, setChannelName] = useState(channel.data?.name || '');
+  const [title, setTitle] = useState('');
+  const updateChannel = async () => {
+    if (channelName && channelName !== channel.data?.name) {
+      await channel.update(
+        { name: channelName },
+        { text: `Channel name changed to ${channelName}` },
+      );
+    }
 
+    setIsEditing(false);
+  };
 
+  const members: any[] = Object.values(channel.state.members || {} as ChannelMemberResponse).filter(
+    (member:any) =>  member.user?.id !== client?.user?.id
+  );
 
-  // const members: ChannelMemberResponse[] = Object.values(channel.state.members || {}).filter(
-  //   (member:any) => member.user?.id !== client?.user?.id,
-  // );
-
-
-  // const EditHeader = () => (
-  //   <form
-  //     style={{ flex: 1 }}
-  //     onSubmit={(event) => {
-  //       event.preventDefault();
-  //       inputRef?.current?.blur();
-  //     }}
-  //   >
-  //     <input
-  //       autoFocus
-  //       className='channel-header__edit-input'
-  //       onBlur={updateChannel}
-  //       onChange={(event) => setChannelName(event.target.value)}
-  //       placeholder='Type a new name for the chat'
-  //       ref={inputRef}
-  //       value={channelName}
-  //     />
-  //   </form>
-  // );
+  const EditHeader = () => (
+    <form
+      style={{ flex: 1 }}
+      onSubmit={(event) => {
+        event.preventDefault();
+        inputRef?.current?.blur();
+      }}
+    >
+      <input
+        autoFocus
+        className='channel-header__edit-input'
+        onBlur={updateChannel}
+        onChange={(event) => setChannelName(event.target.value)}
+        placeholder='Type a new name for the chat'
+        ref={inputRef}
+        value={channelName}
+      />
+    </form>
+  );
 
   return (
     <div className='messaging__channel-header'>
-      {/* <AvatarGroup members={members} /> */}
+            <div id='mobile-nav-icon' className={`${theme}`} onClick={() => toggleMobile()}>
+        <HamburgerIcon />
+      </div>
+      <AvatarGroup members={members} />
+            {!isEditing ? (
+        <div className='channel-header__name'>{channelName || title}</div>
+      ) : (
+        <EditHeader />
+      )}
       <div className='messaging__channel-header__right'>
         <TypingIndicator />
+        {channelName !== 'Social Demo' &&
+          (!isEditing ? <ChannelInfoIcon {...{ isEditing, setIsEditing }} /> : <ChannelSaveIcon />)}
       </div>
     </div>
   );

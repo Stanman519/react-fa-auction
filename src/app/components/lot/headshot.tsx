@@ -13,9 +13,10 @@ export function Headshot({ img, lotId, player }: { img?: string, lotId: number, 
     return (
         <>
         {
-            !player ? 
-            <Avatar variant='rounded' className="max-h-24 max-h-52 max-w-full" alt="" src={avatar} /> 
-            :
+            player && 
+            // ? 
+            // <Avatar variant='rounded' className="max-h-24 max-h-52 max-w-full" alt="" src={avatar} /> 
+            // :
             <div className="bg-no-repeat bg-contain" style={{ backgroundImage: `url('${teamLogo}')`}}>
                 <img className='headshot' src={img ? img : capnMug} />
             </div>

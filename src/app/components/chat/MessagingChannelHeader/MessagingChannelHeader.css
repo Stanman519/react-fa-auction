@@ -6,6 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-left: 15px;
   min-height: 60px;
 }
 

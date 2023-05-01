@@ -24,18 +24,15 @@ export const loadDataForHomeBase = (authUser: User) => async (
     getState: () => RootState
 ): Promise<any> => {
     dispatch(updateUI({isLoading: 'full-screen'}))
-    console.log('usuer', authUser)
-    const dashboard = await GeneralApiSvc.fetchDashboardInitialLoad("", authUser)
-    console.log('dash', dashboard)
+    const { currentLeague } = getState().profile
+    const dashboard = await GeneralApiSvc.fetchDashboardInitialLoad("", authUser, currentLeague?.league.leagueId)
     if (dashboard) {
-        const currentLeague = dashboard.profile.leagues.length > 0 ? dashboard.profile.leagues[0] : undefined
+        const newCurrLeague = currentLeague ? dashboard.profile.leagues.find(l => l.league.leagueId == currentLeague.league.leagueId) : dashboard.profile.leagues.length > 0 ? dashboard.profile.leagues[0] : undefined
+        
         dispatch(loadTransactions(dashboard.leagueTransactions))
         dispatch(updateDeadCapInfo({deadCap: dashboard.teamDeadCaps, selectedTeam: undefined}))
-        dispatch(updateLoginInfo({owner: dashboard.profile, currentLeague: currentLeague}))
+        dispatch(updateLoginInfo({owner: dashboard.profile, currentLeague: newCurrLeague}))
         dispatch(updateUI({modal: undefined}))
-    }
-    else {
-        dispatch(updateUI({modal: 'signIn'}))
     }
     dispatch(updateUI({isLoading: undefined}))
 }

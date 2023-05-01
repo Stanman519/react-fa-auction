@@ -13,12 +13,15 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useNavigate } from 'react-router-dom';
+import { RootState } from '../../redux/reducers/RootReducer';
+import LeagueSwitchMenu from '../menu/LeagueSwitchMenu';
+import { useSelector } from 'react-redux';
 
-const pages = [{label: 'Leagues', route: "/"}, {label:'Games', route: "/"}, {label:'Auction', route: "/auction"}];
-const settings = ['Logout'];
+const pages = [{label:'Games', route: "/games"}, {label:'Auction', route: "/auction"}];
+const settings = ['logout'];
 
 function ResponsiveAppBar() {
-  //const {profile} = useSelector((state: RootState) => state)
+  const { owner } = useSelector((state: RootState) => state.profile)
   const navigate = useNavigate()
   const { user } = useAuth0();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -77,6 +80,7 @@ function ResponsiveAppBar() {
                 display: { xs: 'block', md: 'none' },
               }}
             >
+              {owner.leagues.length > 1 && <LeagueSwitchMenu />}
               {pages.map((page) => (
                 <MenuItem key={page.label} onClick={() => navigate(page.route)}>
                   <Typography textAlign="center">{page.label}</Typography>
@@ -97,15 +101,16 @@ function ResponsiveAppBar() {
               </Button>
 
             ))}
+            {owner.leagues.length > 1 && <LeagueSwitchMenu />}
           </Box>
 
           {<Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+            {/* <Tooltip title="Open settings"> */}
+              {/* <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}> */}
                 <Avatar alt={user?.displayName} src={user?.picture} />
-              </IconButton>
-            </Tooltip>
-            <Menu
+              {/* </IconButton> */}
+            {/* </Tooltip> */}
+            {/* <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"
               anchorEl={anchorElUser}
@@ -120,13 +125,13 @@ function ResponsiveAppBar() {
               }}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
+            > */}
+              {/* {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
-              ))}
-            </Menu>
+              ))} */}
+            {/* </Menu> */}
           </Box>}
         </Toolbar>
       </Container>

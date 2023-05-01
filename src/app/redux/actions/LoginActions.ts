@@ -1,9 +1,12 @@
-import { useAuth0 } from "@auth0/auth0-react";
+import { User, useAuth0 } from "@auth0/auth0-react";
 import { Action } from "@reduxjs/toolkit";
 import AuctionApiSvc from "../../services/AuctionApiSvc";
 import { LoginState } from "../reducers/LoginReducer";
 import { RootState } from "../reducers/RootReducer";
 import { updateUI } from "./UiActions";
+import { Route } from "../../services/Routing";
+import { getInitialAuctionData } from "./FreeAgentActions";
+import { loadDataForHomeBase } from "./TransactionActions";
 
 
 export const UPDATE_LOGIN = 'UPDATE_LOGIN';
@@ -24,7 +27,6 @@ export const submitLogin = (username:string, password: string) => async(
     
 ) => {
     try {
-
         const login = await AuctionApiSvc.login(username, password)
         const currentLeague = login.leagues.length > 0 ? login.leagues[0] : undefined
         dispatch(updateLoginInfo({owner: login, currentLeague}))
@@ -32,26 +34,37 @@ export const submitLogin = (username:string, password: string) => async(
     } catch (e: any) { 
         dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
     }
-
 }
-
-export const loginAuthUserWithRedirect = () => async (
+export const updateCurrentLeague = (leagueId: number, currentRoute: string, user: User) => async(
     dispatch: Function,
     getState: () => RootState
-    ) => {
-        try {
-            const login = getState().profile
-            const { loginWithRedirect, user } = useAuth0();
-            await loginWithRedirect()
-            // call api, does db owner exist with this userid?
-                // if not, create one?
-            // if so, return the user
-            dispatch(updateLoginInfo({...login, authUser: user}))
-        } catch (e: any) { 
-            dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
-        }
+) => {
+    const { profile } = getState()
+    const newProfile = { ...profile }
+    const newCurrentLeague = newProfile.owner.leagues.find(l => l.league.leagueId === leagueId)
+    dispatch(updateLoginInfo({...newProfile, currentLeague: newCurrentLeague}))
+    if (currentRoute == '/auction') dispatch(getInitialAuctionData(user.sub))
+    if (currentRoute == '/home') dispatch(loadDataForHomeBase(user))
+}
+
+
+// export const loginAuthUserWithRedirect = () => async (
+//     dispatch: Function,
+//     getState: () => RootState
+//     ) => {
+//         try {
+//             const login = getState().profile
+//             const { loginWithRedirect, user } = useAuth0();
+//             await loginWithRedirect()
+//             // call api, does db owner exist with this userid?
+//                 // if not, create one?
+//             // if so, return the user
+//             dispatch(updateLoginInfo({...login, authUser: user}))
+//         } catch (e: any) { 
+//             dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
+//         }
     
-    }
+//     }
 
 // export const askCapn = (mflId: string, position: string, age: number) => async(
 //     dispatch: Function,

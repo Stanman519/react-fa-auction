@@ -15,6 +15,8 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
     const [showBio, setShowBio] = useState<boolean>(false);
     const [bio, setBio] = useState<PlayerBio>();
     const [isLoading, setIsLoading] = useState(false);
+    const { currentLeague } = useSelector((state: RootState) => state.profile)
+    const { owners } = useSelector((state: RootState) => state)
     const lastYr: number = lastYear
     const theme = useTheme()
     const slabWidthMultiplier = window.innerWidth < 720 ? 0.7 : 0.4;
@@ -27,7 +29,7 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
 
     const loadHistory = async () => {
         if (bidHistory.length === 0) {
-            const res = await AuctionApiSvc.getBidHistoryByPlayerId(bid.player.mflId);
+            const res = await AuctionApiSvc.getBidHistoryByPlayerId(currentLeague?.league.leagueId ?? 0, bid.player.mflId);
             const historyRes = await AuctionApiSvc.handleErrorResponse(res) as Bid[];
             setBidHistory(historyRes);
         }
@@ -62,7 +64,7 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
                             {bidHistory.map(p =>
                                 <ListItem key={p.bidId}>
                                     <ListItemAvatar>
-                                        <Avatar src={ownerMap.find(o => o.id=== p.ownerId)?.avatar ?? ''}/>
+                                        <Avatar src={owners.find(o => o.leagueownerid === p.ownerId)?.avatar}/>
                                     </ListItemAvatar>
                                     <ListItemText
                                         primary={`$${p.bidSalary}, ${p.bidLength} ${p.bidLength=== 1 ? 'year' : 'years'}`}

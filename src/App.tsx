@@ -32,6 +32,7 @@ function App() {
             <Route path='/' element={<LandingPage />} />
             <Route path='/home' element={<HomeBase />} />
             <Route path='/auction' element={<AuctionHome />} />
+            <Route path='/games' element={<div>coming soon!</div>}/>
           </Routes>
         </Auth0ProviderWithHistory>
       </BrowserRouter>

@@ -5,10 +5,8 @@ import {
     Window,
 
 } from 'stream-chat-react';
-import { LiteralStringForUnion, StreamChat } from 'stream-chat';
+import { ChannelFilters, ChannelOptions, ChannelSort, LiteralStringForUnion, StreamChat } from 'stream-chat';
 import { useSelector } from "react-redux";
-import { RootState } from "../store";
-import { ownerMap } from "../services/Common";
 import { ChatClient } from "../services/ChatUtils";
 import MessagingInput from "./chat/MessagingInput/MessagingInput";
 import React from "react";
@@ -17,6 +15,9 @@ import MessagingThreadHeader from "./chat/MessagingThread/MessagingThread";
 import { ChannelInner } from "./chat/ChannelInner/ChannelInner";
 import 'stream-chat-react/dist/css/index.css';
 import './chat/Chat.css';
+import { useAuth0 } from "@auth0/auth0-react";
+import MessagingSidebar from "./chat/MessagingSidebar";
+import { RootState } from "../redux/reducers/RootReducer";
 
 export type AttachmentType = {};
 export type ChannelType = { demo?: string };
@@ -29,38 +30,47 @@ export type UserType = { image?: string };
 export const GiphyContext = React.createContext(
     {} as { giphyState: boolean; setGiphyState: React.Dispatch<React.SetStateAction<boolean>> },
 );
-
+type ChatWindowProps = {
+    channelListOptions: {
+        options: ChannelOptions;
+        filters: ChannelFilters;
+        sort: ChannelSort;
+    };
+}
 export const FAChatWindow = (): JSX.Element | null => {
-
-
-    const user = useSelector((state: RootState) => state.profile.owner)
-    const [channel, setChannel] = useState<any>(ChatClient.getInstance().chatInstance.activeChannels['messaging:chat']);
+    const { owner, currentLeague } = useSelector((state: RootState) => state.profile)
+    const {profile} = useSelector((state: RootState) => state)
+    const { user } = useAuth0();
+    const [channel, setChannel] = useState<any>(ChatClient.getInstance().chatInstance.activeChannels[`messaging:${currentLeague?.league.leagueId}`]);
     const [isMobileNavVisible, setMobileNav] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
     const [giphyState, setGiphyState] = useState(false);
     const [chatClient, setChatClient] = useState<StreamChat | null>(ChatClient.getInstance().chatInstance);
     const [chatIsInitialized, setChatIsInitialized] = useState<boolean>(ChatClient.getInstance().isInitialized);
 
-
     useEffect(() => {
         let chatClientToUpdate = ChatClient.getInstance()
-        let img: string = ownerMap.find(o => o.id === user.ownerId)?.avatar ?? ''
         const chatSetup = async () => {
-            if(!chatClientToUpdate.isInitialized){
-                setChannel(await ChatClient.finishSetup({
-                    id: user.ownername,
-                    name: user.ownername,
+            if(!chatClientToUpdate.isInitialized || !chatClientToUpdate.chatInstance.activeChannels[`messaging:${currentLeague?.league.leagueId}`]){
+                let channel = await ChatClient.finishSetup({
+                    user_id: `${owner.ownerId}`,
+                    id: `${owner.ownerId}`,
+                    name: owner.displayName,
                     role: 'admin',
-                    image: img,
-                }, user.streamToken))
+                    image: user?.picture,
+                    
+                }, owner.streamToken, currentLeague?.league.leagueId ?? 0)
+                setChannel(channel)
                 setChatClient(chatClientToUpdate.chatInstance)
+
             }
         }
-        if (user.streamToken && !chatIsInitialized) {
+        if (owner.streamToken && (!chatIsInitialized) || !chatClientToUpdate.chatInstance.activeChannels[`messaging:${currentLeague?.league.leagueId}`]){
             chatSetup()
             setChatIsInitialized(true);
         }
 
-    }, [user.streamToken])
+    }, [])
 
     const toggleMobile = () => setMobileNav(!isMobileNavVisible);
     const giphyContextValue = { giphyState, setGiphyState };
@@ -68,9 +78,17 @@ export const FAChatWindow = (): JSX.Element | null => {
     if (!chatClient) return null;
 
     return (
-        <div style={{flex: 1}}>
+        // <div style={{flex: 1}}>
+        <>
             {channel &&
                 <Chat client={chatClient}>
+                    {/* <MessagingSidebar
+                        channelListOptions={{filters: undefined, sort: undefined, options: undefined}}
+                        onClick={toggleMobile}
+                        onCreateChannel={() => setIsCreating(!isCreating)}
+                        onPreviewSelect={() => setIsCreating(false)}
+
+                    /> */}
                     <Channel
                         Input={MessagingInput}
                         maxNumberOfFiles={5}
@@ -79,14 +97,15 @@ export const FAChatWindow = (): JSX.Element | null => {
                         ThreadHeader={MessagingThreadHeader}
                         TypingIndicator={() => null}
                         channel={channel}>
-                        <Window>
+                        {/* <Window> */}
                             <GiphyContext.Provider value={giphyContextValue}>
                                 <ChannelInner theme={'light'} toggleMobile={toggleMobile} />
                             </GiphyContext.Provider>
-                        </Window>
+                        {/* </Window> */}
                     </Channel>
                 </Chat>}
-        </div>
+                </>
+        //{/* </div> */}
 
     );
 }
