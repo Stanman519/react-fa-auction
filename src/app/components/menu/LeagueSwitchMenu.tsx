@@ -46,6 +46,7 @@ export default function LeagueSwitchMenu() {
       >
         {otherLeagues.map(l => <MenuItem onClick={() => {if (user) {
           dispatch(updateCurrentLeague(l.league.leagueId, pathname, user))
+          handleClose()
           }}}> {l.league.name}</MenuItem>)}
 
       </Menu>
