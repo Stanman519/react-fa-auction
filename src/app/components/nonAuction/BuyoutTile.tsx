@@ -22,7 +22,7 @@ const BuyoutTile = () => {
         {showModal && selectedPlayerIndex && selectedPlayerIndex >= 0 && cutCandidates[selectedPlayerIndex!].salary &&
         <ConfirmModal isOpen={showModal} actionButtonLabel={"SUBMIT"} 
             mainText={"Are you sure you want to use your buyout? You only get 1 every season and it costs $15 IRL!"} 
-            onAction={() => dispatch(submitBuyout(currentLeague?.league.leagueId ?? 0, cutCandidates[selectedPlayerIndex!], currentLeague?.mflfranchiseid ?? 0, Number(Math.round(((cutCandidates[selectedPlayerIndex!].salary! * 0.2) * 10) / 10).toFixed(1)) ))} />}
+            onAction={() => dispatch(submitBuyout(currentLeague?.league.leagueId ?? 0, cutCandidates[selectedPlayerIndex!], currentLeague?.mflfranchiseid ?? 0, Number(Math.round(((cutCandidates[selectedPlayerIndex!].salary! * 0.4) * 10) / 10).toFixed(1)) ))} />}
         <Card className="max-w-4xl flex-1">
             <div>
             <div  className="flex flex-row ml-2 mr-3 flex-1 "  >
