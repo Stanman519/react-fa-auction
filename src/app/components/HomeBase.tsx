@@ -38,6 +38,7 @@ const HomeBase = () => {
     if (currentLeague.cutCandidates && currentLeague.cutCandidates.length > 0) additionalTabs.push({ label: 'BUYOUTS', value: 'buyouts' })
     if (currentLeague.taxiPlayers && currentLeague.taxiPlayers.length > 0 ) additionalTabs.push({ label: 'TAXI CUTS', value: 'taxi' })
     if (currentLeague.tagCandidates && currentLeague.tagCandidates.length > 0 ) additionalTabs.push({ label: 'FRANCHISE TAGS', value: 'tags' })
+    if (!additionalTabs.find(t => t.value === currentTab)) setCurrentTab('league')
     //let newTabs = additionalTabs.map((t: Tab) => Object.assign({}, t)) //additionalTabs.map((t: Tab) => {return {label: t.label, value: t.value} as Tab}) ]
     additionalTabs.unshift(leagueTab)
     let newTabs = additionalTabs.map(t => t)

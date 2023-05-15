@@ -2,8 +2,7 @@ import { LoadingButton } from "@mui/lab";
 import { Backdrop, Button, Dialog, DialogActions, DialogContent, Slide, Typography } from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
 import { forwardRef } from "react";
-import { useSelector } from "react-redux";
-import { useAppDispatch } from "../hooks";
+import { useDispatch, useSelector } from "react-redux";
 import { updateUI } from "../redux/actions/UiActions";
 import { RootState } from "../store";
 
@@ -17,7 +16,7 @@ interface ConfirmModalProps{
 export const ConfirmModal = ({isOpen = false, onAction, actionButtonLabel, mainText}: ConfirmModalProps): JSX.Element => {
     const capnWarning = process.env.PUBLIC_URL + '/capn-wtf.png';
     const { isLoading } = useSelector((state: RootState) => state.ui)
-    const dispatch = useAppDispatch();
+    const dispatch = useDispatch();
     const Transition = forwardRef(function Transition(
         props: TransitionProps & {
             children: React.ReactElement<any, any>;
