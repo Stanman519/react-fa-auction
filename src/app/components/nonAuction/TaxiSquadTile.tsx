@@ -19,7 +19,7 @@ const TaxiSquadTile = () => {
 
     return (
     <div className="m-4 flex justify-center">
-    {modal && selectedPlayerIndex && selectedPlayerIndex >= 0 && taxiPlayers[selectedPlayerIndex!].salary && <ConfirmModal 
+    {modal && selectedPlayerIndex !== undefined && selectedPlayerIndex >= 0 && taxiPlayers[selectedPlayerIndex!].salary && <ConfirmModal 
         isOpen={modal} actionButtonLabel={"SUBMIT"} 
         mainText={`Are you sure you want to cut ${taxiPlayers[selectedPlayerIndex ?? 0].fullName}?`} 
         onAction={() => dispatch(submitTaxiCut(currentLeague?.league?.leagueId ?? 0, 

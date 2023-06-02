@@ -32,7 +32,7 @@ const HomeBase = () => {
 
 
   useEffect(() => {
-    if (!currentLeague || !currentLeague?.tagCandidates || !currentLeague?.taxiPlayers || !currentLeague?.cutCandidates) dispatch(loadDataForHomeBase(user!))
+    if (!currentLeague) dispatch(loadDataForHomeBase(user!))
     if (!currentLeague) return
     let additionalTabs: Tab[] = []
     if (currentLeague.cutCandidates && currentLeague.cutCandidates.length > 0) additionalTabs.push({ label: 'BUYOUTS', value: 'buyouts' })
