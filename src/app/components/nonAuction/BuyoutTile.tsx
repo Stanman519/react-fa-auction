@@ -23,12 +23,12 @@ const BuyoutTile = () => {
                 <ConfirmModal isOpen={showModal} actionButtonLabel={"SUBMIT"}
                     mainText={"Are you sure you want to use your buyout? You only get 1 every season and it costs $15 IRL!"}
                     onAction={() => {
-                        console.log('clicked')
-                        dispatch(submitBuyout(currentLeague?.league.leagueId ?? 0, 
+                        dispatch(submitBuyout(
+                        currentLeague?.league.leagueId ?? 0, 
                         cutCandidates[selectedPlayerIndex!], 
                         currentLeague?.mflfranchiseid ?? 0, 
-                        Number(Math.round(((cutCandidates[selectedPlayerIndex!].salary! * 0.4) * 10) / 10).toFixed(1)))
-                        )
+                        Number((Math.round(cutCandidates[selectedPlayerIndex!].salary! * 0.4 * 10) / 10).toFixed(1))
+                        ))
                     }
                     } />
             }

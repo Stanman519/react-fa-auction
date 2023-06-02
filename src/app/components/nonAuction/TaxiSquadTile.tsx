@@ -23,7 +23,7 @@ const TaxiSquadTile = () => {
         isOpen={modal} actionButtonLabel={"SUBMIT"} 
         mainText={`Are you sure you want to cut ${taxiPlayers[selectedPlayerIndex ?? 0].fullName}?`} 
         onAction={() => dispatch(submitTaxiCut(currentLeague?.league?.leagueId ?? 0, 
-            taxiPlayers[selectedPlayerIndex!], currentLeague?.mflfranchiseid ?? 0,  Number(Math.round(((taxiPlayers[selectedPlayerIndex!].salary! * 0.4) * 10) / 10).toFixed(1))))} />}
+            taxiPlayers[selectedPlayerIndex!], currentLeague?.mflfranchiseid ?? 0,  Number((Math.round(taxiPlayers[selectedPlayerIndex!].salary! * 0.4 * 10) / 10).toFixed(1))))} />}
         <Card className="max-w-4xl flex-1">
             <div>
             <div  className="flex flex-row ml-2 mr-3 flex-1 " >
