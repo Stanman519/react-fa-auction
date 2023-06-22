@@ -8,6 +8,7 @@ import { updateLoginInfo } from "./LoginActions";
 import { User } from "@auth0/auth0-react";
 import { LeagueLoginInfo } from "../reducers/OwnerReducer";
 import { PlayerDTO } from "../reducers/FreeAgentReducer";
+import { useNavigate } from "react-router-dom";
 
 export interface TransactionAction extends Action {
     payload: Transaction[]
@@ -26,13 +27,14 @@ export const loadDataForHomeBase = (authUser: User) => async (
     dispatch(updateUI({isLoading: 'full-screen'}))
     const { currentLeague } = getState().profile
     const dashboard = await GeneralApiSvc.fetchDashboardInitialLoad("", authUser, currentLeague?.league.leagueId)
+    const nav = useNavigate()
     if (dashboard) {
         const newCurrLeague = currentLeague ? dashboard.profile.leagues.find(l => l.league.leagueId == currentLeague.league.leagueId) : dashboard.profile.leagues.length > 0 ? dashboard.profile.leagues[0] : undefined
-        
         dispatch(loadTransactions(dashboard.leagueTransactions))
         dispatch(updateDeadCapInfo({deadCap: dashboard.teamDeadCaps, selectedTeam: undefined}))
         dispatch(updateLoginInfo({owner: dashboard.profile, currentLeague: newCurrLeague}))
         dispatch(updateUI({modal: undefined}))
+        nav("/home");
     }
     dispatch(updateUI({isLoading: undefined}))
 }

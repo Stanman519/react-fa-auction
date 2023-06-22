@@ -26,7 +26,7 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
         //endTime.getUTCHours(), endTime.getUTCMinutes(), endTime.getUTCSeconds(), 10);
         
         let utcDate = new Date(
-            now.getFullYear(), now.getUTCMonth(), now.getUTCDate(),
+            now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
             now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
 
         let difference = +endTime - +utcDate;
@@ -37,6 +37,12 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
             if(lot.bid) {
                 dispatch(submitWin(lot.bid))
             }
+            return {
+                days: 0,
+                hours: 0,
+                minutes: 0,
+                seconds: 0
+            } as ExpirationObj;
         }
 
         let timeLeft: ExpirationObj = {

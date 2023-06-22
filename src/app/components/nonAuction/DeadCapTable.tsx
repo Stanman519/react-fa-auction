@@ -10,16 +10,15 @@ import { DeadCapInfo } from '../../redux/reducers/TransactionReducer';
 import useWindowDimensions from '../../services/WindowDimensions';
 
 export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number) => void }) {
-    const { deadCap } = useSelector((state: RootState) => state);
-    const { selectedTeam } = useSelector((state: RootState) => state.deadCap);
+    const { selectedTeam, deadCap } = useSelector((state: RootState) => state.deadCap);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-
+    console.log('dead cap', deadCap)
     const ref = useRef<HTMLDivElement>(null)
     const dispatch = useDispatch();
     const { height, width } = useWindowDimensions();
 
     const getYearRange = () => {
-        const shortRange = deadCap.deadCap
+        const shortRange = deadCap
         .flatMap(d => Object.keys(d.amount))
         .filter((value, index, array) => array.indexOf(value) === index)
         .filter(v => Number(v) >= lastYear + 1)
@@ -34,11 +33,13 @@ export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number)
     }
 
     useEffect(() => {
+        console.log('client height UE')
         retHeight(ref.current?.clientHeight ?? 0)
     },[ref.current?.clientHeight])
 
     useEffect(() => {
-        if (deadCap.deadCap.length > 0) setIsLoading(false)
+        console.log('DeadCap UE')
+        if (deadCap.length > 0) setIsLoading(false)
     }, [deadCap]);
 
 
@@ -57,7 +58,7 @@ export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number)
                                         </TableRow>
                                     </TableHead>
                                     <TableBody className="">
-                                        {deadCap.deadCap.map((row) => (
+                                        {deadCap.map((row) => (
                                             <TableRow
                                                 hover
 

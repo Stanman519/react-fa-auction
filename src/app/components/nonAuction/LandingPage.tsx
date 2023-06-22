@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { loadDataForHomeBase } from "../../redux/actions/TransactionActions";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 export const LandingPage = () => {
     const logo = './stanfan-color-logo.png'
@@ -14,8 +12,9 @@ export const LandingPage = () => {
         if (isLoading) return
         const checkUser = async () => {
             if (isAuthenticated && user?.sub) {
-                dispatch(loadDataForHomeBase(user))
-                nav("/home");
+                nav('/auction')
+                //dispatch(loadDataForHomeBase(user))
+
             } else {
                 await loginWithRedirect();
             }

@@ -56,9 +56,11 @@ export function MenuBar() {
     }
     return (
         <div style={{ flex: 1 }}>
+
             <Fragment>
                 <Box>
                     <AppBar position="static" color="primary">
+                    <img src={user?.picture} referrerPolicy="no-referrer" style={{ height: 0, width: 0 }} />
                         <Toolbar style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: 40, paddingRight: 50 }}>
                             {window.innerWidth < 720 ?(
                             <>
@@ -103,7 +105,14 @@ export function MenuBar() {
                                             <VolumeUp />
                                         </div>
                                     </MenuItem> */}
+                                    {/* <MenuItem>
+                                    <Box> */}
+
+                                {/* </Box>
+                                    </MenuItem> */}
+
                                 </Menu>
+
                                 <img src={logo} style={{ maxHeight: 20, aspectRatio: 'auto', marginRight: 20 }} />
                             </>
                             )
@@ -142,6 +151,7 @@ export function MenuBar() {
                                         LOGIN
                                     </Button>
                                 </div>} */}
+                                                                        <Avatar alt={user?.displayName} src={user?.picture} />
 
                         </Toolbar>
                     </AppBar>
