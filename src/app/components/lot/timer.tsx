@@ -18,18 +18,19 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
     const [preventClockTick, setPreventClockTick] = useState<boolean>(false);
     const calculateTimeLeft = async (endTime: Date | undefined) => {
         if (!endTime) return
-        let now = new Date(Date.now());
-
+        let now = new Date(new Date(Date.now()).toUTCString());
         //TODO: FIX THIS pass in UTC from parent?
         //i dont know why but for whatever reason i have to reconvert the expiration back into UTC... 
-        //let utcExpiration = new Date(endTime.getFullYear(), endTime.getUTCMonth(), endTime.getUTCDate(),
-        //endTime.getUTCHours(), endTime.getUTCMinutes(), endTime.getUTCSeconds(), 10);
-        
+        let utcExpiration = new Date(
+            endTime.getUTCFullYear(), endTime.getUTCMonth(), endTime.getUTCDate(),
+            endTime.getUTCHours(), endTime.getUTCMinutes(), endTime.getUTCSeconds())
+
         let utcDate = new Date(
             now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
             now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
 
-        let difference = +endTime - +utcDate;
+
+        let difference = +utcExpiration - +utcDate;
 
         if (difference <= 0) {
             // NEED TO RESET THE CLOCK SO IT DOESN'T CALL API MULTIPLE TIMES
