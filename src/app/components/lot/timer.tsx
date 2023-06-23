@@ -19,18 +19,13 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
     const calculateTimeLeft = async (endTime: Date | undefined) => {
         if (!endTime) return
         let now = new Date(new Date(Date.now()).toUTCString());
-        //TODO: FIX THIS pass in UTC from parent?
-        //i dont know why but for whatever reason i have to reconvert the expiration back into UTC... 
-        let utcExpiration = new Date(
-            endTime.getUTCFullYear(), endTime.getUTCMonth(), endTime.getUTCDate(),
-            endTime.getUTCHours(), endTime.getUTCMinutes(), endTime.getUTCSeconds())
-
+        // 2023 edit! the end time doesnt need to be converted to UTC because it is in UTC in DB. just need NOW to be in UTC
         let utcDate = new Date(
             now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
             now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
 
 
-        let difference = +utcExpiration - +utcDate;
+        let difference = +endTime - +utcDate;
 
         if (difference <= 0) {
             // NEED TO RESET THE CLOCK SO IT DOESN'T CALL API MULTIPLE TIMES
@@ -72,7 +67,7 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
     return (
         <div className="mb-1 flex content-center" style={{ background: getTimerColor() }}>
             {endTime && remaining && 
-                <div className="text-xl text-center w-full">{remaining.hours.toString().padStart(2, '0')}:{remaining.minutes.toString().padStart(2, '0')}:{remaining.seconds.toString().padStart(2, '0')} 
+                <div className="text-xl text-center w-full">{remaining.days}:{remaining.hours.toString().padStart(2, '0')}:{remaining.minutes.toString().padStart(2, '0')}:{remaining.seconds.toString().padStart(2, '0')} 
                 </div>}
         </div>
     );
