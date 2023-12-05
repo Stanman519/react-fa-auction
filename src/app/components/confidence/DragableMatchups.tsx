@@ -30,7 +30,7 @@ export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo
         return Math.floor(Math.random() * (max - min + 1) + min)
     }
     const EARLY_STAMP_TRANSITION_DUR = 200
-    const STAMP_DURATION = 8000
+    const STAMP_DURATION = 12000
     useEffect(() => {
         if (user) dispatch(getMatchups(user)) 
       },[user])
@@ -57,7 +57,7 @@ export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo
         ));
     }
     const getStampTransform = () => {
-        let rotation = randomIntFromInterval(-35, -12)
+        let rotation = randomIntFromInterval(-15, -5)
         return stamp.showStamp ?
         `rotate(${rotation}deg) scale(1)` : 
         `rotate(${rotation}deg) scale(10)`
@@ -74,19 +74,27 @@ export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo
         transform: getStampTransform(),
         opacity: stamp.fadeStamp ? 100 : 0,
         left: stamp.x, top: stamp.y, 
-        zIndex: 3, fontSize: STAMP_FONT_SIZE, color: 'darkred', 
-        fontWeight: 'bolder', borderColor: 'darkred', 
-        borderWidth: 7, borderRadius: 14,
-         paddingLeft: 6, paddingRight: 6}
-
+        zIndex: 3, 
+        fontSize: STAMP_FONT_SIZE, 
+        color: 'darkred', 
+        fontWeight: 'bolder', 
+        // borderColor: 'darkred', 
+        // borderWidth: 5, borderRadius: 4,
+        outline: '5px solid darkred',
+        outlineOffset: -10,
+        padding: 20,
+        WebkitMask: 'conic-gradient(at 32px 32px,#0000 75%,#000 0)0 0/calc(100% - 32px) calc(100% - 32px), linear-gradient(#000 0 0) content-box',
+        //background: 'conic-gradient(from 90deg  at top    var(--b) left  var(--b),var(--_g)) 0    0    / var(--_p), conic-gradient(from 180deg at top    var(--b) right var(--b),var(--_g)) 100% 0    / var(--_p), conic-gradient(from 0deg   at bottom var(--b) left  var(--b),var(--_g)) 0    100% / var(--_p), conic-gradient(from -90deg at bottom var(--b) right var(--b),var(--_g)) 100% 100% / var(--_p)',
+         //paddingLeft: 6, paddingRight: 6}
+    }
     const handleStampAnim = (e: React.MouseEvent) => {
         if (editMode || stamp.showStamp) return
         var bounds = e.currentTarget.getBoundingClientRect();
         var x = e.clientX - bounds.left;
         var y = e.clientY - bounds.top;
-        if ((x)/ bounds.width > .75) x = x - (0.2 * bounds.width) - (STAMP_FONT_SIZE * 2) //handles width of stamp
+        if ((x)/ bounds.width > .70) x = x - (0.2 * bounds.width) - (STAMP_FONT_SIZE * 3) //handles width of stamp
         if ((x) / bounds.width < .15) x = x + (0.1 * bounds.width)
-        if ((y)/ bounds.height > .85) y = y - (0.2 * bounds.height) - STAMP_FONT_SIZE
+        if ((y)/ bounds.height > .85) y = y - (0.2 * bounds.height) - (STAMP_FONT_SIZE * 1.5)
         if ((y)/ bounds.height < .15) y = y + (0.1 * bounds.height)
         setStamp({showStamp: true, fadeStamp: true, x, y})
         setTimeout(() => {
@@ -99,7 +107,7 @@ export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo
     }
 
     return (
-        <div  className="max-w-md lg:w-1/2" style={{position: 'relative'}}>{
+        <div  className="flex flex-col" style={{position: 'relative'}}>{
             multiLoader?.includes('con-matchups') ? 
                 <div style={{width: '100%'}}>
                 <Skeleton  variant="rectangular" width={400} style={{flex: 1, borderWidth: 1, borderColor: '#C8C8C8', margin: 2, height: 200}} />
@@ -110,7 +118,7 @@ export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo
             {matchups?.length > 0 && 
             <>
 
-            <div style={stampStyles}>LOCKED!</div>
+            {matchups.some(m => !m.pickable) && <div style={stampStyles}>LOCKED</div>}
 
             <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="list">
@@ -136,7 +144,7 @@ export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo
             {editMode && 
             <Button onClick={() => { if (!isDemo) dispatch(submitMyPicks(matchups, thisWeekPoints.points, props))}} variant="contained" 
             disabled={matchups?.some(m => !m.chosenTeamLocal) || props.some(p => !p.localChoice)}
-            style={{width: '100%', height: 50}}>SUBMIT</Button>}
+            style={{ height: 50}}>SUBMIT</Button>}
             {
                 !editMode && matchups.some(m => m.pickable) && 
                 <Button sx={{width: '100%', height: 50}} onClick={() => setEditMode(true)} variant="contained">EDIT</Button>

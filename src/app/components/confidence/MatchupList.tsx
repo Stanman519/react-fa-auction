@@ -1,5 +1,5 @@
 import { Draggable } from "@hello-pangea/dnd";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NflMatchup } from "../../models/ConfidenceDTOs";
 import { ConfidenceWeekPointsMap, confidencePoints } from "../../services/Common";
 import { ConfidenceMatchup } from "./ConfidenceMatchup";
@@ -10,11 +10,26 @@ import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
 
 export const MatchupList = React.memo(({ matchups, placeholder, thisWeekPoints, canEdit, onClick }: { onClick: (e: React.MouseEvent) => void, matchups: NflMatchup[], placeholder: React.ReactNode, thisWeekPoints: ConfidenceWeekPointsMap | undefined, canEdit: boolean }): JSX.Element => {
     // const heightRef = useRef<HTMLDivElement>(null)
+    const [width, setWidth] = useState<number>(window.innerWidth);
+
+    function handleWindowSizeChange() {
+        setWidth(window.innerWidth);
+    }
+    useEffect(() => {
+        window.addEventListener('resize', handleWindowSizeChange);
+        return () => {
+            window.removeEventListener('resize', handleWindowSizeChange);
+        }
+    }, []);
+
+const isMobile = width <= 768;
     const theme = useTheme().palette
     return (
-        <div onClick={(event) => onClick(event)} className="flex flex-row" style={{userSelect: 'none'}}>
-            <div className="flex flex-col grow flex-1" style={{background: (thisWeekPoints && thisWeekPoints?.points.length > 1) ? 
-                'linear-gradient(180deg, rgba(227,57,0,1) 0%, rgba(227,88,0,1) 20%, rgba(0,145,255,1) 76%, rgba(0,61,255,1) 100%)' : 'gray'}} >
+        <div onClick={(event) => onClick(event)} className="flex flex-row w-full" style={{userSelect: 'none'}}>
+            <div className="flex flex-col grow" style={{background: (thisWeekPoints && thisWeekPoints?.points.length > 1) ? 
+                'linear-gradient(180deg, rgba(227,57,0,1) 0%, rgba(227,88,0,1) 20%, rgba(0,145,255,1) 76%, rgba(0,61,255,1) 100%)' : 'gray', 
+                minWidth: 80,
+                maxWidth: 180}} >
                 {thisWeekPoints?.points.map(c => (
                     <Card key={c} 
                     style={{ flex: 1, opacity: 0.5, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -43,6 +58,7 @@ export const MatchupList = React.memo(({ matchups, placeholder, thisWeekPoints, 
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}>
                                 <ConfidenceMatchup
+                                    isMobile={width < 769}
                                     canEdit={canEdit}
                                     matchup={matchup}
                                     index={index}
@@ -55,7 +71,7 @@ export const MatchupList = React.memo(({ matchups, placeholder, thisWeekPoints, 
 
                 ))
                 }
-                {placeholder && <div>{placeholder}</div>}
+                {placeholder && <div >{placeholder}</div>}
             </div>
         </div>
     )

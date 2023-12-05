@@ -8,7 +8,7 @@ import ThumbUpOffAltIcon from '@mui/icons-material/CheckCircleOutline';
 import CloseOutlinedIcon from '@mui/icons-material/CancelOutlined';
 type ChevronAnim = 'left' | 'right' | undefined
 
-export const ConfidenceMatchup = ({ matchup, index, canEdit }: { matchup: NflMatchup, index: number, canEdit: boolean }) => {
+export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false }: { matchup: NflMatchup, index: number, canEdit: boolean, isMobile: boolean }) => {
     const dispatch = useDispatch()
     const [leftChev, setLeftChev] = useState<ChevronAnim>(undefined)
     const [rightChev, setRightChev] = useState<ChevronAnim>(undefined)
@@ -58,7 +58,7 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit }: { matchup: NflMat
         height: 0,
         borderStyle: 'solid',
         borderWidth: '140px 0 0 140px',
-        borderColor: 'transparent transparent transparent rgba(0,0,0,0.15)',
+        borderColor: 'transparent transparent transparent rgba(0,0,0,0.10)',
         transform: 'rotate(0deg)',
         bottom: 0,
         position:'absolute',
@@ -70,7 +70,7 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit }: { matchup: NflMat
         height: 0,
         borderStyle: 'solid',
         borderWidth: '0 0 140px 140px',
-        borderColor: 'transparent transparent rgba(0,0,0,0.15) transparent',
+        borderColor: 'transparent transparent rgba(0,0,0,0.10) transparent',
         transform: 'rotate(0deg)',
         bottom: 0,
         position:'absolute',
@@ -115,7 +115,7 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit }: { matchup: NflMat
     ]
 
     return (
-        <div style={{ height: 200, maxWidth: 300, padding: 0, backgroundColor: matchup.chosenTeamLocal?.secondary, userSelect: 'none' }}
+        <div style={{ height: isMobile ? 150 : 200, maxWidth: 300, padding: 0, backgroundColor: matchup.chosenTeamLocal?.secondary, userSelect: 'none' }}
             className='flex flex-row overflow-hidden'>
             <div className={getClassStringsForAnimation('left')} style={getTeamStyling('left')}>
                 <img src={matchup.left.logo}
@@ -123,7 +123,7 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit }: { matchup: NflMat
                         pointerEvents: 'none', userSelect: 'none',
                         opacity: (matchup.chosenTeamLocal && matchup.chosenTeamLocal !== matchup.left) ? '50%' : '100%',
                         transition: 'all', transitionDuration: '0.5s', position: 'relative',
-                        minHeight: 150, minWidth: 150, maxHeight: 180, maxWidth: 180
+                        minHeight: isMobile ? 120 :150, minWidth: isMobile ? 120 : 150, maxHeight: isMobile ? 120 : 180, maxWidth: isMobile ? 120 : 180
                     }} />
                 {(!matchup.pickable && matchup.winner && matchup.pick?.choice === matchup.left.tricode) && 
                     <div>
@@ -166,11 +166,12 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit }: { matchup: NflMat
                         left: matchup.chosenTeamLocal?.tricode === matchup.left.tricode ? 0 : -300,
                         bottom: 8,
                         transition: 'ease-in',
-                        transitionDuration: '0.5s', fontSize: 24, textShadow: '1px 1px 0px #BBBBBB, -1px 0px 0px #BBBBBB', fontFamily: 'Arial Black', color: matchup.left.secondary, textTransform: 'uppercase'
+                        transitionDuration: '0.5s', fontSize: 24, fontFamily: "'Anton', sans-serif", color: matchup.left.secondary, textTransform: 'uppercase'
                     }}>{matchup.left.city}</div>}
             </div>
             <div className={getClassStringsForAnimation('right')} style={getTeamStyling('right')}>
-                <img src={matchup.right.logo} style={{ pointerEvents: 'none', opacity: (matchup.chosenTeamLocal && matchup.chosenTeamLocal !== matchup.right) ? '50%' : '100%', transition: 'all', transitionDuration: '0.5s', minHeight: 150, minWidth: 150, maxHeight: 180, maxWidth: 180 }} />
+                <img src={matchup.right.logo} style={{ pointerEvents: 'none', opacity: (matchup.chosenTeamLocal && matchup.chosenTeamLocal !== matchup.right) ? '50%' : '100%', transition: 'all', transitionDuration: '0.5s', 
+                minHeight: isMobile ? 120 :150, minWidth: isMobile ? 120 : 150, maxHeight: isMobile ? 120 : 180, maxWidth: isMobile ? 120 : 180 }} />
                 {(!matchup.pickable && matchup.winner && matchup.pick?.choice === matchup.right.tricode) && 
                     <div>
                         <div style={triangleR}/>
@@ -215,7 +216,7 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit }: { matchup: NflMat
                         left: matchup.chosenTeamLocal?.tricode === matchup.right.tricode ? 0 : 300,
                         bottom: 8,
                         transition: 'ease-in',
-                        transitionDuration: '0.5s', fontSize: 24, textShadow: '1px 1px 0px #BBBBBB, -1px 0px 0px #BBBBBB', fontFamily: 'Arial Black', color: matchup.right.secondary, textTransform: 'uppercase'
+                        transitionDuration: '0.5s', fontSize: 24, fontFamily: "'Anton', sans-serif", color: matchup.right.secondary, textTransform: 'uppercase'
                     }}>{matchup.right.city}</div>}
             </div>
         </div>

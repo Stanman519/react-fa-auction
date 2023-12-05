@@ -100,7 +100,9 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
                                             </>
                                     }
                                     
-                                    {barOptions.includes('confidence') && <Button color='inherit' onClick={() => dispatch(updateUI({modal: 'confidence-rules'}))}>Rules</Button>}
+                                    {barOptions.includes('confidence') && <Button color='inherit' onClick={() => {
+                                        setAnchorEl(null)
+                                        dispatch(updateUI({modal: 'confidence-rules'}))}}>Rules</Button>}
                                     {barOptions.includes('chat') && 
                                         user?.sub && <MenuItem onClick={() => {
                                         setOpenDrawer('Chat')
@@ -124,7 +126,10 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
                                     onClick={() => setOpenDrawer('Salaries')}>
                                     Salary Caps
                                 </Button>}
-                                {barOptions.includes('confidence') && <Button color='inherit' onClick={() => dispatch(updateUI({modal: 'confidence-rules'}))}>Rules</Button>}
+                                {barOptions.includes('confidence') && <Button color='inherit' onClick={() => {
+                                    setAnchorEl(null)
+                                    dispatch(updateUI({modal: 'confidence-rules'}))
+                                    }}>Rules</Button>}
                                 {barOptions.includes('chat') && user?.sub && <Button color="inherit"
                                     onClick={() => {
                                         //dispatch()
