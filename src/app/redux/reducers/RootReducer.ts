@@ -7,6 +7,7 @@ import { lotReducer } from './LotReducer';
 import { ownerReducer } from './OwnerReducer';
 import transactionReducer from './TransactionReducer';
 import uiReducer from './UiReducer';
+import { confidenceReducer } from './ConfidenceReducer';
 
 
 export const RootReducer = combineReducers({
@@ -17,7 +18,8 @@ export const RootReducer = combineReducers({
     ui: uiReducer,
     transactions: transactionReducer,
     franchises: franchiseReducer,
-    deadCap: deadCapReducer
+    deadCap: deadCapReducer,
+    confidence: confidenceReducer
 });
 
 export type RootState = ReturnType<typeof RootReducer>

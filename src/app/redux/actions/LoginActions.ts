@@ -7,6 +7,7 @@ import { updateUI } from "./UiActions";
 import { Route } from "../../services/Routing";
 import { getInitialAuctionData } from "./FreeAgentActions";
 import { loadDataForHomeBase } from "./TransactionActions";
+import GeneralApiSvc from "../../services/GeneralApiSvc";
 
 
 export const UPDATE_LOGIN = 'UPDATE_LOGIN';
@@ -22,19 +23,17 @@ export const updateLoginInfo = (profile: LoginState): LoginAction => {
     }
 }
 
-export const submitLogin = (username:string, password: string) => async(
+export const synchronizeAuth0WithDbLogin = (user: User) => async(
     dispatch: Function,
-    
+    getState: () => RootState
 ) => {
-    try {
-        const login = await AuctionApiSvc.login(username, password)
-        const currentLeague = login.leagues.length > 0 ? login.leagues[0] : undefined
-        dispatch(updateLoginInfo({owner: login, currentLeague}))
-        dispatch(updateUI({modal: undefined}))
-    } catch (e: any) { 
-        dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
-    }
+    const { profile } = getState()
+    const dbUser = await GeneralApiSvc.synchronizeAuth(user);
+    const newProfile = {...profile}
+    newProfile.owner = dbUser
+    dispatch(updateLoginInfo(newProfile))
 }
+
 export const updateCurrentLeague = (leagueId: number, currentRoute: string, user: User) => async(
     dispatch: Function,
     getState: () => RootState

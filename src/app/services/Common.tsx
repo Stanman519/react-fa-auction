@@ -7,7 +7,7 @@ interface OwnerLookup{
     avatar: string
 }
 
-interface TmColor{
+export interface TmColor{
     team: string
     nickname: string
     primary: string
@@ -93,6 +93,16 @@ export const ownerMap: OwnerLookup[] = [
     { name: 'Drew', id: 12, avatar: `${file}12.png`},
 ]
 
+export interface ConfidenceWeekPointsMap{
+    week: number,
+    points: number[]
+}
+export const confidencePoints: ConfidenceWeekPointsMap[] = [
+    {week: 1, points: [6,5,4,3,2,1]},
+    {week: 2, points: [7,6,5,4]},
+    {week: 3, points: [8,7]},
+    {week: 4, points: [9]},
+]
 
 
 export const tmColorMap: TmColor[] = [

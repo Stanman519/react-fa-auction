@@ -1,21 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import '../../styles/CapDetails.css';
-import '../../styles/DeadCapTable.css';
 import { RootState } from '../../redux/reducers/RootReducer.js';
 import { lastYear } from '../../services/Common';
 import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, CircularProgress, Card, CardContent } from '@mui/material';
 import { selectTeam } from '../../redux/actions/DeadCapActions';
 import { DeadCapInfo } from '../../redux/reducers/TransactionReducer';
-import useWindowDimensions from '../../services/WindowDimensions';
 
 export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number) => void }) {
     const { selectedTeam, deadCap } = useSelector((state: RootState) => state.deadCap);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    console.log('dead cap', deadCap)
+
     const ref = useRef<HTMLDivElement>(null)
     const dispatch = useDispatch();
-    const { height, width } = useWindowDimensions();
+
 
     const getYearRange = () => {
         const shortRange = deadCap
@@ -33,12 +30,10 @@ export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number)
     }
 
     useEffect(() => {
-        console.log('client height UE')
         retHeight(ref.current?.clientHeight ?? 0)
     },[ref.current?.clientHeight])
 
     useEffect(() => {
-        console.log('DeadCap UE')
         if (deadCap.length > 0) setIsLoading(false)
     }, [deadCap]);
 

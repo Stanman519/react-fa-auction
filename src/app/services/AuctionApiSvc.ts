@@ -2,6 +2,7 @@ import axios from "axios";
 import { PlayerDTO } from "../redux/reducers/FreeAgentReducer";
 import { Bid, Lot } from "../redux/reducers/LotReducer";
 import Owner, { LeagueInfo, LeagueLoginInfo, OpposingFranchiseDTO } from "../redux/reducers/OwnerReducer";
+import { ConfidenceHomeResponse } from "../models/ConfidenceDTOs";
 
 export const URL = process.env.REACT_APP_AUCTION_API_URL;
 //const env = process.env.NODE_ENV;
@@ -49,6 +50,11 @@ const makeNewNom = async (bid: Bid): Promise<Response> => {
     })
 }
 
+const getBundledConfidenceLoadData = async (year: number) : Promise<Response> => {
+    return await fetch(`${process.env.REACT_APP_AUCTION_API_URL}/confidence/home?year=${year}`)
+}
+
+
 const getFullPlayerBio = async (lastYear: number, id: number, position: string, firstName: string, lastName: string, actionShot: boolean, leagueId: number = 13894) : Promise<Response> => {
     return await fetch(`${URL}/free-agency/leagues/${leagueId}/year/${lastYear}/playerId/${id}/position/${position}/firstName/${firstName}/lastName/${lastName}?hasAction=${actionShot}`)
 }
@@ -84,15 +90,15 @@ const register = async (name: string, username: string, password: string): Promi
     return res;
 }
 
-const pageLoad = async (cookie: string = "", leagueId: number = 0): Promise<PageLoad> => {
-    const rest = await axios.get(`${URL}/free-agency/leagues/${leagueId}/page-load`, 
-    {
-        params: { loginInfo: cookie }
-    }).catch(error => {
-        throw new Error(error.response.data.friendlyMessage)
-    });
-    return rest.data;
-}
+// const pageLoad = async (cookie: string = "", leagueId: number = 0): Promise<PageLoad> => {
+//     const rest = await axios.get(`${URL}/free-agency/leagues/${leagueId}/page-load`, 
+//     {
+//         params: { loginInfo: cookie }
+//     }).catch(error => {
+//         throw new Error(error.response.data.friendlyMessage)
+//     });
+//     return rest.data;
+// }
 
 async function handleErrorResponse<Type>(response: Response): Promise<Type | void> {
     const failureCodes = [400, 500]
@@ -127,7 +133,7 @@ const askCapn = async (PlayerTipRequest: PlayerTipRequest): Promise<Response> =>
 
 
 export default {
-    pageLoad,
+    //pageLoad,
     getFullPlayerBio,
     login,
     getBidHistoryByPlayerId,
@@ -136,5 +142,6 @@ export default {
     makeNewBid,
     makeNewNom,
     sendWin,
-    askCapn
+    askCapn,
+    getBundledConfidenceLoadData
 }

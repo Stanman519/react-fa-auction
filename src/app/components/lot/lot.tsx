@@ -12,7 +12,6 @@ interface LotProps {
 }
 
 export const LotBody = ({lot}: LotProps): JSX.Element => {
-  console.log('date prop', lot.bid?.expires)
   const dateProp = lot.bid?.expires ? new Date(lot.bid.expires) : undefined
   const bidMode = !lot.newNom;
   const theme = useTheme();

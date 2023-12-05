@@ -7,12 +7,14 @@ const defaultState: UIState = {
   modal: undefined,
   chatOpen: false,
   isMobile: true,
-  audioOn: true
+  audioOn: true,
+  multiLoader: []
 };
 
 export interface UIState {
   isLoading?: LoadingStates;
   error?: ErrorTypes;
+  multiLoader?: MultiLoads[]
   errorText?: string;
   modal?: Modals;
   chatOpen?: boolean;
@@ -28,9 +30,12 @@ export type Modals =
   'taxi-confirm' |
   'buyout-confirm' |
   'tag-confirm' |
+  'confidence-rules' |
   undefined;
 
 export type LoadingStates = 'full-screen' | 'button' | undefined
+export type MultiLoads = 'con-matchups' | 'con-results'
+
 
 export type SnackBars =  undefined; 
 

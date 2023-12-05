@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/reducers/RootReducer';
 import { Standings } from '../../redux/reducers/TransactionReducer';
 import { lastYear } from '../../services/Common';
-import '../../styles/TriTable.css';
 
 export default function TriTable() {
     const ownerList = useSelector((state: RootState) => state.deadCap.deadCap);

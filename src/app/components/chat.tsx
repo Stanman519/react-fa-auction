@@ -37,7 +37,7 @@ type ChatWindowProps = {
         sort: ChannelSort;
     };
 }
-export const FAChatWindow = (): JSX.Element | null => {
+export const FAChatWindow = ({chatChannel = ""}: {chatChannel?: string }): JSX.Element | null => {
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile)
     const {profile} = useSelector((state: RootState) => state)
     const { user } = useAuth0();
@@ -59,7 +59,7 @@ export const FAChatWindow = (): JSX.Element | null => {
                     role: 'admin',
                     image: user?.picture,
                     
-                }, owner.streamToken, currentLeague?.league.leagueId ?? 0)
+                }, owner.streamToken, chatChannel)
                 setChannel(channel)
                 setChatClient(chatClientToUpdate.chatInstance)
 

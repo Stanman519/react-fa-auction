@@ -6,6 +6,8 @@ import HomeBase from './app/components/HomeBase';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Auth0ProviderWithHistory from './app/auth/auth0-provider-with-history';
 import { LandingPage } from './app/components/nonAuction/LandingPage';
+import GamesHome from './app/components/games/GamesHome';
+import { ConfidenceAdminHome } from './app/components/confidence/admin/AdminHome';
 
 
 function App() {
@@ -18,7 +20,7 @@ function App() {
   }, [])
 
   return (
-    <div className="min-h-screen max-w-screen" style={{ backgroundColor: theme.palette.background.default }}>
+    <div className="min-h-screen max-w-screen" style={{ backgroundColor: theme.palette.background.default }}> 
 
       <BrowserRouter>
         <Auth0ProviderWithHistory
@@ -32,8 +34,10 @@ function App() {
             <Route path='/' element={<LandingPage />} />
             <Route path='/home' element={<HomeBase />} />
             <Route path='/auction' element={<AuctionHome />} />
-            <Route path='/games' element={<div>coming soon!</div>}/>
-          </Routes>
+            <Route path='/games' element={<GamesHome />}/>
+            <Route path='/demo' element={<GamesHome isDemo/>}/>
+            <Route path='/admin' element={<ConfidenceAdminHome />} />
+          </Routes> 
         </Auth0ProviderWithHistory>
       </BrowserRouter>
     </div>

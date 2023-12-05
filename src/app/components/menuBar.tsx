@@ -18,7 +18,10 @@ import LeagueSwitchMenu from "./menu/LeagueSwitchMenu";
 
 type DrawerType = 'Salaries' | 'Chat' | undefined
 
-export function MenuBar() {
+type BarOption = 'fa-auction' | 'salary-league' | 'chat' | 'confidence'
+
+export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, barOptions: BarOption[] }) {
+    const { user, isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
     const owners = useSelector((state: RootState) => state.owners);
     const lots = useSelector((state: RootState) => state.lots.filter(l => l.leagueId === currentLeague?.league.leagueId ?? 0));
@@ -28,7 +31,7 @@ export function MenuBar() {
     })
     const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const { user } = useAuth0();
+
     const avatar = user?.picture
     const logo = process.env.PUBLIC_URL + '/stanfan-logo-white.png';
 
@@ -55,7 +58,7 @@ export function MenuBar() {
             .reduce((prev, curr) => prev! + curr!, 0) ?? 0;
     }
     return (
-        <div style={{ flex: 1 }}>
+        <div>
 
             <Fragment>
                 <Box>
@@ -83,33 +86,31 @@ export function MenuBar() {
                                     //'aria-labelledby': 'basic-button',
                                     }}
                                 >
+                                    {barOptions.includes('fa-auction') && 
+                                    
+                                    <>
                                     <MenuItem onClick={() => {
                                         setOpenDrawer('Salaries')
                                         setAnchorEl(null)
                                         }}>Salary Caps</MenuItem>
-                                    {owner.ownername && <MenuItem onClick={() => {
+                                        {!nomIsUsed && <MenuItem onClick={() => {
+                                            addNominationCard()
+                                            setAnchorEl(null)
+                                            }}>Nominate a Player</MenuItem>}
+                                            </>
+                                    }
+                                    
+                                    {barOptions.includes('confidence') && <Button color='inherit' onClick={() => dispatch(updateUI({modal: 'confidence-rules'}))}>Rules</Button>}
+                                    {barOptions.includes('chat') && 
+                                        user?.sub && <MenuItem onClick={() => {
                                         setOpenDrawer('Chat')
                                         setAnchorEl(null)
-                                        }}>{openDrawer=== 'Chat' ? 'Close Chat' : 'Open Chat'}</MenuItem>}
-                                    {!nomIsUsed && <MenuItem onClick={() => {
-                                        addNominationCard()
-                                        setAnchorEl(null)
-                                        }}>Nominate a Player</MenuItem>}
-                                    <MenuItem onClick={() => {
+                                        }}>{openDrawer === 'Chat' ? 'Close Chat' : 'Open Chat'}</MenuItem>
+                                    }
+                                    {barOptions.includes('salary-league') && <MenuItem onClick={() => {
                                         navigate("/home")
-                                        }}>League Info</MenuItem>
-                                    {/* <MenuItem>
-                                        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 8}}>
-                                            <VolumeMute />
-                                            <Switch defaultChecked color='default' onChange={handleAudio}/>
-                                            <VolumeUp />
-                                        </div>
-                                    </MenuItem> */}
-                                    {/* <MenuItem>
-                                    <Box> */}
+                                        }}>League Info</MenuItem>}
 
-                                {/* </Box>
-                                    </MenuItem> */}
 
                                 </Menu>
 
@@ -119,39 +120,31 @@ export function MenuBar() {
                             :
                             (<div style={{ display: 'flex', flexDirection: 'row', flex: 1, alignItems: 'center'}}>
                                 <img src={logo} style={{ maxHeight: 20, aspectRatio: 'auto', marginRight: 20 }} />
-                                <Button color="inherit"
+                                {barOptions.includes('fa-auction') && <Button color="inherit"
                                     onClick={() => setOpenDrawer('Salaries')}>
                                     Salary Caps
-                                </Button>
-                                {owner.ownername && <Button color="inherit"
+                                </Button>}
+                                {barOptions.includes('confidence') && <Button color='inherit' onClick={() => dispatch(updateUI({modal: 'confidence-rules'}))}>Rules</Button>}
+                                {barOptions.includes('chat') && user?.sub && <Button color="inherit"
                                     onClick={() => {
                                         //dispatch()
                                         setOpenDrawer('Chat')
                                         }}>
                                     {openDrawer=== 'Chat' ? 'Close Chat' : 'Open Chat'}
                                 </Button>}
-                                <Button color="inherit"
+                                {barOptions.includes('salary-league') && <Button color="inherit"
                                     onClick={() => {
                                         navigate('/home')
-                                        }}>League Info</Button>
-                                {!nomIsUsed &&
+                                        }}>League Info</Button>}
+                                {barOptions.includes('fa-auction') &&  !nomIsUsed &&
                                     <Button color='inherit' onClick={() => addNominationCard()}>
                                         Nominate a Player
                                     </Button>}
-                                {owner.leagues.length > 1 && <LeagueSwitchMenu />}
-                                {/* <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 8}}>
-                                    <VolumeMute />
-                                    <Switch defaultChecked color='default' onChange={handleAudio}/>
-                                    <VolumeUp />
-                                </div> */}
+                                {/* {owner.leagues.length > 1 && <LeagueSwitchMenu />} */}
+
                             </div>)}
-                            {/* {!owner.ownerId &&
-                                <div>
-                                    <Button color="inherit" onClick={() => dispatch(updateUI({ modal: 'signIn' }))}>
-                                        LOGIN
-                                    </Button>
-                                </div>} */}
-                                                                        <Avatar alt={user?.displayName} src={user?.picture} />
+
+                            <Avatar alt={user?.displayName} src={user?.picture} />
 
                         </Toolbar>
                     </AppBar>
@@ -197,7 +190,7 @@ export function MenuBar() {
                         //onClick={() => closeDrawer()}
                         bgcolor={palette.background.default}
                     > */}
-                        <FAChatWindow />
+                        <FAChatWindow chatChannel={chatChannel}/>
 
                     {/* </Box> */}
                 </Drawer>

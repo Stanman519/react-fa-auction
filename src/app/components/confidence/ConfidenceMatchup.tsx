@@ -1,0 +1,225 @@
+import { Fab, Zoom } from "@mui/material"
+import { NflMatchup } from "../../models/ConfidenceDTOs"
+import { pickTeamInMatchup } from "../../redux/actions/ConfidenceActions"
+import { useDispatch } from "react-redux"
+import './animations.css'
+import { CSSProperties, useState } from "react"
+import ThumbUpOffAltIcon from '@mui/icons-material/CheckCircleOutline';
+import CloseOutlinedIcon from '@mui/icons-material/CancelOutlined';
+type ChevronAnim = 'left' | 'right' | undefined
+
+export const ConfidenceMatchup = ({ matchup, index, canEdit }: { matchup: NflMatchup, index: number, canEdit: boolean }) => {
+    const dispatch = useDispatch()
+    const [leftChev, setLeftChev] = useState<ChevronAnim>(undefined)
+    const [rightChev, setRightChev] = useState<ChevronAnim>(undefined)
+
+    //const teams = Array.from({length: 6}, () => [tmColorMap[Math.floor(Math.random() * 31)], tmColorMap[Math.floor(Math.random() * 31)]])
+    const getTeamStyling = (origin: 'left' | 'right'): React.CSSProperties => {
+        const defaultState = !matchup.chosenTeamLocal
+        if (defaultState) return {
+            backgroundColor: origin === 'left' ? matchup.left.primary : matchup.right.primary,
+            position: 'relative',
+            flexDirection: 'column',
+            display: 'flex',
+            height: '100%',
+            width: '50%',
+            transition: 'all',
+            alignItems: 'center',
+            overflow: 'hidden',
+            transitionDuration: '0.5s',
+        }
+        const isPick = (origin === 'left' && matchup.chosenTeamLocal === matchup.left) || (origin === 'right' && matchup.chosenTeamLocal === matchup.right)
+        return isPick ? {
+            backgroundColor: origin === 'left' ? matchup.left.primary : matchup.right.primary,
+            position: 'relative',
+            flexDirection: 'column',
+            display: 'flex',
+            height: '100%',
+            width: '80%',
+            transition: 'all',
+            alignItems: 'center',
+            overflow: 'hidden',
+            transitionDuration: '0.5s',
+        } : {
+            backgroundColor: 'gray',
+            position: 'relative',
+            flexDirection: 'column',
+            display: 'flex',
+            alignItems: 'center',
+            height: '100%',
+            width: '20%',
+            transition: 'all',
+            overflow: 'hidden',
+            transitionDuration: '0.5s',
+        }
+    }
+    const triangleL: CSSProperties =  {
+        width: 0,
+        height: 0,
+        borderStyle: 'solid',
+        borderWidth: '140px 0 0 140px',
+        borderColor: 'transparent transparent transparent rgba(0,0,0,0.15)',
+        transform: 'rotate(0deg)',
+        bottom: 0,
+        position:'absolute',
+        zIndex: 1,
+        left: 0
+     }
+    const triangleR: CSSProperties = {
+        width: 0,
+        height: 0,
+        borderStyle: 'solid',
+        borderWidth: '0 0 140px 140px',
+        borderColor: 'transparent transparent rgba(0,0,0,0.15) transparent',
+        transform: 'rotate(0deg)',
+        bottom: 0,
+        position:'absolute',
+        zIndex: 1,
+        right: 0
+    }
+    const handleChevronFiring = (origin: 'left' | 'right', dir: 'left' | 'right') => {
+        if (origin === 'left') {
+            setLeftChev(dir === 'left' ? 'left' : 'right')
+            setTimeout(() => {
+                setLeftChev(undefined)
+            }, 1000)
+        } else {
+            setRightChev(dir === 'left' ? 'left' : 'right')
+            setTimeout(() => {
+                setRightChev(undefined)
+            }, 1000)
+        }
+    }
+
+    const getClassStringsForAnimation = (origin: 'left' | 'right') => {
+        if (origin === 'left') return `${leftChev === 'left' ? 'chevron-left-active' : leftChev === 'right' ? 'chevron-right-active' : ''}`
+        else return `${rightChev === 'left' ? 'chevron-left-active' : rightChev === 'right' ? 'chevron-right-active' : ''}`
+    }
+
+    const getCorrectFabName = (src: string) => {
+        if ((src === 'right' && matchup.chosenTeamLocal === matchup.right) || (src === 'left' && matchup.chosenTeamLocal === matchup.left)) return 'UNDO'
+        if (!matchup.chosenTeamLocal) return 'PICK'
+        else return ''
+    }
+
+    const fabTransitionDuration = {
+        appear: 700,
+        enter: 700,
+        exit: 700,
+    };
+
+    const fabs = [
+        { name: 'UNDO', onPress: (origin: 'left' | 'right') => { handleChevronFiring(origin, origin === 'left' ? 'left' : 'right') } },
+        { name: 'PICK', onPress: (origin: 'left' | 'right') => { handleChevronFiring(origin, origin === 'right' ? 'left' : 'right') } },
+        { name: '', onPress: (origin: 'left' | 'right') => { } },
+    ]
+
+    return (
+        <div style={{ height: 200, maxWidth: 300, padding: 0, backgroundColor: matchup.chosenTeamLocal?.secondary, userSelect: 'none' }}
+            className='flex flex-row overflow-hidden'>
+            <div className={getClassStringsForAnimation('left')} style={getTeamStyling('left')}>
+                <img src={matchup.left.logo}
+                    style={{
+                        pointerEvents: 'none', userSelect: 'none',
+                        opacity: (matchup.chosenTeamLocal && matchup.chosenTeamLocal !== matchup.left) ? '50%' : '100%',
+                        transition: 'all', transitionDuration: '0.5s', position: 'relative',
+                        minHeight: 150, minWidth: 150, maxHeight: 180, maxWidth: 180
+                    }} />
+                {(!matchup.pickable && matchup.winner && matchup.pick?.choice === matchup.left.tricode) && 
+                    <div>
+                        <div style={triangleL}/>
+                        {matchup.winner.tricode !== matchup.choice ?
+                    <CloseOutlinedIcon color='error' style={{ position: 'absolute', zIndex: 2, height: '35%', width: '35%', bottom: 0, left: 0 }} /> :
+                    <ThumbUpOffAltIcon color='success' style={{ position: 'absolute', zIndex: 2, height: '35%', width: '35%', bottom: 0, left: 0 }} />
+                    }
+                    </div>}
+                {canEdit && fabs.map((fab, index) => {
+                    let currFab = fab.name === getCorrectFabName('left')
+                    return (
+                        <Zoom
+                            key={fab.name}
+                            in={currFab}
+                            timeout={fabTransitionDuration}
+                            style={{
+                                transitionDelay: `${currFab ? fabTransitionDuration.enter : 0}ms`,
+                            }}
+                            unmountOnExit
+                            mountOnEnter
+                        >
+                            <Fab sx={{
+                                opacity: fab.name === '' ? 0 : 1000,
+                                position: 'absolute',
+                                bottom: 24,
+                                left: 6,
+                            }} onClick={() => {
+                                dispatch(pickTeamInMatchup(matchup, matchup.chosenTeamLocal === matchup.left ? undefined : matchup.left))
+                                fab.onPress('left')
+                            }}>{matchup.chosenTeamLocal ? (matchup.chosenTeamLocal === matchup.left ? 'UNDO' : '') : 'PICK'}</Fab>
+                        </Zoom>
+                    )
+                })}
+                {matchup.chosenTeamLocal?.tricode != matchup.right.tricode &&
+                    <div style={{
+                        position: 'absolute',
+                        width: '100%', textAlign: 'center',
+                        fontStyle: 'italic',
+                        left: matchup.chosenTeamLocal?.tricode === matchup.left.tricode ? 0 : -300,
+                        bottom: 8,
+                        transition: 'ease-in',
+                        transitionDuration: '0.5s', fontSize: 24, textShadow: '1px 1px 0px #BBBBBB, -1px 0px 0px #BBBBBB', fontFamily: 'Arial Black', color: matchup.left.secondary, textTransform: 'uppercase'
+                    }}>{matchup.left.city}</div>}
+            </div>
+            <div className={getClassStringsForAnimation('right')} style={getTeamStyling('right')}>
+                <img src={matchup.right.logo} style={{ pointerEvents: 'none', opacity: (matchup.chosenTeamLocal && matchup.chosenTeamLocal !== matchup.right) ? '50%' : '100%', transition: 'all', transitionDuration: '0.5s', minHeight: 150, minWidth: 150, maxHeight: 180, maxWidth: 180 }} />
+                {(!matchup.pickable && matchup.winner && matchup.pick?.choice === matchup.right.tricode) && 
+                    <div>
+                        <div style={triangleR}/>
+                        {matchup.winner.tricode !== matchup.pick.choice ?
+                        <CloseOutlinedIcon color='error' style={{ position: 'absolute', zIndex: 2, height: '35%', width: '35%', bottom: 0, right: 0  }} /> :
+                        <ThumbUpOffAltIcon color='success' style={{ position: 'absolute', zIndex: 2, height: '35%', width: '35%', bottom: 0, right: 0  }} />}
+                    </div>}
+                {canEdit && <>{fabs.map((fab, index) => {
+                    let currFab = fab.name === getCorrectFabName('right')
+                    return (
+                        <Zoom
+                            key={index}
+                            in={currFab}
+                            timeout={fabTransitionDuration}
+                            style={{
+                                transitionDelay: `${currFab ? fabTransitionDuration.enter : 0}ms`
+                            }}
+                            unmountOnExit
+                            mountOnEnter
+                        >
+                            <Fab sx={{
+                                opacity: fab.name === '' ? 0 : 1000,
+                                position: 'absolute',
+                                bottom: 24,
+                                right: 6,
+                            }}
+                                onClick={() => {
+                                    dispatch(pickTeamInMatchup(matchup, matchup.chosenTeamLocal === matchup.right ? undefined : matchup.right))
+                                    fab.onPress('right')
+                                }}>
+                                {fab.name}
+                            </Fab>
+                        </Zoom>
+                    )
+                })
+                }</>}
+                {matchup.chosenTeamLocal?.tricode != matchup.left.tricode &&
+                    <div style={{
+                        position: 'absolute',
+                        width: '100%', textAlign: 'center',
+                        fontStyle: 'italic',
+                        left: matchup.chosenTeamLocal?.tricode === matchup.right.tricode ? 0 : 300,
+                        bottom: 8,
+                        transition: 'ease-in',
+                        transitionDuration: '0.5s', fontSize: 24, textShadow: '1px 1px 0px #BBBBBB, -1px 0px 0px #BBBBBB', fontFamily: 'Arial Black', color: matchup.right.secondary, textTransform: 'uppercase'
+                    }}>{matchup.right.city}</div>}
+            </div>
+        </div>
+
+    )
+
+}

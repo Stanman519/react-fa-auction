@@ -14,17 +14,17 @@ body::-webkit-scrollbar {
   background: transparent;
 }
 
-body {
+/* body {
   scrollbar-color: transparent transparent;
-}
+} */
 
-body::-webkit-scrollbar-track {
+/* body::-webkit-scrollbar-track {
   background: transparent;
-}
+} */
 
-body::-webkit-scrollbar-thumb {
+/* body::-webkit-scrollbar-thumb {
   background-color: transparent;
-}
+} */
 
 #root {
   height: 100%;

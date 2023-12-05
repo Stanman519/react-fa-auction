@@ -31,7 +31,7 @@ export class ChatClient {
         return ChatClient.instance;
     }
 
-    public static finishSetup = async (user: any, token: string, leagueId: number) => {
+    public static finishSetup = async (user: any, token: string, leagueId: number | string) => {
         if (!ChatClient.instance.isInitialized){
             try{
                 const resp = await ChatClient.instance.chatInstance.connectUser(

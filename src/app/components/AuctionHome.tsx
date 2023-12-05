@@ -4,17 +4,14 @@ import { getInitialAuctionData } from '../redux/actions/FreeAgentActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { MenuBar } from '../components/menuBar';
-import { Alert, Backdrop, CircularProgress, Modal, Snackbar, useTheme } from '@mui/material';
-import Register from '../components/login/register';
-import SignIn from '../components/login/signIn';
+import { Alert, Backdrop, CircularProgress, Snackbar, useTheme } from '@mui/material';
 import { updateUI } from '../redux/actions/UiActions';
-
 import signalR from '../signalR/socketMiddleware';
-import { NoActiveAuctions } from './noActiveAuctions';
-import { FAChatWindow } from './chat';
 import { ChatClient } from '../services/ChatUtils';
-import { AppState, useAuth0 } from '@auth0/auth0-react';
+import { useAuth0 } from '@auth0/auth0-react';
 import { useNavigate } from 'react-router-dom';
+import { synchronizeAuth0WithDbLogin } from '../redux/actions/LoginActions';
+import { NoActiveAuctions } from './noActiveAuctions';
 
 function AuctionHome() {
   const theme = useTheme()
@@ -32,6 +29,8 @@ function AuctionHome() {
     if (isLoading) return
     const checkUser = async () => {
       if (isAuthenticated && user?.sub) {
+        dispatch(synchronizeAuth0WithDbLogin(user))
+
         dispatch(getInitialAuctionData(user.sub))
         dispatch(signalR())
       } else {
@@ -47,7 +46,7 @@ function AuctionHome() {
   return (
     <div className="App" style={{backgroundColor: theme.palette.background.default}}>
                 <div className='menu-container'>
-            <MenuBar/>
+            <MenuBar barOptions={['chat', 'fa-auction', 'salary-league']}/>
           </div>
 
       <div style={{display: 'flex', justifyContent: 'center'}}>
@@ -69,7 +68,7 @@ function AuctionHome() {
           <NoActiveAuctions />
         </div>
         }
-        
+
       </div>
       <Snackbar open={error === 'snackbar'} autoHideDuration={6000}>
         <Alert onClose={() => dispatch(updateUI({error: undefined}))} severity="error" sx={{ width: '100%' }}>
