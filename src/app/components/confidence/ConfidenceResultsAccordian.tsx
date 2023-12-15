@@ -16,7 +16,10 @@ export function ConfidenceResultsAccordian({isDemo}: {isDemo: boolean}) {
     const dispatch = useDispatch()
 
     useEffect(() => {    
-        dispatch(getConfidenceResults(isDemo ? -1 : undefined))    
+        if (results.length === 0) {
+            dispatch(getConfidenceResults(isDemo ? -1 : undefined))    
+        }
+
       },[])
 
 

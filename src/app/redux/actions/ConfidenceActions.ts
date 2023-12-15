@@ -1,16 +1,16 @@
 import { Action } from "@reduxjs/toolkit";
 import { UPDATE_CONFIDENCE } from "../reducers/ConfidenceReducer";
-import { ConfidenceHomeResponse, ConfidencePlayerResult, ExtraPick, NflMatchup, NflPickSubmissionBody, NflTeam, PickSubmission, Prop } from "../../models/ConfidenceDTOs";
-import AuctionApiSvc from "../../services/AuctionApiSvc";
+import { ConfidencePlayerResult, ExtraPick, NflMatchup, NflPickSubmissionBody, NflTeam, PickSubmission, Prop } from "../../models/ConfidenceDTOs";
 import { RootState } from "../reducers/RootReducer";
 import GeneralApiSvc from "../../services/GeneralApiSvc";
 import { updateUI } from "./UiActions";
 import { NewMatchup } from "../../components/confidence/admin/AddMatchups";
-import { User, useAuth0 } from "@auth0/auth0-react";
-import { ModeFanOff } from "@mui/icons-material";
-import { synchronizeAuth0WithDbLogin } from "./LoginActions";
+import { User } from "@auth0/auth0-react";
+
+export type MyPickViewMode = 'my-picks' | 'community-picks'
 
 export interface ConfidenceState {
+    viewMode: MyPickViewMode
     nflTeams?: NflTeam[],
     props: Prop[],
     matchups: NflMatchup[],
@@ -33,6 +33,7 @@ export const getMatchups = (user: User, year: number = 2000) => async (
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
+    console.log('getMatchups')
     const sub = user?.sub ?? '' // need to decide how to handle this with demo page
     dispatch(updateUI({multiLoader: [...getState().ui.multiLoader ?? [], 'con-matchups']}))
     let response = await GeneralApiSvc.getMatchups(year, sub)
@@ -57,6 +58,7 @@ export const getConfidenceResults = (year?: number) => async (
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
+    console.log('getCon results')
     dispatch(updateUI({multiLoader: [...getState().ui.multiLoader ?? [], 'con-results']}))
     let response = await GeneralApiSvc.getConfidenceResults(year ?? 2000)
     const state = getState().confidence
@@ -84,10 +86,20 @@ export const pickTeamInMatchup = (matchup: NflMatchup, pick?: NflTeam) => async 
     }
 }
 
+export const setViewModeForPicks = (mode: MyPickViewMode) => async (
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const { confidence } = getState()
+    if (mode === confidence.viewMode) return
+    dispatch(updateCofidence({...confidence, viewMode: mode}))
+}
+
 export const reorderConfidenceMatchups = (sourceIndex: number, destIndex: number) => async (
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
+    console.log('reorder matchups')
     const { confidence } = getState()
     let result = [...confidence.matchups];
     const [removed] = result.splice(sourceIndex, 1);
@@ -133,6 +145,7 @@ export const submitMyPicks = (locMatchups: NflMatchup[], points: number[], local
     const { owner } = getState().profile
     const {confidence } = getState()
     if (locMatchups.some(m => !m.chosenTeamLocal) || !owner || localProps.some(p => !p.localChoice)) return;
+    dispatch(updateUI({button: 'conf-pick-submit'}))
     const submitPicks: PickSubmission[] = locMatchups.map((m, index) => {
         return {
             matchupId: m.id,
@@ -155,8 +168,13 @@ export const submitMyPicks = (locMatchups: NflMatchup[], points: number[], local
         picks: submitPicks,
         props: propPicks
     }
-    await GeneralApiSvc.submitPicks(body)
-    
+    const response = await GeneralApiSvc.submitPicks(body)
+    if (response.ok) {
+        dispatch(updateUI({button: undefined, modal: 'confidence-submit-success'}))
+    }
+    else {
+        dispatch(updateUI({modal: 'error'}))
+    }
     const {props, matchups, picks } = confidence
     let newMatchups = [...matchups]
     let newProps = [...props]

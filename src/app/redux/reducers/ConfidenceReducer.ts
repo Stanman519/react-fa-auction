@@ -7,6 +7,7 @@ import { DeadCapInfo } from "./TransactionReducer";
 export const UPDATE_CONFIDENCE = 'UPDATE_CONFIDENCE'
 
 const defaultState: ConfidenceState = {
+    viewMode: 'my-picks',
     nflTeams: [],
     props: [],
     matchups: [],

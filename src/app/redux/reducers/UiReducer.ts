@@ -13,6 +13,7 @@ const defaultState: UIState = {
 
 export interface UIState {
   isLoading?: LoadingStates;
+  button?: ButtonLoads;
   error?: ErrorTypes;
   multiLoader?: MultiLoads[]
   errorText?: string;
@@ -24,12 +25,16 @@ export interface UIState {
  
 export type ErrorTypes = 'snackbar' | undefined;
 
+export type ButtonLoads = 'conf-pick-submit' | undefined;
+
 export type Modals = 
   'signIn' | 
   'register' | 
   'taxi-confirm' |
   'buyout-confirm' |
   'tag-confirm' |
+  'confidence-submit-success' |
+  'error'|
   'confidence-rules' |
   undefined;
 

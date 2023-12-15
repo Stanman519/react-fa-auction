@@ -1,4 +1,4 @@
-import { Draggable } from "@hello-pangea/dnd";
+import { Draggable, DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
 import React, { useEffect, useState } from "react";
 import { NflMatchup } from "../../models/ConfidenceDTOs";
 import { ConfidenceWeekPointsMap, confidencePoints } from "../../services/Common";
@@ -26,12 +26,14 @@ const isMobile = width <= 768;
     const theme = useTheme().palette
     return (
         <div onClick={(event) => onClick(event)} className="flex flex-row w-full" style={{userSelect: 'none'}}>
+
             <div className="flex flex-col grow" style={{background: (thisWeekPoints && thisWeekPoints?.points.length > 1) ? 
                 'linear-gradient(180deg, rgba(227,57,0,1) 0%, rgba(227,88,0,1) 20%, rgba(0,145,255,1) 76%, rgba(0,61,255,1) 100%)' : 'gray', 
                 minWidth: 80,
                 maxWidth: 180}} >
-                {thisWeekPoints?.points.map(c => (
-                    <Card key={c} 
+
+                {thisWeekPoints?.points.map((c, i) => (
+                    <Card id={`point-card-${i}`} key={c} 
                     style={{ flex: 1, opacity: 0.5, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <div className="text-5xl font-extrabold">{c}</div>
                     </Card>
@@ -56,8 +58,10 @@ const isMobile = width <= 768;
                             <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
-                                {...provided.dragHandleProps}>
+                                {...provided.dragHandleProps}
+                                >
                                 <ConfidenceMatchup
+                                    commStats={{lPct: 38, rPct: 62, rAvg: 0, lAvg: 0}}
                                     isMobile={width < 769}
                                     canEdit={canEdit}
                                     matchup={matchup}
@@ -66,6 +70,7 @@ const isMobile = width <= 768;
                             </div>
                         )
                         }
+                        
                     </Draggable>
 
 

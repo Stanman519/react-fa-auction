@@ -1,18 +1,32 @@
 import { Fab, Zoom } from "@mui/material"
 import { NflMatchup } from "../../models/ConfidenceDTOs"
 import { pickTeamInMatchup } from "../../redux/actions/ConfidenceActions"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import './animations.css'
 import { CSSProperties, useState } from "react"
 import ThumbUpOffAltIcon from '@mui/icons-material/CheckCircleOutline';
 import CloseOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
+import { RootState } from "../../redux/reducers/RootReducer"
+
+
+export interface CommunityStats {
+    lPct: number
+    rPct: number
+    lAvg: number
+    rAvg: number
+}
+
 type ChevronAnim = 'left' | 'right' | undefined
 
-export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false }: { matchup: NflMatchup, index: number, canEdit: boolean, isMobile: boolean }) => {
+export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false, commStats }: { matchup: NflMatchup, index: number, canEdit: boolean, isMobile: boolean, commStats: CommunityStats }) => {
     const dispatch = useDispatch()
     const [leftChev, setLeftChev] = useState<ChevronAnim>(undefined)
     const [rightChev, setRightChev] = useState<ChevronAnim>(undefined)
-
+    const longList = useSelector((state: RootState) => state.confidence.matchups.length > 4)
+    // useEffect(() => {
+    //     if (matchup.chosenTeamLocal) 
+    // },[])
     //const teams = Array.from({length: 6}, () => [tmColorMap[Math.floor(Math.random() * 31)], tmColorMap[Math.floor(Math.random() * 31)]])
     const getTeamStyling = (origin: 'left' | 'right'): React.CSSProperties => {
         const defaultState = !matchup.chosenTeamLocal
@@ -113,9 +127,15 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false }:
         { name: 'PICK', onPress: (origin: 'left' | 'right') => { handleChevronFiring(origin, origin === 'right' ? 'left' : 'right') } },
         { name: '', onPress: (origin: 'left' | 'right') => { } },
     ]
-
+    const getLogoSize = () => {
+        if (isMobile){
+            return longList ? 90 : 120
+        } else { 
+            return 150
+        }
+    }
     return (
-        <div style={{ height: isMobile ? 150 : 200, maxWidth: 300, padding: 0, backgroundColor: matchup.chosenTeamLocal?.secondary, userSelect: 'none' }}
+        <div id={`matchup${index}`} style={{ height: getLogoSize()*1.33, maxWidth: 300, padding: 0, backgroundColor: matchup.chosenTeamLocal?.secondary, userSelect: 'none' }}
             className='flex flex-row overflow-hidden'>
             <div className={getClassStringsForAnimation('left')} style={getTeamStyling('left')}>
                 <img src={matchup.left.logo}
@@ -123,7 +143,7 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false }:
                         pointerEvents: 'none', userSelect: 'none',
                         opacity: (matchup.chosenTeamLocal && matchup.chosenTeamLocal !== matchup.left) ? '50%' : '100%',
                         transition: 'all', transitionDuration: '0.5s', position: 'relative',
-                        minHeight: isMobile ? 120 :150, minWidth: isMobile ? 120 : 150, maxHeight: isMobile ? 120 : 180, maxWidth: isMobile ? 120 : 180
+                        minHeight: getLogoSize(), minWidth: getLogoSize(), maxHeight: getLogoSize() + 30, maxWidth: getLogoSize() + 30
                     }} />
                 {(!matchup.pickable && matchup.winner && matchup.pick?.choice === matchup.left.tricode) && 
                     <div>
@@ -147,6 +167,8 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false }:
                             mountOnEnter
                         >
                             <Fab sx={{
+                                height: isMobile && longList ? 44 : undefined,
+                                width: isMobile && longList ? 44 : undefined,
                                 opacity: fab.name === '' ? 0 : 1000,
                                 position: 'absolute',
                                 bottom: 24,
@@ -164,14 +186,19 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false }:
                         width: '100%', textAlign: 'center',
                         fontStyle: 'italic',
                         left: matchup.chosenTeamLocal?.tricode === matchup.left.tricode ? 0 : -300,
-                        bottom: 8,
+                        bottom: longList && isMobile ? 0 : 8,
+                        WebkitTextStroke: '0.25px white',
                         transition: 'ease-in',
                         transitionDuration: '0.5s', fontSize: 24, fontFamily: "'Anton', sans-serif", color: matchup.left.secondary, textTransform: 'uppercase'
                     }}>{matchup.left.city}</div>}
             </div>
             <div className={getClassStringsForAnimation('right')} style={getTeamStyling('right')}>
-                <img src={matchup.right.logo} style={{ pointerEvents: 'none', opacity: (matchup.chosenTeamLocal && matchup.chosenTeamLocal !== matchup.right) ? '50%' : '100%', transition: 'all', transitionDuration: '0.5s', 
-                minHeight: isMobile ? 120 :150, minWidth: isMobile ? 120 : 150, maxHeight: isMobile ? 120 : 180, maxWidth: isMobile ? 120 : 180 }} />
+                <img src={matchup.right.logo} 
+                style={{pointerEvents: 'none', 
+                        opacity: (matchup.chosenTeamLocal && matchup.chosenTeamLocal !== matchup.right) ? '50%' : '100%', 
+                        transition: 'all', 
+                        transitionDuration: '0.5s', 
+                        minHeight: getLogoSize(), minWidth: getLogoSize(), maxHeight: getLogoSize() + 30, maxWidth: getLogoSize() + 30 }} />
                 {(!matchup.pickable && matchup.winner && matchup.pick?.choice === matchup.right.tricode) && 
                     <div>
                         <div style={triangleR}/>
@@ -193,6 +220,8 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false }:
                             mountOnEnter
                         >
                             <Fab sx={{
+                                 height: isMobile && longList ? 44 : undefined,
+                                 width: isMobile && longList ? 44 : undefined,
                                 opacity: fab.name === '' ? 0 : 1000,
                                 position: 'absolute',
                                 bottom: 24,
@@ -214,10 +243,13 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false }:
                         width: '100%', textAlign: 'center',
                         fontStyle: 'italic',
                         left: matchup.chosenTeamLocal?.tricode === matchup.right.tricode ? 0 : 300,
-                        bottom: 8,
+                        bottom: longList && isMobile ? 0 : 8,
                         transition: 'ease-in',
-                        transitionDuration: '0.5s', fontSize: 24, fontFamily: "'Anton', sans-serif", color: matchup.right.secondary, textTransform: 'uppercase'
+                        WebkitTextStroke: '0.25px silver',
+                        transitionDuration: '0.5s', fontSize: 24, fontFamily: "'Anton', sans-serif", 
+                        color: matchup.right.secondary, textTransform: 'uppercase'
                     }}>{matchup.right.city}</div>}
+                    
             </div>
         </div>
 

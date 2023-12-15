@@ -16,12 +16,12 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 import LeagueSwitchMenu from "./menu/LeagueSwitchMenu";
 
-type DrawerType = 'Salaries' | 'Chat' | undefined
+type DrawerType = 'Salaries' | 'Chat' | 'pfp-click' | undefined
 
 type BarOption = 'fa-auction' | 'salary-league' | 'chat' | 'confidence'
 
 export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, barOptions: BarOption[] }) {
-    const { user, isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
+    const { user, isAuthenticated, loginWithRedirect, isLoading, logout } = useAuth0();
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
     const owners = useSelector((state: RootState) => state.owners);
     const lots = useSelector((state: RootState) => state.lots.filter(l => l.leagueId === currentLeague?.league.leagueId ?? 0));
@@ -31,11 +31,12 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
     })
     const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
+    const [picAnchorEl, setPicAnchorEl] = useState<null | HTMLElement>(null);
     const avatar = user?.picture
     const logo = process.env.PUBLIC_URL + '/stanfan-logo-white.png';
 
     const open = Boolean(anchorEl);
+    const pfpMenuOpen = Boolean(picAnchorEl)
     const dispatch = useDispatch();
     const { palette } = useTheme();
     const navigate = useNavigate();
@@ -45,6 +46,9 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
     const mobileMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
       };
+    const pfpMenuClick = (event: React.MouseEvent<HTMLImageElement>) => {
+        setPicAnchorEl(event?.currentTarget);
+    }
     const handleAudio = (event: React.ChangeEvent<HTMLInputElement>) => {
         dispatch(updateUI({audioOn: event.target.checked}))
     }
@@ -63,7 +67,8 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
             <Fragment>
                 <Box>
                     <AppBar position="static" color="primary">
-                    <img src={user?.picture} referrerPolicy="no-referrer" style={{ height: 0, width: 0 }} />
+                    <img onClick={() => console.log('hi')}  src={user?.picture} referrerPolicy="no-referrer" style={{ height: 0, width: 0 }} />
+                    
                         <Toolbar style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: 40, paddingRight: 50 }}>
                             {window.innerWidth < 720 ?(
                             <>
@@ -100,9 +105,9 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
                                             </>
                                     }
                                     
-                                    {barOptions.includes('confidence') && <Button color='inherit' onClick={() => {
+                                    {barOptions.includes('confidence') && <MenuItem color='inherit' onClick={() => {
                                         setAnchorEl(null)
-                                        dispatch(updateUI({modal: 'confidence-rules'}))}}>Rules</Button>}
+                                        dispatch(updateUI({modal: 'confidence-rules'}))}}>Rules</MenuItem>}
                                     {barOptions.includes('chat') && 
                                         user?.sub && <MenuItem onClick={() => {
                                         setOpenDrawer('Chat')
@@ -135,7 +140,7 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
                                         //dispatch()
                                         setOpenDrawer('Chat')
                                         }}>
-                                    {openDrawer=== 'Chat' ? 'Close Chat' : 'Open Chat'}
+                                    {openDrawer === 'Chat' ? 'Close Chat' : 'Open Chat'}
                                 </Button>}
                                 {barOptions.includes('salary-league') && <Button color="inherit"
                                     onClick={() => {
@@ -149,8 +154,35 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
 
                             </div>)}
 
-                            <Avatar alt={user?.displayName} src={user?.picture} />
+                            <Avatar onClick={pfpMenuClick} alt={user?.displayName} src={user?.picture} />
+                            <Menu
+                                    id="basic-menu"
+                                    anchorEl={picAnchorEl}
+                                    sx={{alignItems: 'flex-end'}}
+                                    open={pfpMenuOpen}
+                                    onClose={() => setPicAnchorEl(null)}
+                                    MenuListProps={{
+                                    //'aria-labelledby': 'basic-button',
+                                    }}
+                                >
+                                    
+                                    {<MenuItem color='inherit' 
+                                    style={{textAlign: 'right', width: '100%', flexDirection: 'row', justifyContent: 'flex-end'}}
+                                    onClick={() => {
+                                        setAnchorEl(null)
+                                        //should reset state to default here
+                                        logout()
+                                    }}>Log out</MenuItem>}
+                                    {<MenuItem sx={{width: 226, justifyContent: 'flex-end'} }onClick={() => {
+                                        setPicAnchorEl(null)
+                                        }}>
+                                            <a href="https://www.buymeacoffee.com/ryanstanley" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style={{height: 60,width: 217}} /></a>
+                                            </MenuItem>
+                                    }
 
+
+
+                                </Menu>
                         </Toolbar>
                     </AppBar>
                 </Box>

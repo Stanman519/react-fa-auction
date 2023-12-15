@@ -10,9 +10,9 @@ body {
   background: #212326;
 }
 
-body::-webkit-scrollbar {
+/* body::-webkit-scrollbar {
   background: transparent;
-}
+} */
 
 /* body {
   scrollbar-color: transparent transparent;

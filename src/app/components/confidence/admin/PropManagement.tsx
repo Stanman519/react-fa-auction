@@ -43,7 +43,7 @@ export function PropManagement() {
 
 
   return (
-    <div className="flex flex-col justify-center m-5 border border-black">
+    <div  className="flex flex-col justify-center m-5 border border-black">
         <TextField id="filled-basic" label="PROMPT" variant="filled" 
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setEntries({...entries, prompt: event.target.value});

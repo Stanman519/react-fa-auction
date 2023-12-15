@@ -8,6 +8,8 @@ import Auth0ProviderWithHistory from './app/auth/auth0-provider-with-history';
 import { LandingPage } from './app/components/nonAuction/LandingPage';
 import GamesHome from './app/components/games/GamesHome';
 import { ConfidenceAdminHome } from './app/components/confidence/admin/AdminHome';
+import { TermsOfService } from './app/components/legal/TermsOfService';
+import { PrivacyPolicy } from './app/components/legal/PrivacyPolicy';
 
 
 function App() {
@@ -37,6 +39,10 @@ function App() {
             <Route path='/games' element={<GamesHome />}/>
             <Route path='/demo' element={<GamesHome isDemo/>}/>
             <Route path='/admin' element={<ConfidenceAdminHome />} />
+            
+            <Route path='/terms-of-service' element={<TermsOfService />} />
+            
+            <Route path='/privacy-policy' element={<PrivacyPolicy />} />
           </Routes> 
         </Auth0ProviderWithHistory>
       </BrowserRouter>

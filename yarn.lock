@@ -3426,6 +3426,11 @@ bluebird@^3.5.5:
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
   integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
 
+boarding.js@^3.5.2:
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/boarding.js/-/boarding.js-3.5.2.tgz#d1ca2155c16ed21fca717743815b96ad88cfe3bf"
+  integrity sha512-ryZK8HpNdWPjWSl8HnmglOsS3OL2zB0GIQNUqqHKjNRYRqc1FrfAlkxePFOVdk9QoVKIcTvdOcvQYbMMNv5f6g==
+
 body-parser@1.20.1:
   version "1.20.1"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.20.1.tgz#b1812a8912c195cd371a3ee5e66faa2338a5c668"

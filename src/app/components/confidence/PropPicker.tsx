@@ -25,7 +25,7 @@ export const PropPicker = ({ prop, index, canEdit }: { prop: Prop, index: number
     }
 
     return (
-        <div>
+        <div id={'prop-container'}>
             <div className='px-2'>{prop.prompt}</div>
              {canEdit ?
              <FormControl fullWidth>
