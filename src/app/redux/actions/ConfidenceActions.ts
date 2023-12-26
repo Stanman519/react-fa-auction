@@ -235,7 +235,8 @@ export const submitMyPicks = (locMatchups: NflMatchup[], points: number[], local
         props: propPicks
     }
     const response = await GeneralApiSvc.submitPicks(body)
-    if (response.ok) {
+    console.log('res', response)
+    if (response.success) {
         dispatch(updateUI({button: undefined, modal: 'confidence-submit-success'}))
         const {props, matchups, picks } = confidence
         let newMatchups = [...matchups]
@@ -252,7 +253,7 @@ export const submitMyPicks = (locMatchups: NflMatchup[], points: number[], local
         // TODO: SET STATE TO POST SUBMISSION MODE
     }
     else {
-        dispatch(updateUI({modal: 'error', errorText: 'There was a problem submitting your picks.'}))
+        dispatch(updateUI({modal: 'error', errorText: typeof response.data === 'string' ? response.data : 'There was a problem submitting your picks.'}))
     }
 
 }

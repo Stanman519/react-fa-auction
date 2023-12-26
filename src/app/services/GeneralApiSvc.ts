@@ -38,7 +38,6 @@ function extractErrorMsg<Type>(res: AxiosResponse): GenericResponse<string | Typ
         else {
             errorMsg = "There was an error with the request."
         }
-        console.log('no success')
         return {success: false, data: errorMsg} as GenericResponse<string>
     }
     if (!res.data) return {success: true}
@@ -171,15 +170,15 @@ const postNewMatchups = (matchups: NflMatchup[]) : Promise<Response> => {
             return undefined
         })
 }
-const submitPicks = (picks: NflPickSubmissionBody) : Promise<Response> => {
+const submitPicks = (picks: NflPickSubmissionBody) : Promise<GenericResponse<string | Type>> => {
     return axios.post(`${URL}/confidence/picks`, picks, {headers: {
         'Content-Type': 'application/json'
     },})
         .then((res) => {
-            return res.data
+            return extractErrorMsg<string>(res)
         }).catch((e) => {
             console.log(e)
-            return undefined
+            return extractErrorMsg<string>(e.response)
         })
 }
 

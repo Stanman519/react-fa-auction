@@ -170,8 +170,37 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                             <Menu
                                     id="basic-menu"
                                     anchorEl={picAnchorEl}
+
                                     sx={{alignItems: 'flex-end'}}
                                     open={pfpMenuOpen}
+                                    PaperProps={{
+                                        elevation: 10,
+                                        sx: {
+                                          overflow: 'visible',
+                                          filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                                          mt: 1.5,
+                                          '& .MuiAvatar-root': {
+                                            width: 32,
+                                            height: 32,
+                                            ml: -0.5,
+                                            mr: 1,
+                                          },
+                                          '&::before': {
+                                            content: '""',
+                                            display: 'block',
+                                            position: 'absolute',
+                                            top: 0,
+                                            right: 14,
+                                            width: 10,
+                                            height: 10,
+                                            bgcolor: 'background.paper',
+                                            transform: 'translateY(-50%) rotate(45deg)',
+                                            zIndex: 0,
+                                          },
+                                        },
+                                      }}
+                                      transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                                     onClose={() => setPicAnchorEl(null)}
                                     MenuListProps={{
                                     //'aria-labelledby': 'basic-button',
@@ -186,10 +215,10 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                                         logout()
                                     }}>Log out</MenuItem>}
                                     {user?.sub?.includes('118311468702754688467') && <MenuItem sx={{justifyContent: 'flex-end'}} onClick={() => navigate('/admin')}>Admin</MenuItem>}
-                                    {<MenuItem sx={{width: 226, justifyContent: 'flex-end'} } onClick={() => {
+                                    {<MenuItem sx={{width: 150, justifyContent: 'flex-end'} } onClick={() => {
                                         setPicAnchorEl(null)
                                         }}>
-                                            <a href="https://www.buymeacoffee.com/ryanstanley" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style={{height: 60,width: 217}} /></a>
+                                            <a href="https://www.buymeacoffee.com/ryanstanley" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style={{height: 34,width: 122}} /></a>
                                             </MenuItem>
                                     }
 
