@@ -5,13 +5,15 @@ import { ConfidenceWeekPointsMap, confidencePoints } from "../../services/Common
 import { ConfidenceMatchup } from "./ConfidenceMatchup";
 import { Card, useTheme } from "@mui/material";
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
+import { RootState } from "../../redux/reducers/RootReducer";
+import { useSelector } from "react-redux";
 
 
 
 export const MatchupList = React.memo(({ matchups, placeholder, thisWeekPoints, canEdit, onClick }: { onClick: (e: React.MouseEvent) => void, matchups: NflMatchup[], placeholder: React.ReactNode, thisWeekPoints: ConfidenceWeekPointsMap | undefined, canEdit: boolean }): JSX.Element => {
     // const heightRef = useRef<HTMLDivElement>(null)
     const [width, setWidth] = useState<number>(window.innerWidth);
-
+    const {communityStats} = useSelector((state: RootState) => state.confidence)
     function handleWindowSizeChange() {
         setWidth(window.innerWidth);
     }
@@ -22,15 +24,15 @@ export const MatchupList = React.memo(({ matchups, placeholder, thisWeekPoints, 
         }
     }, []);
 
-const isMobile = width <= 768;
+const isMobile = width <= 500;
     const theme = useTheme().palette
     return (
         <div onClick={(event) => onClick(event)} className="flex flex-row w-full" style={{userSelect: 'none'}}>
 
-            <div className="flex flex-col grow" style={{background: (thisWeekPoints && thisWeekPoints?.points.length > 1) ? 
+            <div className="flex flex-col grow " style={{background: (thisWeekPoints && thisWeekPoints?.points.length > 1) ? 
                 'linear-gradient(180deg, rgba(227,57,0,1) 0%, rgba(227,88,0,1) 20%, rgba(0,145,255,1) 76%, rgba(0,61,255,1) 100%)' : 'gray', 
-                minWidth: 80,
-                maxWidth: 180}} >
+                minWidth: 50,
+                maxWidth: 150}} >
 
                 {thisWeekPoints?.points.map((c, i) => (
                     <Card id={`point-card-${i}`} key={c} 
@@ -51,8 +53,10 @@ const isMobile = width <= 768;
                     </div>
             </div>}
             <div className="flex flex-col">
-                {matchups.map((matchup: NflMatchup, index: number) => (
-                    < Draggable draggableId={`${matchup.id}`} index={index} key={matchup.id} isDragDisabled={!canEdit}>
+                {matchups.map((matchup: NflMatchup, index: number) => {
+                    let stats = communityStats.find(s => s.matchupId === matchup.id)
+
+                    return (< Draggable draggableId={`${matchup.id}`} index={index} key={matchup.id} isDragDisabled={!canEdit}>
                         {provided => (
 
                             <div
@@ -61,7 +65,7 @@ const isMobile = width <= 768;
                                 {...provided.dragHandleProps}
                                 >
                                 <ConfidenceMatchup
-                                    commStats={{lPct: 38, rPct: 62, rAvg: 0, lAvg: 0}}
+                                    commStats={stats}
                                     isMobile={width < 769}
                                     canEdit={canEdit}
                                     matchup={matchup}
@@ -71,10 +75,10 @@ const isMobile = width <= 768;
                         )
                         }
                         
-                    </Draggable>
+                    </Draggable>)
 
 
-                ))
+                    })
                 }
                 {placeholder && <div >{placeholder}</div>}
             </div>

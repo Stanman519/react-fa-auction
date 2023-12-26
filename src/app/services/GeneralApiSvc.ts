@@ -1,10 +1,11 @@
 import { User } from "@auth0/auth0-react"
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 import { PlayerDTO } from "../redux/reducers/FreeAgentReducer"
 import Owner, { LeagueInfo } from "../redux/reducers/OwnerReducer"
 import { DeadCapInfo, Transaction } from "../redux/reducers/TransactionReducer"
 import { URL } from "./AuctionApiSvc"
-import { ConfidencePlayerResult, MatchupFormResponse, NflMatchup, NflPickSubmissionBody, NflTeam, PickResult, PickSubmission, Prop } from "../models/ConfidenceDTOs"
+import { CommunityMatchupStats, ConfidencePlayerResult, MatchupFormResponse, NflMatchup, NflPickSubmissionBody, NflTeam, PickResult, PickSubmission, Prop } from "../models/ConfidenceDTOs"
+import { Type } from "typescript"
 
 export interface Dashboard {
     profile: Owner
@@ -25,6 +26,24 @@ export interface CutRequestBody{
     rebate: number
 }
 
+export interface GenericResponse<Type> {
+    success: boolean
+    data?: Type
+}
+
+function extractErrorMsg<Type>(res: AxiosResponse): GenericResponse<string | Type> {
+    var errorMsg
+    if (res.status > 299){
+        if (res.data.friendlyMessage) errorMsg = res.data.friendlyMessage
+        else {
+            errorMsg = "There was an error with the request."
+        }
+        console.log('no success')
+        return {success: false, data: errorMsg} as GenericResponse<string>
+    }
+    if (!res.data) return {success: true}
+    return {success: true, data: res.data as Type}
+}
 
 const fetchDashboardInitialLoad = (cookie: string = "", authUser: User, leagueId?: number) : Promise<Dashboard> => {
     return axios.post(`${URL}/dashboard/home`, 
@@ -66,11 +85,22 @@ const getConfidenceResults = (year: number) : Promise<ConfidencePlayerResult[]> 
         'Content-Type': 'application/json'
     },})
         .then((res) => {
-            console.log('res.data', res.data)
             return res.data
         }).catch(() => {
             console.log('catch')
             return undefined
+        })
+}
+
+const getErrorTest = () : Promise<GenericResponse<string | Type>> => {
+    return axios.get(`${URL}/confidence/error`, {headers: {
+        'Content-Type': 'application/json'
+    },})
+        .then((res) => {
+            return extractErrorMsg<string>(res)
+        }).catch((res) => {
+            console.log('catch')
+            return extractErrorMsg<string>(res.response)
         })
 }
 
@@ -79,7 +109,18 @@ const getNflTeams = () : Promise<NflTeam[]> => {
         'Content-Type': 'application/json'
     },})
         .then((res) => {
-            console.log('res.data', res.data)
+            return res.data
+        }).catch(() => {
+            console.log('catch')
+            return undefined
+        })
+}
+
+const getCommunityStats = (year: number, week: number) : Promise<CommunityMatchupStats[]> => {
+    return axios.get(`${URL}/confidence/year/${year}/week/${week}/coummunity-stats`, {headers: {
+        'Content-Type': 'application/json'
+    },})
+        .then((res) => {
             return res.data
         }).catch(() => {
             console.log('catch')
@@ -124,7 +165,6 @@ const postNewMatchups = (matchups: NflMatchup[]) : Promise<Response> => {
         'Content-Type': 'application/json'
     },})
         .then((res) => {
-            console.log(res)
             return res.data
         }).catch((e) => {
             console.log(e)
@@ -136,7 +176,6 @@ const submitPicks = (picks: NflPickSubmissionBody) : Promise<Response> => {
         'Content-Type': 'application/json'
     },})
         .then((res) => {
-            console.log(res)
             return res.data
         }).catch((e) => {
             console.log(e)
@@ -149,7 +188,6 @@ const submitProp = (props: Prop[]) : Promise<Response> => {
         'Content-Type': 'application/json'
     },})
         .then((res) => {
-            console.log(res)
             return res.data
         }).catch((e) => {
             console.log(e)
@@ -162,7 +200,6 @@ const lockAllMatchups = (year?: number): Promise<Response> => {
         params: {year}
     } : {})
     .then((res) => {
-        console.log(res)
         return res.data
     }).catch((e) => {
         console.log(e)
@@ -175,7 +212,6 @@ const setWinnerForMatchup = (matchupId: number, winningTricode: string): Promise
         'Content-Type': 'application/json'
     }})
     .then((res) => {
-        console.log(res)
         return res.data
     }).catch((e) => {
         console.log(e)
@@ -188,7 +224,6 @@ const setWinningProp = (propId: number, winningSide: string): Promise<Response> 
         'Content-Type': 'application/json'
     }})
     .then((res) => {
-        console.log(res)
         return res.data
     }).catch((e) => {
         console.log(e)
@@ -198,9 +233,11 @@ const setWinningProp = (propId: number, winningSide: string): Promise<Response> 
 
 export default {
     synchronizeAuth,
+    getCommunityStats,
     getConfidenceResults,
     submitPicks,
     fetchDashboardInitialLoad,
+    getErrorTest,
     postFranchiseTagPlayer,
     postBuyoutPlayer,
     postTaxiCut,

@@ -1,5 +1,4 @@
-import { AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, Switch, Toolbar, useTheme } from "@mui/material";
-import {VolumeUp, VolumeMute} from '@mui/icons-material';
+import { AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, Toolbar, useTheme } from "@mui/material";
 import { Fragment, useState } from "react";
 import MenuIcon from '@mui/icons-material/Menu';
 import Drawer from '@mui/material/Drawer';
@@ -8,19 +7,19 @@ import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store";
+import { RootState, useAppThunkDispatch } from "../store";
 import { turnOnNominationModeForThisOwnersLot } from "../redux/actions/LotActions";
 import { updateUI } from "../redux/actions/UiActions";
 import { FAChatWindow } from "./chat";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
-import LeagueSwitchMenu from "./menu/LeagueSwitchMenu";
+import { clearConfidenceStateBeforeNav } from "../redux/actions/ConfidenceActions";
 
 type DrawerType = 'Salaries' | 'Chat' | 'pfp-click' | undefined
 
 type BarOption = 'fa-auction' | 'salary-league' | 'chat' | 'confidence'
 
-export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, barOptions: BarOption[] }) {
+export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatChannel?: string, barOptions: BarOption[], isDemo?: boolean}) {
     const { user, isAuthenticated, loginWithRedirect, isLoading, logout } = useAuth0();
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
     const owners = useSelector((state: RootState) => state.owners);
@@ -37,7 +36,7 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
 
     const open = Boolean(anchorEl);
     const pfpMenuOpen = Boolean(picAnchorEl)
-    const dispatch = useDispatch();
+    const dispatch = useAppThunkDispatch();
     const { palette } = useTheme();
     const navigate = useNavigate();
     const closeDrawer = () => {
@@ -46,6 +45,15 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
     const mobileMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
       };
+
+    const clearDemoStateAndNav = (route: string) => {
+        setAnchorEl(null)
+        dispatch(clearConfidenceStateBeforeNav()).then(() => {
+            navigate(`/${route}`)
+        })
+
+    }
+    
     const pfpMenuClick = (event: React.MouseEvent<HTMLImageElement>) => {
         setPicAnchorEl(event?.currentTarget);
     }
@@ -53,8 +61,8 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
         dispatch(updateUI({audioOn: event.target.checked}))
     }
 
-    const addNominationCard = () => {
-        dispatch(turnOnNominationModeForThisOwnersLot());
+    const addNominationCard = async () => {
+        dispatch(turnOnNominationModeForThisOwnersLot())
     }
 
     const highBidsOnTheBoard = (ownerId: number): number => {
@@ -62,7 +70,7 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
             .reduce((prev, curr) => prev! + curr!, 0) ?? 0;
     }
     return (
-        <div>
+        <div className="w-full">
 
             <Fragment>
                 <Box>
@@ -108,8 +116,10 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
                                     {barOptions.includes('confidence') && <MenuItem color='inherit' onClick={() => {
                                         setAnchorEl(null)
                                         dispatch(updateUI({modal: 'confidence-rules'}))}}>Rules</MenuItem>}
-                                    {barOptions.includes('chat') && 
-                                        user?.sub && <MenuItem onClick={() => {
+                                    {isDemo && <MenuItem color='inherit' onClick={() => clearDemoStateAndNav('games')}> Confidence Pool </MenuItem>}
+                                    {!isDemo && <MenuItem color='inherit' onClick={() => clearDemoStateAndNav('demo')}> See Demo </MenuItem>}
+                                    {barOptions.includes('chat') &&  
+                                        user?.sub && isDemo !== true && <MenuItem onClick={() => {
                                         setOpenDrawer('Chat')
                                         setAnchorEl(null)
                                         }}>{openDrawer === 'Chat' ? 'Close Chat' : 'Open Chat'}</MenuItem>
@@ -135,7 +145,7 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
                                     setAnchorEl(null)
                                     dispatch(updateUI({modal: 'confidence-rules'}))
                                     }}>Rules</Button>}
-                                {barOptions.includes('chat') && user?.sub && <Button color="inherit"
+                                {barOptions.includes('chat') && user?.sub && isDemo !== true && <Button color="inherit"
                                     onClick={() => {
                                         //dispatch()
                                         setOpenDrawer('Chat')
@@ -146,6 +156,8 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
                                     onClick={() => {
                                         navigate('/home')
                                         }}>League Info</Button>}
+                                {isDemo && <Button color='inherit' onClick={() => clearDemoStateAndNav('games')}> CONFIDENCE POOL </Button>}
+                                {!isDemo && <Button color='inherit' onClick={() => clearDemoStateAndNav('demo')}>See Demo</Button>}
                                 {barOptions.includes('fa-auction') &&  !nomIsUsed &&
                                     <Button color='inherit' onClick={() => addNominationCard()}>
                                         Nominate a Player
@@ -154,7 +166,7 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
 
                             </div>)}
 
-                            <Avatar onClick={pfpMenuClick} alt={user?.displayName} src={user?.picture} />
+                            <Avatar onClick={pfpMenuClick} alt={user?.displayName} src={user?.picture} sx={{cursor: 'pointer'}} />
                             <Menu
                                     id="basic-menu"
                                     anchorEl={picAnchorEl}
@@ -173,7 +185,8 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
                                         //should reset state to default here
                                         logout()
                                     }}>Log out</MenuItem>}
-                                    {<MenuItem sx={{width: 226, justifyContent: 'flex-end'} }onClick={() => {
+                                    {user?.sub?.includes('118311468702754688467') && <MenuItem sx={{justifyContent: 'flex-end'}} onClick={() => navigate('/admin')}>Admin</MenuItem>}
+                                    {<MenuItem sx={{width: 226, justifyContent: 'flex-end'} } onClick={() => {
                                         setPicAnchorEl(null)
                                         }}>
                                             <a href="https://www.buymeacoffee.com/ryanstanley" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style={{height: 60,width: 217}} /></a>
@@ -201,7 +214,7 @@ export function MenuBar({chatChannel = "", barOptions}: {chatChannel?: string, b
                             {owners.map((o, index) => (
                                 <ListItem key={o.teamName} style={{ backgroundColor: index % 2 === 0 ? palette.background.default : palette.background.paper }}>
                                     <img src={o.avatar} referrerPolicy="no-referrer" style={{ height: 0, width: 0 }} />
-                                    <Avatar style={{ marginRight: 8 }} sx={{ height: 50, width: 50 }} alt={o.ownerName} src={o.avatar}  />
+                                    <Avatar style={{ marginRight: 8, cursor: 'pointer' }} sx={{ height: 50, width: 50 }} alt={o.ownerName} src={o.avatar}  />
                                     <div style={{flexDirection: 'column'}}>
                                         <ListItemText style={{}} primary={`${o.ownerName} - $${o?.capRoom}`} secondary={highBidsOnTheBoard(o.leagueownerid) ?? 0 > 0 ? `outstanding bids: $${highBidsOnTheBoard(o.leagueownerid)}`: ''} />
                                     </div>

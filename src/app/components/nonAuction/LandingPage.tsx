@@ -15,7 +15,6 @@ export const LandingPage = () => {
         const checkUser = async () => {
             if (isAuthenticated && user?.sub) {
                 //nav('/auction')
-                console.log('authenticated? ', isAuthenticated)
                 dispatch(synchronizeAuth0WithDbLogin(user))
                 //DETERMINE NAVIGATION --- Check params, for from screen. if none... are there any leagues? go to dashboard, unless league isAuctioning, no leagues, go to games
                 if (owner.ownerId < 1) {
@@ -24,7 +23,6 @@ export const LandingPage = () => {
                 if (owner.leagues.length > 0) nav('/home')
                 if (owner.leagues.length == 0) nav('/games')
                 else nav('/games')
-                //dispatch(loadDataForHomeBase(user))
 
             } else {
                 await loginWithRedirect();
@@ -33,9 +31,9 @@ export const LandingPage = () => {
         checkUser()
     }, [isAuthenticated, loginWithRedirect, isLoading, user])
     return (
-        <div className='flex flex-row justify-center content-center max-w-full min-h-full'>
-            <div className='flex-col justify-center content-center max-w-screen-sm max-h-screen-sm'>
-                <img className='max-w-md animate-pulse' src={logo} />
+        <div className='flex flex-row justify-center items-center max-w-screen-sm min-h-screen '>
+            <div className='flex-col justify-center items-center max-w-full p-4 m-4 '>
+                <img className='max-w-xs animate-pulse' src={logo} />
                 {/* < Button onClick={() => loginWithRedirect()}> Log In</Button > */}
             </div>
         </div>

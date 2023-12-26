@@ -41,7 +41,6 @@ export const AddMatchups = (): JSX.Element => {
     //     setTeams(response)
     // }
      checkUser()
-    // console.log('owner', owner.ownerId) 
     // if (isAuthenticated && owner.ownerId == 69 && teams.length === 0){
     //     getTeams()
     //     setNewMatchups([{index: 0, left: "", right: ""}])

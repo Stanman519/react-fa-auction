@@ -10,7 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/reducers/RootReducer';
-import { setViewModeForPicks } from '../../redux/actions/ConfidenceActions';
+import { getCommunityStats, setViewModeForPicks } from '../../redux/actions/ConfidenceActions';
 
 const options = ['My Results', 'Community Picks'];
 
@@ -18,6 +18,7 @@ export default function MyPicksAndStatsDropdown() {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const {communityStats} = useSelector((state: RootState) => state.confidence)
   const pickable = useSelector((state: RootState) => state.confidence.matchups[0]?.pickable ?? true)
   const dispatch = useDispatch()
 
@@ -27,7 +28,10 @@ export default function MyPicksAndStatsDropdown() {
   ) => {
     setSelectedIndex(index);
     setOpen(false);
-    dispatch(setViewModeForPicks(index === 0 ? 'my-picks' : 'community-picks'))
+    if (index === 1 && (communityStats.length === 0 || !communityStats)) {
+      dispatch(getCommunityStats())
+    }
+    else dispatch(setViewModeForPicks(index === 0 ? 'my-picks' : 'community-picks'))
   };
 
   const handleToggle = () => {
@@ -46,9 +50,9 @@ export default function MyPicksAndStatsDropdown() {
   };
 
   return (
-    <React.Fragment>
-      <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button">
-        <Button onClick={() => {}}>{options[selectedIndex]}</Button>
+    <div style={{width: '100%'}}>
+      <ButtonGroup sx={{width: '100%'}} variant="contained" ref={anchorRef} aria-label="split button">
+        <Button sx={{flex: 1}} onClick={() => setOpen(!open)}>{options[selectedIndex]}</Button>
         <Button
           size="small"
           aria-controls={open ? 'split-button-menu' : undefined}
@@ -61,6 +65,7 @@ export default function MyPicksAndStatsDropdown() {
       </ButtonGroup>
       <Popper
         sx={{
+          width: '100%',
           zIndex: 10000,
         }}
         open={open}
@@ -85,7 +90,9 @@ export default function MyPicksAndStatsDropdown() {
                       key={option}
                       disabled={index === 1 && pickable}
                       selected={index === selectedIndex}
-                      onClick={(event) => handleMenuItemClick(event, index)}
+                      onClick={(event) => {
+                        handleMenuItemClick(event, index)
+                      }}
                     >
                       {option}
                     </MenuItem>
@@ -96,6 +103,6 @@ export default function MyPicksAndStatsDropdown() {
           </Grow>
         )}
       </Popper>
-    </React.Fragment>
+    </div>
   );
 }

@@ -29,11 +29,11 @@ export const Rules = (): JSX.Element => {
 
     Each week has a different set of points for the games, so the games become more pivotal as you go.
 
-    Week 1 (6 games): 6, 5, 4, 3, 2, 1
-    Week 2 (4 games): 7, 6, 5, 4
-    Week 3 (2 games): 8, 7
-    Week 4 (Super Bowl): 9
-
+    Week 1 (6 games): 6, 5, 4, 3, 2, 1 points
+    Week 2 (4 games): 7, 6, 5, 4 points
+    Week 3 (2 games): 8, 7 points
+    Week 4 (Super Bowl): 9 points
+ 
     You must submit all of your picks before the first game each week. All picks will lock at the start of the first game.  You can make a change to your picks, but it has to be before the first game. 
 
     Each week will have a bonus prop question that will be used at the end for tiebreaker purposes.

@@ -16,11 +16,11 @@ export function ConfidenceResultsAccordian({isDemo}: {isDemo: boolean}) {
     const dispatch = useDispatch()
 
     useEffect(() => {    
-        if (results.length === 0) {
+        if (results.length === 0 || (isDemo && results.filter(r => r.ownerId !== -1).every(p => p.totalPoints === 0))) {
             dispatch(getConfidenceResults(isDemo ? -1 : undefined))    
         }
 
-      },[])
+      }, [])
 
 
     const handleChange =
@@ -29,7 +29,7 @@ export function ConfidenceResultsAccordian({isDemo}: {isDemo: boolean}) {
         };
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col max-w-6xl w-full">
             {
 
                 multiLoader?.includes('con-results')
@@ -50,7 +50,7 @@ export function ConfidenceResultsAccordian({isDemo}: {isDemo: boolean}) {
                         <Accordion key={r.ownerId} expanded={expanded === `panel${r.ownerId}`} onChange={handleChange(`panel${r.ownerId}`)}>
                             <AccordionSummary
 
-                                
+                                sx={{backgroundColor: (r.displayName === 'YOU' || r.ownerId === owner.ownerId) ? 'lightyellow': 'white'}}
                                 expandIcon={r.weeklyResults.length > 0 ? <ExpandMoreIcon /> :<> </>}
                                 aria-controls="panel1bh-content"
                                 id="panel1bh-header"

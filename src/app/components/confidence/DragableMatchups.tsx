@@ -1,9 +1,9 @@
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
-import { Skeleton, Button, Zoom } from "@mui/material";
+import { Skeleton, Button, Zoom, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { MatchupList } from "./MatchupList";
-import { getMatchups, reorderConfidenceMatchups, submitMyPicks } from "../../redux/actions/ConfidenceActions";
+import { getMatchups, reorderConfidenceMatchups, submitDemoPicks, submitMyPicks } from "../../redux/actions/ConfidenceActions";
 import { confidencePoints } from "../../services/Common";
 import React, { CSSProperties, useEffect, useState } from "react";
 import { User } from "@auth0/auth0-react";
@@ -20,12 +20,13 @@ interface StampAnim {
 
 export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo: boolean}) {
     // const [stateMatchups, setStateMatchups] = useState<NflMatchup[]>([]);
-    const { matchups, picks, props } = useSelector((state: RootState) => state.confidence)
-    const { multiLoader,  } = useSelector((state: RootState) => state.ui)
+    const { matchups, picks, props, viewMode } = useSelector((state: RootState) => state.confidence)
+    const { multiLoader, button  } = useSelector((state: RootState) => state.ui)
     const { owner } = useSelector((state: RootState) => state.profile)
     const dispatch = useDispatch()
     const thisWeekPoints = confidencePoints.find(cp => cp.week === matchups[0]?.week ?? 1) ?? confidencePoints[0]
-    const [editMode, setEditMode] = useState<boolean>((matchups.some(m => m.pickable) && !picks?.savedPicks) || isDemo) // (matchups are pickable AND user has NOT made picks)  ----- can be set to true by edit button (only shown if pickable and user made picks)
+    const [editMode, setEditMode] = useState<boolean>((matchups.some(m => m.pickable) && !picks?.savedPicks)) // (matchups are pickable AND user has NOT made picks)  ----- can be set to true by edit button (only shown if pickable and user made picks)
+    const theme = useTheme()
     const [stamp, setStamp] = useState<StampAnim>({showStamp: false, fadeStamp: false, x: 0, y: 0});
     const STAMP_FONT_SIZE = 64
     const randomIntFromInterval = (min: number, max: number) => { // min and max included 
@@ -35,17 +36,24 @@ export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo
     const STAMP_DURATION = 12000
 
     useEffect(() => {
-        if (isDemo) dispatch(getMatchups({}, -1)) 
+        if (isDemo) {
+            if (matchups.length === 0 || matchups.some(m => m.year != -1)) dispatch(getMatchups({}, -1)) 
+        }
         else if (user && !matchups.some(m => m.year > 0)) {
             dispatch(getMatchups(user)) 
         }
-      },[user])
+      },[user, isDemo])
 
 
       useEffect(() => {
-        if ((matchups.some(m => m.pickable) && !picks?.savedPicks) || isDemo) setEditMode(true)
-        if (picks?.savedPicks === true && !isDemo) setEditMode(false)
-      }, [picks?.savedPicks])
+
+        if (isDemo) {
+            picks?.demoPicks ? setEditMode(false) : setEditMode(true)
+        } else {
+            if ((matchups.some(m => m.pickable) && !picks?.savedPicks)) setEditMode(true)
+            if (picks?.savedPicks) setEditMode(false)
+        }
+      }, [picks, picks?.savedPicks])
 
     function onDragEnd(result: any) {
         if (!result.destination) {
@@ -76,7 +84,7 @@ export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo
         pointerEvents: 'none',
         transform: getStampTransform(),
         opacity: stamp.fadeStamp ? 100 : 0,
-        left: stamp.x, top: stamp.y, 
+        left: '20%', top: '50%', 
         zIndex: 3, 
         fontSize: STAMP_FONT_SIZE, 
         color: 'darkred', 
@@ -108,23 +116,21 @@ export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo
         }, EARLY_STAMP_TRANSITION_DUR + STAMP_DURATION)
         e.stopPropagation()
     }
-
     return (
-        <div  className="max-w-md lg:w-1/2" style={{position: 'relative'}}>{
+        <div  className="max-w-md w-full lg:w-1/2 " style={{position: 'relative'}}>{
             multiLoader?.includes('con-matchups') ? 
                 <div style={{width: '100%'}}>
-                <Skeleton  variant="rectangular" width={400} style={{flex: 1, borderWidth: 1, borderColor: '#C8C8C8', margin: 2, height: 200}} />
-                <Skeleton  variant="rectangular" width={400} style={{flex: 1, borderWidth: 1, borderColor: '#C8C8C8', margin: 2, height: 200}} />
-                <Skeleton  variant="rectangular" width={400} style={{flex: 1, borderWidth: 1, borderColor: '#C8C8C8', margin: 2, height: 200}} />
+                <Skeleton  variant="rectangular"  style={{flex: 1, borderWidth: 1, borderColor: '#C8C8C8', margin: 2, height: 150}} />
+                <Skeleton  variant="rectangular"  style={{flex: 1, borderWidth: 1, borderColor: '#C8C8C8', margin: 2, height: 150}} />
+                <Skeleton  variant="rectangular"  style={{flex: 1, borderWidth: 1, borderColor: '#C8C8C8', margin: 2, height: 150}} />
                 </div> : 
-                <>
+                <> 
             {matchups?.length > 0 && 
             <>
 
-            <div style={stampStyles}>LOCKED</div>
-            <MyPicksAndStatsDropdown />
+            {matchups.every(m => !m.pickable && !m.winner) && viewMode !== 'community-picks' && <div style={stampStyles}>LOCKED</div>}
+            {matchups.some(m => !m.pickable) && <MyPicksAndStatsDropdown />}
             <DragDropContext onDragEnd={onDragEnd}>
-            <div style={{width: '100%', textAlign: 'center' }}>WEEK {matchups[0].week}</div>
                 <Droppable droppableId="list">
                     {provided => (
                         <div ref={provided.innerRef} {...provided.droppableProps} >
@@ -138,18 +144,21 @@ export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo
             
             </>}
             {props.length > 0 &&
-                <div className="border-slate-800 border">
+                <div className="border" style={{borderColor: theme.palette.primary.main}}>
                     <div>
-                        <div className="text-center w-full font-bold text-lg bg-slate-800 text-white">THE EXTRA POINT TIEBREAKER</div>
+                        <div className="text-center w-full font-bold text-lg text-white" style={{backgroundColor: theme.palette.primary.main}}>THE EXTRA POINT TIEBREAKER</div>
                     </div>
                     {props.map((p, i) => <PropPicker key={i} prop={p} index={i} canEdit={editMode}/>)}
                 </div>
             }
             {editMode && 
-            <LoadingButton id={'submit-button'} loading
-            onClick={() => { if (!isDemo) dispatch(submitMyPicks(matchups, thisWeekPoints.points, props))}} variant="contained" 
+            <LoadingButton id={'submit-button'} loading={button === 'conf-pick-submit'}
+            onClick={() => { 
+                if (!isDemo) dispatch(submitMyPicks(matchups, thisWeekPoints.points, props))
+                else dispatch(submitDemoPicks(thisWeekPoints))
+            }} variant="contained" 
             disabled={matchups?.some(m => !m.chosenTeamLocal) || props.some(p => !p.localChoice)}
-            style={{width: '100%', height: 50}}>SUBMIT</LoadingButton>}
+            style={{width: '100%', height: 50}}>{isDemo ? 'SIMULATE GAMES' : 'SUBMIT'}</LoadingButton>}
             {
                 !editMode && matchups.some(m => m.pickable) && 
                 <Button sx={{width: '100%', height: 50}} onClick={() => setEditMode(true)} variant="contained">EDIT</Button>

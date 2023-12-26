@@ -29,15 +29,7 @@ export const DecideMatchups = (): JSX.Element => {
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>, matchupId: number) => {
-        console.log('here', (event.target as HTMLInputElement).value)
-
-
-
-
         var newVals = value.filter(v => v.id !== matchupId)
-
-        
-
         setValue([...newVals, {id: matchupId, value: event.target.value}]);
       };
     return (

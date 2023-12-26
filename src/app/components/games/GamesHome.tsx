@@ -14,6 +14,7 @@ import "boarding.js/styles/main.css";
 import "boarding.js/styles/themes/basic.css";
 import { RootState } from "../../redux/reducers/RootReducer";
 import { updateUI } from "../../redux/actions/UiActions";
+import { getError } from "../../redux/actions/ConfidenceActions";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -38,7 +39,7 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
   const dispatch = useDispatch();
   const { user, isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
   const {matchups} = useSelector((state:RootState) => state.confidence)
-  const {modal} = useSelector((state:RootState) => state.ui)
+  const {modal, errorText} = useSelector((state:RootState) => state.ui)
   const theme = useTheme();
   const [value, setValue] = useState('1');
 
@@ -109,13 +110,15 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
 
 
   const startTutorial = () => {
-    console.log(boarding.isActivated)
     boarding.start()
   }
 
 // Define the steps for introduction
 
 
+// useEffect(() => {
+//   dispatch(getError())
+// },[])
   useEffect(() => {
 
     if (isLoading || isDemo) return
@@ -137,12 +140,12 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
   };
 
   return (
-    <div className="flex flex-col justify-start content-center" style={{ overflowX: 'hidden', overflowY: 'hidden', minHeight: '100vh' }}>
+    <div className="flex flex-col justify-start items-center" style={{ overflowX: 'hidden', overflowY: 'hidden', minHeight: '100vh' }}>
 
-      <MenuBar chatChannel={'confidence'} barOptions={['confidence', 'chat']} />
+      <MenuBar isDemo={isDemo} chatChannel={'confidence'} barOptions={['confidence', 'chat']} />
       <Rules />
-      <TabContext value={value} >
-        <div className="flex flex-row w-full justify-center">
+      <TabContext value={value}>
+        <div className="flex flex-row w-full justify-center ">
           <TabList 
             value={value}
             onChange={handleChange}
@@ -156,32 +159,30 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
         </div>
         {isDemo && 
         <div style={{width: '100%', display: 'flex', justifyContent: 'center'}}>
-        <Button variant="outlined" style={{marginBottom: -10, marginTop: 10, width: 300 }} onClick={() => startTutorial()}>start tutorial</Button>
+        {value === "1" && <Button variant="outlined" style={{marginBottom: -10, marginTop: 10, width: 300 }} 
+        onClick={() => startTutorial()}>start tutorial</Button>}
         </div>}
-        {/* <SwipeableViews
-	  	disabled
-        axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-        index={value}
-        onChangeIndex={handleChangeIndex}
-		style={{}}
-      > */}
-        <TabPanel  value={'1'} dir={theme.direction}>
+
+        <TabPanel  value={'1'} dir={theme.direction} className="w-full flex flex-row justify-center">
           <DragableMatchups user={user} isDemo={isDemo} />
         </TabPanel>
-        <TabPanel  value={'2'} dir={theme.direction}>
+        <TabPanel  value={'2'} dir={theme.direction} className="w-full flex flex-row justify-center">
           <ConfidenceResultsAccordian isDemo={isDemo} />
         </TabPanel>
       </TabContext>
-      <Snackbar open={modal === 'confidence-submit-success'} autoHideDuration={6000}>
-        <Alert onClose={() => dispatch(updateUI({modal: undefined}))} severity="success">
+      <Snackbar open={modal === 'confidence-submit-success'} autoHideDuration={800} onClose={() => dispatch(updateUI({modal: undefined}))} >
+        <Alert severity="success" onClose={() => dispatch(updateUI({modal: undefined}))}>
           Submission Complete!
         </Alert>
       </Snackbar>
-      {/* </SwipeableViews> */}
-      {/* <div className="flex flex-col lg:flex-row lg:justify-around lg:max-w-full lg:content-start p-2">
-        <DragableMatchups user={user} isDemo={isDemo}/>
-        <ConfidenceResultsAccordian isDemo={isDemo} /> 
-      </div> */}
+      <Snackbar open={modal === 'error'} autoHideDuration={8000} onClose={() => {
+
+          dispatch(updateUI({modal: undefined}))}}>
+        <Alert  severity="error" onClose={() => dispatch(updateUI({modal: undefined}))}>
+          {errorText}
+        </Alert>
+      </Snackbar>
+
 
     </div>
   );

@@ -1,20 +1,26 @@
 import { Action } from "@reduxjs/toolkit";
-import { UPDATE_CONFIDENCE } from "../reducers/ConfidenceReducer";
-import { ConfidencePlayerResult, ExtraPick, NflMatchup, NflPickSubmissionBody, NflTeam, PickSubmission, Prop } from "../../models/ConfidenceDTOs";
+import { UPDATE_CONFIDENCE, defaultConfState } from "../reducers/ConfidenceReducer";
+import { CommunityMatchupStats, ConfidencePlayerResult, ExtraPick, NflMatchup, NflPickSubmissionBody, NflTeam, PickSubmission, Prop } from "../../models/ConfidenceDTOs";
 import { RootState } from "../reducers/RootReducer";
 import GeneralApiSvc from "../../services/GeneralApiSvc";
 import { updateUI } from "./UiActions";
 import { NewMatchup } from "../../components/confidence/admin/AddMatchups";
 import { User } from "@auth0/auth0-react";
+import { ConfidenceWeekPointsMap } from "../../services/Common";
+import { stat } from "fs";
+import { useNavigate } from "react-router-dom";
 
 export type MyPickViewMode = 'my-picks' | 'community-picks'
+
 
 export interface ConfidenceState {
     viewMode: MyPickViewMode
     nflTeams?: NflTeam[],
     props: Prop[],
     matchups: NflMatchup[],
+    communityStats: CommunityMatchupStats[],
     picks?: {
+        demoPicks?: boolean
         savedPicks: boolean
     },
     results: ConfidencePlayerResult[]
@@ -33,13 +39,11 @@ export const getMatchups = (user: User, year: number = 2000) => async (
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
-    console.log('getMatchups')
     const sub = user?.sub ?? '' // need to decide how to handle this with demo page
     dispatch(updateUI({multiLoader: [...getState().ui.multiLoader ?? [], 'con-matchups']}))
     let response = await GeneralApiSvc.getMatchups(year, sub)
     const state = getState().confidence
     let savedPicks = false
-    console.log('res', response)
     if (response.matchups.every(m => m.pick)) {
         savedPicks = true
         response.matchups.forEach(m => {
@@ -54,16 +58,79 @@ export const getMatchups = (user: User, year: number = 2000) => async (
 
 }
 
+
+export const getError = () => async (
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    var x = await GeneralApiSvc.getErrorTest()
+    if (!x.success && typeof x.data === 'string') dispatch(updateUI({modal: 'error', errorText: x.data}))
+}
+
+
 export const getConfidenceResults = (year?: number) => async (
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
-    console.log('getCon results')
     dispatch(updateUI({multiLoader: [...getState().ui.multiLoader ?? [], 'con-results']}))
+
     let response = await GeneralApiSvc.getConfidenceResults(year ?? 2000)
     const state = getState().confidence
+    if (year === -1 && state.picks?.demoPicks){
+        response.push({
+            displayName: 'YOU',
+            ownerId: -1,
+            weeklyResults: [{
+                week: 1,
+                //@ts-ignore
+                results: state.matchups.map((m, i) => {
+                    return {
+                        ownerId: -1,
+                        matchupId: m.id,
+                        points: m.pick?.points,
+                        pickTeam: {...m.pick, tricode: m.pick?.choice, name: [m.left, m.right].find(tm => tm.tricode === m.pick?.choice)?.name},
+                        correct: false,
+                        id: i
+                }
+                })
+        }]
+        })}
+    if (year === -1 && state.picks?.demoPicks) {
+
+        response.forEach(r => {
+            var totalPoints = 0
+            r.weeklyResults.forEach(w => {
+                var pts = 0
+                w.results.forEach(gm => {
+                    const mup = state.matchups.find(m => m.id === gm.matchupId)
+                    if (mup) {
+                        gm.correct = gm.pickTeam?.tricode === mup.winner?.tricode
+                    } 
+                    if (gm.correct) pts += gm.points
+                })
+                w.totalPoints = pts
+                totalPoints = pts
+            })
+            r.totalPoints = totalPoints
+        })
+    }
+    if (year === -1){
+    response.sort((a,b) => b.totalPoints - a.totalPoints)
+
+    for (let i = 0; i < response.length; i++) {
+        let totalPoints = response[i].totalPoints
+        let usersWithRank = response.filter(user => user.totalPoints === totalPoints)
+        usersWithRank.forEach(u => {
+            u.rank = i + 1
+        })
+        i += usersWithRank.length - 1;
+    }
+}
+    //res.Rank = (from s in scores where s > res.TotalPoints select s).Count() + 1;
+    
     dispatch(updateCofidence({ ...state, results: response }))
     dispatch(updateUI({multiLoader: [...getState().ui.multiLoader?.filter(l => l !== 'con-results') ?? []]}))
+
 
 }
 
@@ -99,7 +166,6 @@ export const reorderConfidenceMatchups = (sourceIndex: number, destIndex: number
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
-    console.log('reorder matchups')
     const { confidence } = getState()
     let result = [...confidence.matchups];
     const [removed] = result.splice(sourceIndex, 1);
@@ -164,33 +230,31 @@ export const submitMyPicks = (locMatchups: NflMatchup[], points: number[], local
         
     }
     })
-    const body: NflPickSubmissionBody = {
+    const body: NflPickSubmissionBody = {    
         picks: submitPicks,
         props: propPicks
     }
     const response = await GeneralApiSvc.submitPicks(body)
     if (response.ok) {
         dispatch(updateUI({button: undefined, modal: 'confidence-submit-success'}))
+        const {props, matchups, picks } = confidence
+        let newMatchups = [...matchups]
+        let newProps = [...props]
+        newMatchups.forEach(m => {
+            m.choice = m.chosenTeamLocal?.tricode
+        })
+        newProps.forEach(p => {
+            const i = propPicks.findIndex(pp => pp.propId == p.id)
+            if (i >= 0) p.pick = propPicks[i]
+        })
+        const newPicks = { savedPicks: true}
+        dispatch(updateCofidence({...confidence, matchups: newMatchups, props: newProps, picks: newPicks}))
+        // TODO: SET STATE TO POST SUBMISSION MODE
     }
     else {
-        dispatch(updateUI({modal: 'error'}))
+        dispatch(updateUI({modal: 'error', errorText: 'There was a problem submitting your picks.'}))
     }
-    const {props, matchups, picks } = confidence
-    let newMatchups = [...matchups]
-    let newProps = [...props]
-    newMatchups.forEach(m => {
-        m.choice = m.chosenTeamLocal?.tricode
-    })
-    newProps.forEach(p => {
-        const i = propPicks.findIndex(pp => pp.propId == p.id)
-        if (i >= 0) p.pick = propPicks[i]
-    })
-    const newPicks = { savedPicks: true}
 
-
-
-    dispatch(updateCofidence({...confidence, matchups: newMatchups, props: newProps, picks: newPicks}))
-    // TODO: SET STATE TO POST SUBMISSION MODE
 }
 
 export const makeMatchupsUnpickable = (year?: number) => async (
@@ -209,6 +273,62 @@ export const setupAdminScreen = () => async (
     dispatch(updateCofidence({...confidence, nflTeams: response}))
       
 }
+
+export const getCommunityStats = () => async (
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const { confidence } = getState()
+    const {year, week} = getState().confidence.matchups[0]
+    const response = await GeneralApiSvc.getCommunityStats(year, week)
+    await dispatch(updateCofidence({...confidence, communityStats: response}))
+    dispatch(setViewModeForPicks('community-picks'))
+}
+
+export const submitDemoPicks = (thisWeekPoints: ConfidenceWeekPointsMap) => async (
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const { confidence } = getState()
+    const {year, week} = getState().confidence.matchups[0]
+    const response = await GeneralApiSvc.getCommunityStats(year, week)
+    dispatch(updateCofidence({...confidence, communityStats: response}))
+    //go through demo matchups, pick a random winner, pick random prop winner, hopefully everything else just falls into place?
+    const newMatchups = [...confidence.matchups]
+    newMatchups.forEach((m, i) => {
+        var rnd = Math.round(Math.random())
+        m.winner = rnd === 1 ? m.left : m.right
+        m.pickable = false
+        m.choice = m.chosenTeamLocal?.tricode
+        m.pick = {
+            id: i,
+            ownerId: -1,
+            matchupId: m.id,
+            choice: m.chosenTeamLocal?.tricode ?? '',
+            points: thisWeekPoints.points[i]
+        }
+    })
+    const newPicks = {...confidence.picks!, demoPicks: true}
+    let newProps = confidence.props
+    newProps.forEach(p => {
+        p.pickable = false
+        var rnd = Math.round(Math.random())
+        p.winner = rnd === 1 ? "A" : "B"
+        //@ts-ignore
+        p.pick = {choice: p.localChoice ?? ''}
+    })
+    dispatch(updateCofidence({...confidence, matchups: newMatchups, picks: newPicks, props: newProps}))
+
+ 
+}
+export const clearConfidenceStateBeforeNav = () => async (
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => { 
+    dispatch(updateCofidence(defaultConfState))
+}
+
+
 
 // export const setWinnerForProp = (propId: number, winningSide: string) => async (
 //     dispatch: Function,

@@ -40,7 +40,13 @@ export interface NflTeam {
     logo: string
     secondaryLogo: string
 }
-
+export interface CommunityMatchupStats{
+    matchupId: number
+    lPct: number
+    rPct: number
+    lAvg: number
+    rAvg: number
+}
 export interface NflPick {
     id: number
     ownerId: number
