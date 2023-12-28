@@ -14,6 +14,7 @@ const defaultState: LoginState = {
         ownerId: -1,
         ownername: '',
         password: '',
+        confidencePaid: false,
         leagues: [],
         streamToken: '',
         premium: false,

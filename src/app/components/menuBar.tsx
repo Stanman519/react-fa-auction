@@ -215,9 +215,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                                         logout()
                                     }}>Log out</MenuItem>}
                                     {user?.sub?.includes('118311468702754688467') && <MenuItem sx={{justifyContent: 'flex-end'}} onClick={() => navigate('/admin')}>Admin</MenuItem>}
-                                    {<MenuItem sx={{width: 150, justifyContent: 'flex-end'} } onClick={() => {
-                                        setPicAnchorEl(null)
-                                        }}>
+                                    {<MenuItem sx={{width: 150, justifyContent: 'flex-end'} } onClick={() => {}}>
                                             <a href="https://www.buymeacoffee.com/ryanstanley" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style={{height: 34,width: 122}} /></a>
                                             </MenuItem>
                                     }

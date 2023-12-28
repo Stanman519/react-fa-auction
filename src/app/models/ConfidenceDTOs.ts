@@ -39,6 +39,7 @@ export interface NflTeam {
     secondary: string
     logo: string
     secondaryLogo: string
+    tertiary: string
 }
 export interface CommunityMatchupStats{
     matchupId: number
@@ -75,6 +76,7 @@ export interface ConfidencePlayerResult {
     weeklyResults: WeeklyConfidenceResult[]
     rank: number
     avatar: string
+    isPaid: boolean
 }
 export interface WeeklyConfidenceResult{
 

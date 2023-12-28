@@ -1,4 +1,4 @@
-import { Accordion, AccordionSummary, AccordionDetails, Skeleton, Avatar } from "@mui/material";
+import { Accordion, AccordionSummary, AccordionDetails, Skeleton, Avatar, Tooltip } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
@@ -7,6 +7,8 @@ import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { getRankStringSuffix } from "../../services/Common";
 import { getConfidenceResults } from "../../redux/actions/ConfidenceActions";
+import Icon from '@mdi/react';
+import { mdiCashRemove } from '@mdi/js';
 
 export function ConfidenceResultsAccordian({isDemo}: {isDemo: boolean}) {
     const { owner } = useSelector((state: RootState) => state.profile)
@@ -56,15 +58,24 @@ export function ConfidenceResultsAccordian({isDemo}: {isDemo: boolean}) {
                                 id="panel1bh-header"
                             >   
                             <div className="flex flex-row items-center h-full w-full">
-                                <div className="text-2xl mr-2 w-1/6">{getRankStringSuffix(r.rank)}</div>
+                                <div style={{minWidth: '16.666666%'}} className="text-2xl mr-2 w-1/6">{getRankStringSuffix(r.rank)}</div>
                                 <img src={r?.avatar} referrerPolicy="no-referrer" style={{ height: 0, width: 0 }} />
                                 <Avatar alt={r.displayName} src={r.avatar} variant="rounded"/>
                                 <div className="flex flex-col justify-start mx-2">
-                                    <div className="flex flex-nowrap text-lg grow leading-tight">{r.displayName}</div>
-                                    {r.pickSubmitted && <div className="italic text-red-900">Picks submitted</div>}
+
+                                        <div className="flex text-sm sm:text-lg grow leading-tight items-center">{r.displayName} 
+                                        {!r.isPaid && 
+                                            <Tooltip title="This player has not paid and will be disqualified once the games start" placement="right">
+                                                <Icon path={mdiCashRemove} size={1} color="red" />
+                                            </Tooltip>}
+                                        </div>
+
+
+                                    {r.pickSubmitted && <div style={{lineHeight: 1}} className="italic text-xs sm:text-sm text-red-900">Picks submitted</div>}
                                 </div>
                                 <div style={{flex: 1, minWidth: 24}}/>
-                                <div className="leading-tight mr-2 text-xl whitespace-nowrap">{r.totalPoints} pts</div> 
+                                    <div className="leading-tight mr-2 text-xl whitespace-nowrap">{r.totalPoints}</div> 
+
                             </div>
                             </AccordionSummary>
                             {r.weeklyResults.map(w =>

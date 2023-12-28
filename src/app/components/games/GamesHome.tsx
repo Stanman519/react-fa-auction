@@ -45,7 +45,7 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
 
   const testRef = useRef(null);
   const boarding = new Boarding({
-    opacity: 0.5,
+    opacity: 0.75,
     allowClose: false
   });
   
@@ -116,11 +116,11 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
 // Define the steps for introduction
 
 
-// useEffect(() => {
-//   dispatch(getError())
-// },[])
   useEffect(() => {
+    setValue('1')
+  },[isDemo])
 
+  useEffect(() => {
     if (isLoading || isDemo) return
     const checkUser = async () => {
       if (isAuthenticated && user?.sub) {
@@ -138,6 +138,8 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
+
+
 
   return (
     <div className="flex flex-col justify-start items-center" style={{ overflowX: 'hidden', overflowY: 'hidden', minHeight: '100vh' }}>

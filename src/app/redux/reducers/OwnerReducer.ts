@@ -11,6 +11,7 @@ export default interface Owner {
     streamToken: string
     leagues: LeagueLoginInfo[]
     avatar: string
+    confidencePaid: boolean
     //tipsUsed: PlayerTipResponse[]
 }
 

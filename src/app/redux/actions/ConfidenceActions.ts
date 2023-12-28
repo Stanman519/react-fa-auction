@@ -250,7 +250,7 @@ export const submitMyPicks = (locMatchups: NflMatchup[], points: number[], local
         })
         const newPicks = { savedPicks: true}
         dispatch(updateCofidence({...confidence, matchups: newMatchups, props: newProps, picks: newPicks}))
-        // TODO: SET STATE TO POST SUBMISSION MODE
+
     }
     else {
         dispatch(updateUI({modal: 'error', errorText: typeof response.data === 'string' ? response.data : 'There was a problem submitting your picks.'}))

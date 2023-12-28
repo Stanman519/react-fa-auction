@@ -183,7 +183,7 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false, c
                             <Fab sx={{
                                 height: isMobile && longList ? 44 : undefined,
                                 width: isMobile && longList ? 44 : undefined,
-                                opacity: fab.name === '' ? 0 : 1000,
+                                opacity: fab.name === '' ? 0 : 0.9,
                                 position: 'absolute',
                                 bottom: 24,
                                 left: 6,
@@ -201,10 +201,12 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false, c
                         fontStyle: 'italic',
                         left: (matchup.chosenTeamLocal?.tricode === matchup.left.tricode && displayType === 'my-picks')? 0 : -300,
                         bottom: longList && isMobile ? 0 : 8,
-                        filter: tinycolor(matchup.left.secondary).isDark() ? 'drop-shadow(2px 1px 0px rgba(222, 222, 222, 0.8)' : 'drop-shadow(1px 1px 0px rgba(22, 22, 22, 0.8)',
+                        filter: matchup.left.tertiary ? `drop-shadow(2px 1px 0px ${matchup.left.tertiary})` : 'drop-shadow(0px 0px 0px rgba(22, 22, 22, 0.8)',
                         //WebkitTextStroke: '0.25px white',
                         transition: 'ease-in',
-                        transitionDuration: '0.5s', fontSize: isMobile ? 24 : 32, fontFamily: "'Anton', sans-serif", color: matchup.left.secondary, textTransform: 'uppercase'
+                        transitionDuration: '0.5s', fontSize: isMobile ? 24 : 32, 
+                        fontFamily: "'Anton', sans-serif", color: matchup.left.secondary, 
+                        textTransform: 'uppercase'
                     }}>{matchup.left.city}</div>}
             </div>
             <div className={getClassStringsForAnimation('right')} style={getTeamStyling('right')}>
@@ -247,7 +249,7 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false, c
                             <Fab sx={{
                                  height: isMobile && longList ? 44 : undefined,
                                  width: isMobile && longList ? 44 : undefined,
-                                opacity: fab.name === '' ? 0 : 1000,
+                                opacity: fab.name === '' ? 0 : 0.9,
                                 position: 'absolute',
                                 bottom: 24,
                                 right: 6,
@@ -270,7 +272,7 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false, c
                         left: matchup.chosenTeamLocal?.tricode === matchup.right.tricode && displayType === 'my-picks' ? 0 : 300,
                         bottom: longList && isMobile ? 0 : 8,
                         transition: 'ease-in',
-                        filter: tinycolor(matchup.right.secondary).isDark() ? 'drop-shadow(1px 1px 0px rgba(222, 222, 222, 0.8)' : 'drop-shadow(1px 1px 0px rgba(222, 222, 222, 0.8)',
+                        filter: matchup.right.tertiary ? `drop-shadow(2px 1px 0px ${matchup.right.tertiary})` : 'drop-shadow(0px 0px 0px rgba(22, 22, 22, 0.8)',
                         //WebkitTextStroke: '0.25px silver',
                         transitionDuration: '0.5s', fontSize: isMobile ? 24 : 32, fontFamily: "'Anton', sans-serif", 
                         color: matchup.right.secondary, textTransform: 'uppercase'

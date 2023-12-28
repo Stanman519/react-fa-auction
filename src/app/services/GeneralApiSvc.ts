@@ -115,6 +115,18 @@ const getNflTeams = () : Promise<NflTeam[]> => {
         })
 }
 
+const getUnpaidOwners = () : Promise<Owner[]> => {
+    return axios.get(`${URL}/confidence/admin/unpaid`, {headers: {
+        'Content-Type': 'application/json'
+    },})
+        .then((res) => {
+            return res.data
+        }).catch(() => {
+            console.log('catch')
+            return undefined
+        })
+}
+
 const getCommunityStats = (year: number, week: number) : Promise<CommunityMatchupStats[]> => {
     return axios.get(`${URL}/confidence/year/${year}/week/${week}/coummunity-stats`, {headers: {
         'Content-Type': 'application/json'
@@ -127,6 +139,17 @@ const getCommunityStats = (year: number, week: number) : Promise<CommunityMatchu
         })
 }
 
+const setOwnersToPaid = (body: number[]) : Promise<Response> => {
+    return axios.post(`${URL}/confidence/admin/mark-paid`, body, {headers: {
+        'Content-Type': 'application/json'
+    },})
+        .then((res) => {
+            return res.data
+        }).catch(() => {
+            console.log('catch')
+            return undefined
+        })
+}
 
 const postFranchiseTagPlayer = (body: FranchiseTagBody) : Promise<Response> => {
     return axios.post(`${URL}/dashboard/tag-player`, body, {headers: {
@@ -241,9 +264,11 @@ export default {
     postBuyoutPlayer,
     postTaxiCut,
     postNewMatchups,
+    setOwnersToPaid,
     getMatchups,
     lockAllMatchups,
     getNflTeams,
+    getUnpaidOwners,
     setWinningProp,
     submitProp,
     setWinnerForMatchup
