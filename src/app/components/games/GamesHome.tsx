@@ -133,7 +133,7 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
     return () => {
       ChatClient.getInstance().chatInstance.disconnectUser();
     }
-  }, [isAuthenticated, loginWithRedirect, isLoading, user])
+  }, [isAuthenticated, loginWithRedirect, isLoading, user, isDemo])
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
