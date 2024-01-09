@@ -35,6 +35,7 @@ export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo
     const EARLY_STAMP_TRANSITION_DUR = 200
     const STAMP_DURATION = 12000
 
+    console.log('matchups, ma',matchups)
     useEffect(() => {
         if (isDemo) {
             if (matchups.length === 0 || matchups.some(m => m.year != -1)) dispatch(getMatchups({}, -1)) 

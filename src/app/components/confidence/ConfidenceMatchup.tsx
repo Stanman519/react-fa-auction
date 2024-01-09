@@ -109,6 +109,7 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false, c
         }
     }
 
+
     const getClassStringsForAnimation = (origin: 'left' | 'right') => {
         if (origin === 'left') return `${leftChev === 'left' ? 'chevron-left-active' : leftChev === 'right' ? 'chevron-right-active' : ''}`
         else return `${rightChev === 'left' ? 'chevron-left-active' : rightChev === 'right' ? 'chevron-right-active' : ''}`
@@ -161,7 +162,7 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false, c
                 {(!matchup.pickable && matchup.winner && matchup.pick?.choice === matchup.left.tricode && displayType === 'my-picks') && 
                     <div>
                         <div />
-                        {matchup.winner.tricode !== matchup.choice ?
+                        {matchup.winner.tricode !== matchup.pick.choice ?
                     <CloseOutlinedIcon color='error' sx={{ position: 'absolute', zIndex: 2, height: '35%', width: '35%', bottom: 0, left: 0, 
                     filter: 'drop-shadow(3px 3px 2px rgb(0 0 0 / 0.5))'}} /> :
                     <ThumbUpOffAltIcon color='success' style={{ filter: 'drop-shadow(3px 3px 2px rgb(0 0 0 / 0.5))',position: 'absolute', zIndex: 2, height: '35%', width: '35%', bottom: 0, left: 0 }} />

@@ -11,7 +11,7 @@ import { OwnerPaymentManagement } from "./OwnerPaymentManagement";
 
 export function ConfidenceAdminHome() {
   const {owner} = useSelector((state: RootState) => state.profile)
-  const { user, isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
+  const { user } = useAuth0();
   const nav = useNavigate()
   useEffect(() => {
     if (!user || !user.sub?.includes('118311468702754688467')) nav("/")

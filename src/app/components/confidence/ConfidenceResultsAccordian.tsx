@@ -65,7 +65,7 @@ export function ConfidenceResultsAccordian({isDemo}: {isDemo: boolean}) {
 
                                         <div className="flex text-sm sm:text-lg grow leading-tight items-center">{r.displayName} 
                                         {!r.isPaid && 
-                                            <Tooltip title="This player has not paid and will be disqualified once the games start" placement="right">
+                                            <Tooltip title="This player has not paid and will be disqualified once the games start" placement="top">
                                                 <Icon path={mdiCashRemove} size={1} color="red" />
                                             </Tooltip>}
                                         </div>

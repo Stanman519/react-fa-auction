@@ -6,9 +6,7 @@ import GeneralApiSvc from "../../services/GeneralApiSvc";
 import { updateUI } from "./UiActions";
 import { NewMatchup } from "../../components/confidence/admin/AddMatchups";
 import { User } from "@auth0/auth0-react";
-import { ConfidenceWeekPointsMap } from "../../services/Common";
-import { stat } from "fs";
-import { useNavigate } from "react-router-dom";
+import { ConfidenceWeekPointsMap, lastYear } from "../../services/Common";
 
 export type MyPickViewMode = 'my-picks' | 'community-picks'
 
@@ -35,7 +33,7 @@ export const updateCofidence = (state: ConfidenceState): ConfidenceAction => {
     return { type: UPDATE_CONFIDENCE, payload: state };
 }
 
-export const getMatchups = (user: User, year: number = 2000) => async (
+export const getMatchups = (user: User, year: number = lastYear + 1) => async (
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
@@ -74,7 +72,7 @@ export const getConfidenceResults = (year?: number) => async (
 ): Promise<any> => {
     dispatch(updateUI({multiLoader: [...getState().ui.multiLoader ?? [], 'con-results']}))
 
-    let response = await GeneralApiSvc.getConfidenceResults(year ?? 2000)
+    let response = await GeneralApiSvc.getConfidenceResults(year ?? lastYear + 1)
     const state = getState().confidence
     if (year === -1 && state.picks?.demoPicks){
         response.push({
