@@ -233,7 +233,7 @@ export const submitMyPicks = (locMatchups: NflMatchup[], points: number[], local
         props: propPicks
     }
     const response = await GeneralApiSvc.submitPicks(body)
-    console.log('res', response)
+
     if (response.success) {
         dispatch(updateUI({button: undefined, modal: 'confidence-submit-success'}))
         const {props, matchups, picks } = confidence

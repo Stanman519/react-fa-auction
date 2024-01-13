@@ -6,10 +6,8 @@ import './animations.css'
 import { CSSProperties, useState } from "react"
 import ThumbUpOffAltIcon from '@mui/icons-material/CheckCircle';
 import CloseOutlinedIcon from '@mui/icons-material/Cancel';
-import { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
 import { RootState } from "../../redux/reducers/RootReducer"
 import CountUp from "react-countup"
-import tinycolor from "tinycolor2";
 
 export interface CommunityStats {
     lPct: number
@@ -151,7 +149,13 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false, c
                 borderTopColor: '#CFFF06',
                 borderTopWidth: commStats && displayType === 'community-picks' ? 2 : 0, backgroundColor: 'rgba(211,211,211,0.4', zIndex: 5}}>
                 </div>
-                {commStats && displayType === 'community-picks' && <div style={{fontSize: 40, color: '#242424',zIndex: 51, position: 'absolute', bottom: 0, left: 5, fontStyle: 'italic', fontFamily: "'Anton', sans-serif"}}><CountUp  duration={1} end={commStats.lPct * 100} />{'%'}</div>}
+                {commStats && displayType === 'community-picks' && 
+                <div style={{fontSize: 40, color: '#242424',zIndex: 51, position: 'absolute', bottom: 0, left: 5, fontStyle: 'italic', fontFamily: "'Anton', sans-serif"}}>
+                    {commStats.lPct * 100 > 49 && <>
+                        <CountUp  duration={1} end={commStats.lPct * 100} />{'%'}
+                        </>
+                    }
+                </div>}
                 <img src={matchup.left.logo}
                     style={{
                         pointerEvents: 'none', userSelect: 'none',
@@ -220,7 +224,13 @@ export const ConfidenceMatchup = ({ matchup, index, canEdit, isMobile = false, c
                 borderTopColor: '#CFFF06',
                 borderTopWidth: commStats && displayType === 'community-picks' ? 2 : 0, backgroundColor: 'rgba(211,211,211,0.4', zIndex: 5}}>
                 </div>
-                {commStats && displayType === 'community-picks' && <div style={{color: '#242424', fontSize: 40, zIndex: 51, position: 'absolute', bottom: 0, right: 5, fontStyle: 'italic', fontFamily: "'Anton', sans-serif"}}><CountUp  duration={commStats.rPct} end={commStats.rPct * 100} />{'%'}</div>}
+                {commStats && displayType === 'community-picks' && 
+                <div style={{color: '#242424', fontSize: 40, zIndex: 51, position: 'absolute', bottom: 0, right: 5, fontStyle: 'italic', fontFamily: "'Anton', sans-serif"}}>
+                    {commStats.rPct * 100 > 49 && 
+                    <>
+                        <CountUp  duration={commStats.rPct} end={commStats.rPct * 100} />{'%'}
+                    </>}
+                    </div>}
                 <img src={matchup.right.logo} 
                 style={{pointerEvents: 'none', 
                         opacity: (matchup.chosenTeamLocal && matchup.chosenTeamLocal !== matchup.right && displayType === 'my-picks') ? '50%' : '100%', 

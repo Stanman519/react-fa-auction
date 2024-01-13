@@ -1,4 +1,4 @@
-import { Accordion, AccordionSummary, AccordionDetails, Skeleton, Avatar, Tooltip } from "@mui/material";
+import { Accordion, AccordionSummary, AccordionDetails, Skeleton, Avatar, Tooltip, Divider } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
@@ -46,8 +46,38 @@ export function ConfidenceResultsAccordian({isDemo}: {isDemo: boolean}) {
                 </div> : 
                 results.length > 0 &&
 
-
+//530
                 <>
+                    {!isDemo && 
+                    <div className="flex flex-row justify-between">
+                        <Divider orientation="vertical" variant="middle" flexItem />
+                        <div className="flex flex-col content-center">
+                            <div style={{textAlign: 'center'}}>1st</div>
+                            <div>$350</div>
+                        </div>
+                        <Divider orientation="vertical" variant="middle" flexItem />
+                        <div className="flex flex-col content-center">
+                            <div style={{textAlign: 'center'}}>2nd</div>
+                            <div>$100</div>
+                        </div>
+                        <Divider orientation="vertical" variant="middle" flexItem />
+                        <div className="flex flex-col content-center">
+                            <div style={{textAlign: 'center'}}>3rd</div>
+                            <div>$50</div>
+                        </div>
+                        <Divider orientation="vertical" variant="middle" flexItem />
+                        <div className="flex flex-col content-center">
+                            <div style={{textAlign: 'center'}}>4th</div>
+                            <div>$20</div>
+                        </div>
+                        <Divider orientation="vertical" variant="middle" flexItem />
+                        <div className="flex flex-col content-center">
+                            <div style={{textAlign: 'center'}}>5th</div>
+                            <div>$10</div>
+                        </div>
+                        <Divider orientation="vertical" variant="middle" flexItem />
+                    </div>
+                    }
                     {results.map(r =>
                         <Accordion key={r.ownerId} expanded={expanded === `panel${r.ownerId}`} onChange={handleChange(`panel${r.ownerId}`)}>
                             <AccordionSummary
