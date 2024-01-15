@@ -125,7 +125,6 @@ export const getConfidenceResults = (year?: number) => async (
     }
 }
     //res.Rank = (from s in scores where s > res.TotalPoints select s).Count() + 1;
-    
     dispatch(updateCofidence({ ...state, results: response }))
     dispatch(updateUI({multiLoader: [...getState().ui.multiLoader?.filter(l => l !== 'con-results') ?? []]}))
 

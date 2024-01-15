@@ -16,20 +16,27 @@ export function ConfidenceResultsAccordian({isDemo}: {isDemo: boolean}) {
     const [expanded, setExpanded] = React.useState<string | false>(false);
     const { multiLoader } = useSelector((state: RootState) => state.ui)
     const dispatch = useDispatch()
-
+    const [closedWeeks, setClosedWeeks] = React.useState<string[]>([])
     useEffect(() => {    
         if (results.length === 0 || (isDemo && results.filter(r => r.ownerId !== -1).every(p => p.totalPoints === 0))) {
             dispatch(getConfidenceResults(isDemo ? -1 : undefined))    
         }
 
       }, [])
-
-
     const handleChange =
         (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
             setExpanded(isExpanded ? panel : false);
         };
-
+    const handleNestChange =
+        (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+            if (closedWeeks.includes(panel)){
+                const newClosed = closedWeeks.filter(w => w !== panel)
+                setClosedWeeks(newClosed)
+            } else  {
+                const newClosed = [...closedWeeks, panel]
+                setClosedWeeks(newClosed)
+            }
+        };
     return (
         <div className="flex flex-col max-w-6xl w-full">
             {
@@ -110,7 +117,7 @@ export function ConfidenceResultsAccordian({isDemo}: {isDemo: boolean}) {
                             </AccordionSummary>
                             {r.weeklyResults.map(w =>
                                 <AccordionDetails style={{paddingLeft: 4, paddingRight: 4, paddingTop: 0, paddingBottom: 0}} key={w.week}>
-                                    <Accordion sx={{margin: 0}}>
+                                    <Accordion sx={{margin: 0}} expanded={!closedWeeks.includes(`${r.ownerId}-${w}`)} onChange={handleNestChange(`${r.ownerId}-${w}`)}>
                                         <AccordionSummary  sx={{paddingBottom: 0, }} expandIcon={<ExpandMoreIcon />}>
                                             <div className="flex justify-between w-full">
                                                 <div className="text-lg">Week {w.week} </div>
@@ -119,6 +126,7 @@ export function ConfidenceResultsAccordian({isDemo}: {isDemo: boolean}) {
 
                                         </AccordionSummary>
                                         <AccordionDetails>
+                                            <>
                                             {w.results.map(gm =>
                                                 <div className="flex row" key={gm.id}>
                                                     <div></div>
@@ -127,13 +135,19 @@ export function ConfidenceResultsAccordian({isDemo}: {isDemo: boolean}) {
                                                     {!gm.pickTeam?.name && <div style={{color: 'darkgray', fontStyle: 'italic', marginLeft: 4}}>hidden</div>}
                                                     <div></div>
                                                 </div>
-
-                                            )}
+                                                )}
+                                            </>
                                         </AccordionDetails>
                                     </Accordion>
                                 </AccordionDetails>
                             )
                             }
+                            <AccordionDetails>
+                            <div className="flex w-full justify-end">
+                                <div>Tiebreaker Points: {r.extraPoints}</div>
+                            </div>
+                            </AccordionDetails>
+
                         </Accordion>
                     )}
 

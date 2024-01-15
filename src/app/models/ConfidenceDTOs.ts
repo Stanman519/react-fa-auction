@@ -74,12 +74,13 @@ export interface ConfidencePlayerResult {
     ownerId: number
     totalPoints: number
     weeklyResults: WeeklyConfidenceResult[]
+    extraPoints: number
     rank: number
     avatar: string
     isPaid: boolean
 }
 export interface WeeklyConfidenceResult{
-
+    extraPoints: number
     week: number
     totalPoints: number
     results: PickResult[]
