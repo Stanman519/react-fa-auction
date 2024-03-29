@@ -1,12 +1,16 @@
 import { User } from "@auth0/auth0-react"
 import axios, { AxiosResponse } from "axios"
 import { PlayerDTO } from "../redux/reducers/FreeAgentReducer"
-import Owner, { LeagueInfo } from "../redux/reducers/OwnerReducer"
+import Owner, { LeagueInfo, TagCandidate } from "../redux/reducers/OwnerReducer"
 import { DeadCapInfo, Transaction } from "../redux/reducers/TransactionReducer"
 import { URL } from "./AuctionApiSvc"
 import { CommunityMatchupStats, ConfidencePlayerResult, MatchupFormResponse, NflMatchup, NflPickSubmissionBody, NflTeam, PickResult, PickSubmission, Prop } from "../models/ConfidenceDTOs"
 import { Type } from "typescript"
 
+export interface LeagueCapInfo{
+    leagueTransactions: Transaction[]
+    teamDeadCapData: DeadCapInfo[]
+}
 export interface Dashboard {
     profile: Owner
     leagueTransactions: Transaction[]
@@ -45,9 +49,21 @@ function extractErrorMsg<Type>(res: AxiosResponse): GenericResponse<string | Typ
 }
 
 const fetchDashboardInitialLoad = (cookie: string = "", authUser: User, leagueId?: number) : Promise<Dashboard> => {
-    return axios.post(`${URL}/dashboard/home`, 
+    return axios.post(`${URL}/dashboard/league-home`, 
     authUser, {
         params: {leagueId},
+        headers: {'Content-Type': 'application/json'}
+    })
+        .then((res) => {
+            return res.data
+        }).catch(() => {
+            return undefined
+        })
+}
+
+const getDeadCapAndTransactions = (leagueId?: number) : Promise<LeagueCapInfo> => {
+    return axios.get(`${URL}/dashboard/leagues/${leagueId}/league-caps`, 
+    {
         headers: {'Content-Type': 'application/json'}
     })
         .then((res) => {
@@ -138,7 +154,51 @@ const getCommunityStats = (year: number, week: number) : Promise<CommunityMatchu
             return undefined
         })
 }
+const getFranchiseTagCandidates = (leagueId: number, leagueOwnerId: number, mflFranchiseId: number) : Promise<TagCandidate[]> => {
+    return axios.get(`${URL}/dashboard/league/${leagueId}/owners/${leagueOwnerId}/mfl/${mflFranchiseId}/tag-candidates`, {headers: {
+        'Content-Type': 'application/json'
+    },})
+        .then((res) => {
+            return res.data
+        }).catch(() => {
+            console.log('catch')
+            return undefined
+        })
+}
+const getTaxiSquadPlayers = (leagueId: number, leagueOwnerId: number, mflFranchiseId: number) : Promise<PlayerDTO[]> => {
+    return axios.get(`${URL}/dashboard/league/${leagueId}/owners/${leagueOwnerId}/mfl/${mflFranchiseId}/taxi-squad`, {headers: {
+        'Content-Type': 'application/json'
+    },})
+        .then((res) => {
+            return res.data
+        }).catch(() => {
+            console.log('catch')
+            return undefined
+        })
+}
 
+const getBuyoutCandidates = (leagueId: number, leagueOwnerId: number, mflFranchiseId: number) : Promise<PlayerDTO[]> => {
+    return axios.get(`${URL}/dashboard/league/${leagueId}/owners/${leagueOwnerId}/mfl/${mflFranchiseId}/buyout-candidates`, {headers: {
+        'Content-Type': 'application/json'
+    },})
+        .then((res) => {
+            return res.data
+        }).catch(() => {
+            console.log('catch')
+            return undefined
+        })
+}
+const getWaiverExtensionCandidates = (leagueId: number, leagueOwnerId: number, mflFranchiseId: number) : Promise<PlayerDTO[]> => {
+    return axios.get(`${URL}/dashboard/league/${leagueId}/owners/${leagueOwnerId}/mfl/${mflFranchiseId}/waiver-extensions`, {headers: {
+        'Content-Type': 'application/json'
+    },})
+        .then((res) => {
+            return res.data
+        }).catch(() => {
+            console.log('catch')
+            return undefined
+        })
+}
 const setOwnersToPaid = (body: number[]) : Promise<Response> => {
     return axios.post(`${URL}/confidence/admin/mark-paid`, body, {headers: {
         'Content-Type': 'application/json'
@@ -161,6 +221,17 @@ const postFranchiseTagPlayer = (body: FranchiseTagBody) : Promise<Response> => {
             return undefined
         })
 }
+const postWaiverExtension = (body: FranchiseTagBody) : Promise<Response> => {
+    return axios.post(`${URL}/dashboard/waiver-extension`, body, {headers: {
+        'Content-Type': 'application/json'
+    },})
+        .then((res) => {
+            return res.data
+        }).catch(() => {
+            return undefined
+        })
+}
+
 const postBuyoutPlayer = (body: CutRequestBody) : Promise<Response> => {
     return axios.post(`${URL}/dashboard/buyout`, body, {headers: {
         'Content-Type': 'application/json'
@@ -262,14 +333,20 @@ export default {
     getErrorTest,
     postFranchiseTagPlayer,
     postBuyoutPlayer,
+    postWaiverExtension,
     postTaxiCut,
     postNewMatchups,
     setOwnersToPaid,
+    getDeadCapAndTransactions,
     getMatchups,
     lockAllMatchups,
     getNflTeams,
     getUnpaidOwners,
+    getFranchiseTagCandidates,
     setWinningProp,
     submitProp,
+    getTaxiSquadPlayers,
+    getWaiverExtensionCandidates,
+    getBuyoutCandidates,
     setWinnerForMatchup
 }

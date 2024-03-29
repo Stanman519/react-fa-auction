@@ -12,13 +12,27 @@ export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number)
 
     const ref = useRef<HTMLDivElement>(null)
     const dispatch = useDispatch();
+    
+    const getFixedCap = () => {
+        let newList: DeadCapInfo[] = []
+        deadCap.forEach(d => {
+            if (newList.find(e => e.franchiseId === d.franchiseId) && (Object.keys(d.amount) as Array<string>).every(k => d.amount[k] === 0)) {
 
+            } else {
+                newList.push(d)
+            }
+        })
+        return newList
+    }
+    const fixedDeadCap = getFixedCap()
 
     const getYearRange = () => {
+        if (!deadCap) return
+        console.log('deadcap running', deadCap)
         const shortRange = deadCap
-        .flatMap(d => Object.keys(d.amount))
-        .filter((value, index, array) => array.indexOf(value) === index)
-        .filter(v => Number(v) >= lastYear + 1)
+            .flatMap(d => Object.keys(d.amount))
+            .filter((value, index, array) => array.indexOf(value) === index)
+            .filter(v => Number(v) >= lastYear + 1)
         
         return shortRange.length < 4 ? shortRange.concat((Number(shortRange[shortRange.length - 1]) + 1).toString()) : shortRange;
     }
@@ -34,7 +48,7 @@ export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number)
     },[ref.current?.clientHeight])
 
     useEffect(() => {
-        if (deadCap.length > 0) setIsLoading(false)
+        if (deadCap && deadCap.length > 0) setIsLoading(false)
     }, [deadCap]);
 
 
@@ -49,11 +63,11 @@ export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number)
                                     <TableHead>
                                         <TableRow className="text-lg font-extrabold">
                                             <TableCell className="">Team</TableCell>
-                                            {YEAR_RANGE.map(y => <TableCell className="" key={y}>{y}</TableCell>)}
+                                            {YEAR_RANGE?.map(y => <TableCell className="" key={y}>{y}</TableCell>)}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody className="">
-                                        {deadCap.map((row) => (
+                                        {fixedDeadCap.map((row) => (
                                             <TableRow
                                                 hover
 
@@ -61,7 +75,7 @@ export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number)
                                                 style={{ backgroundColor: selectedTeam === row?.franchiseId ? 'lightgray' : 'white', cursor: 'pointer' }}
                                                 key={row.franchiseId}>
                                                 <TableCell>{row.team}</TableCell>
-                                                {YEAR_RANGE.map(yr => {
+                                                {YEAR_RANGE?.map(yr => {
                                                     return (<TableCell  key={yr}>${row.amount[yr.toString()] ?? 0}</TableCell>)
                                                 }
                                                 )}

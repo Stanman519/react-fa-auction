@@ -35,6 +35,7 @@ export interface LeagueLoginInfo {
     tagCandidates: TagCandidate[]
     taxiPlayers: PlayerDTO[]
     cutCandidates: PlayerDTO[]
+    waiverExtensionPlayers: PlayerDTO[]
 }
 
 export interface LeagueInfo {

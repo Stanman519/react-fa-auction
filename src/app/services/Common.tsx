@@ -23,7 +23,7 @@ export interface BidValidity{
 
 const file = process.env.PUBLIC_URL + '/avatars/';
 
-export const lastYear = 2022;
+export const lastYear = 2023;
 
 
 export const checkValidity = (league: LeagueLoginInfo, newBid: number, newYears: number, mflId: number, oldBid: number = 0, oldYears: number = 0, bidsOnBoard: number = 0): BidValidity => {

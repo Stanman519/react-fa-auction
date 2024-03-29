@@ -1,13 +1,19 @@
 import { Card, CardContent } from '@mui/material';
 import DeadCapTable from './DeadCapTable';
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { TeamCapDetails } from './TeamCapDetails';
+import { getLeagueCapInfo } from '../../redux/actions/TransactionActions';
 
 export default function DeadCapParentCard() {
     const [height, setHeight] = useState(0)
     const teamSelected = useSelector((state: RootState) => state.deadCap.selectedTeam !== undefined)
+    const {deadCap} = useSelector((state: RootState) => state.deadCap)
+    const dispatch = useDispatch()
+
+
+
     return (
         <div className="m-4 flex justify-center">
             <Card className="p-0 max-w-5xl flex-1" >

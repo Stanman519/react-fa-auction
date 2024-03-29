@@ -8,16 +8,16 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { TogglePlayerCardButton } from "./TogglePlayerCardButton";
 import { ConfirmModal } from "../ConfirmModal";
 import { updateUI } from "../../redux/actions/UiActions";
-import { getFranchiseTagCandidates, submitFranchiseTag } from "../../redux/actions/TransactionActions";
+import { getFranchiseTagCandidates, submitFranchiseTag, submitWaiverExtension } from "../../redux/actions/TransactionActions";
 
-const FranchiseTags = () => {
+const WaiverExtensions = () => {
     const dispatch = useDispatch();
-    const confirmModal = useSelector((state: RootState) => state.ui.modal === 'tag-confirm')
+    const confirmModal = useSelector((state: RootState) => state.ui.modal === 'waiver-confirm')
     const { currentLeague } = useSelector((state: RootState) => state.profile)
     const [selectedPlayerIndex, setSelectedPlayerIndex] = useState<number | undefined>(undefined)
     const franchiseId = currentLeague?.mflfranchiseid
-    const tagPlayers = currentLeague?.tagCandidates ?? []
-    console.log('tag', tagPlayers)
+    const waivers = currentLeague?.waiverExtensionPlayers ?? []
+    console.log('waivers', waivers)
 
 
     return (
@@ -25,24 +25,24 @@ const FranchiseTags = () => {
             {confirmModal && <ConfirmModal
                 isOpen={confirmModal}
                 actionButtonLabel={'submit'}
-                mainText={`Are you sure you want to tag ${tagPlayers[selectedPlayerIndex ?? 0]?.player.fullName}? You can only do this once a season and it cannot be reversed.`}
-                onAction={() => dispatch(submitFranchiseTag(currentLeague?.league.leagueId!, tagPlayers[selectedPlayerIndex ?? 0].player.mflId, franchiseId!, tagPlayers[selectedPlayerIndex ?? 0].tagAmount ))} />}
+                mainText={`Are you sure you want to tag ${waivers[selectedPlayerIndex ?? 0]?.fullName}? You can only do this once a season and it cannot be reversed.`}
+                onAction={() => dispatch(submitWaiverExtension(currentLeague?.league.leagueId!, waivers[selectedPlayerIndex ?? 0].mflId, franchiseId!, 25 ))} />}
             <Card className="max-w-3xl flex-1" >
                 <div className="flex flex-col">
                     <div className="flex flex-row ml-2 mr-3 flex-1 ">
                         <div className="w-3/4"/>
                         <div className="flex flex-row w-1/4 justify-center">
-                            <div className="flex-1">TAG PRICE</div>
+                            <div className="flex-1">1 YEAR EXTENSION SALARY</div>
                         </div>
                     </div>
 
-                    {tagPlayers.map((p, index) => {
+                    {waivers.map((p, index) => {
                         return (
                             <TogglePlayerCardButton
-                                key={p.player.mflId}
-                                player={p.player}
+                                key={p.mflId}
+                                player={p}
                                 // attribute1={`$${p.lastSeasonSalary}`}
-                                attribute2={`$${p.tagAmount ?? 0}`}
+                                attribute2={`$25`}
                                 onSelect={() => selectedPlayerIndex === index ? setSelectedPlayerIndex(undefined) : setSelectedPlayerIndex(index)}
                                 isSelected={index === selectedPlayerIndex}
                             />
@@ -53,10 +53,10 @@ const FranchiseTags = () => {
                     {selectedPlayerIndex !== undefined && currentLeague?.league.leagueId && franchiseId &&
                     <div className="flex flex-row justify-center content-center m-3" >
                         <Button className="w-full" style={{ backgroundColor: 'green' }}
-                            onClick={() => dispatch(updateUI({ modal: 'tag-confirm' }))}>
+                            onClick={() => dispatch(updateUI({ modal: 'waiver-confirm' }))}>
                             <div className="flex flex-row justify-center content-center pl-3 pr-4 pt-2 pb-2 " >
                                 <AttachMoneyIcon style={{ color: 'white', marginRight: 10, alignSelf: 'center' }} />
-                                <div className="lg:text-2xl text-white">FRANCHISE TAG THIS PLAYER</div>
+                                <div className="lg:text-2xl text-white">GIVE 1 YEAR EXTENSION TO THIS PLAYER</div>
                             </div>
 
                         </Button>
@@ -67,4 +67,4 @@ const FranchiseTags = () => {
     );
 }
 
-export default FranchiseTags;
+export default WaiverExtensions;

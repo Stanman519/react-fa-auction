@@ -3,21 +3,26 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/reducers/RootReducer';
-import { Standings } from '../../redux/reducers/TransactionReducer';
+import { FranchiseStandings, SeasonFranchiseStanding } from '../../redux/reducers/TransactionReducer';
 import { lastYear } from '../../services/Common';
 
 export default function TriTable() {
     const ownerList = useSelector((state: RootState) => state.deadCap.deadCap);
-    const [standings, setStandings] = useState<Standings[]>([]);
+    const [standings, setStandings] = useState<FranchiseStandings[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const relevantYears = [2020, 2021, 2022];
+    const [years, setYears] = useState<number[]>([])
     const thisYear = lastYear + 1;
     useEffect(() => {
         axios.get(`https://capncrunch-api.azurewebsites.net/Mfl/standings/${thisYear}`)
             .then(res => {
-                let sorted = res.data.sort((a: any, b: any) => ((a.h2hWins1 * 5 + a.pointsFor1) + (a.h2hWins2 * 5 + a.pointsFor2) + (a.h2hWins3 * 5 + a.pointsFor3)) > ((b.h2hWins1 * 5 + b.pointsFor1) + (b.h2hWins2 * 5 + b.pointsFor2) + (b.h2hWins3 * 5 + b.pointsFor3)) ? -1 : 1);
+                let sorted = res.data.sort((a: FranchiseStandings, b: FranchiseStandings) => (a.teamStandings.reduce((sum, ts) => (sum + ts.pointsFor) + (ts.h2hWins * 10), 0)) > (b.teamStandings.reduce((sum, ts) => (sum + ts.pointsFor) + (ts.h2hWins * 10), 0)) ? -1 : 1);
+                console.log('standins ', sorted)
                 setStandings(sorted)
-                setIsLoading(false)
+
+                setYears(res.data.length > 0 ? 
+                res.data[0].teamStandings.map((t: SeasonFranchiseStanding) => t.year)
+                : [])
+                if (res.status <= 300) setIsLoading(false)
             });
     }, []);
     return (
@@ -25,7 +30,7 @@ export default function TriTable() {
         <Card>
             <CardContent>
                 {!isLoading ?
-                    standings.some(s => s.pointsFor1 > 0) ?
+                    standings.some(s => s.teamStandings.some(t => t.pointsFor > 0))  ?
                     <>
                         <div className="title" style={{fontSize: 50}}>Tri-Year Trophy</div>
                         <div className="title">Presented By Taco Bell</div>
@@ -34,24 +39,26 @@ export default function TriTable() {
 
                                 <TableHead>
                                     <TableRow>
-                                        {relevantYears.map(y => <>
-                                            <TableCell className="year-text"></TableCell>
+                                    <TableCell className="year-text"></TableCell>
+                                        {years.map(y => <>
+
                                             <TableCell className="year-text"></TableCell>
                                             <TableCell className="year-text">{y}</TableCell>
+                                            <TableCell/> 
                                         </>
                                         )}
                                     </TableRow>
                                     <TableRow className="horizontal">
+
                                         <TableCell></TableCell>
-                                        <TableCell className="tritable-text">Wins</TableCell>
-                                        <TableCell className="tritable-text">Pts For</TableCell>
-                                        <TableCell className="tritable-text">TYT Pts</TableCell>
-                                        <TableCell className="tritable-text">Wins</TableCell>
-                                        <TableCell className="tritable-text">Pts For</TableCell>
-                                        <TableCell className="tritable-text">TYT Pts</TableCell>
-                                        <TableCell className="tritable-text">Wins</TableCell>
-                                        <TableCell className="tritable-text">Pts For</TableCell>
-                                        <TableCell className="tritable-text">TYT Pts</TableCell>
+                                        {years.map(y => 
+                                        <>
+                                            <TableCell className="tritable-text">Wins</TableCell>
+                                            <TableCell className="tritable-text">Pts For</TableCell>
+                                            <TableCell className="tritable-text">TYT Pts</TableCell>
+                                        </>
+                                        )}
+
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -59,19 +66,19 @@ export default function TriTable() {
                                         <TableRow className="horizontal" key={row.franchiseId}>
                                             <TableCell className="team-text">
                                                 {ownerList.find(o => o.franchiseId === row.franchiseId)?.team}
-                                                <div className="total">{((row.h2hWins1 * 5 + row.pointsFor1) + (row.h2hWins2 * 5 + row.pointsFor2)
-                                                    + (row.h2hWins3 * 5 + row.pointsFor3)).toFixed(1)} PTS</div>
+                                                <div className="total">{(row.teamStandings.reduce((sum, ts) => (sum + ts.pointsFor) + (ts.h2hWins * 10), 0)).toFixed(1)} PTS</div>
 
                                             </TableCell>
-                                            <TableCell className="tritable-text">{row.h2hWins1 ?? 0}</TableCell>
-                                            <TableCell className="tritable-text">{row.pointsFor1 ?? 0}</TableCell>
-                                            <TableCell className="vertical tritable-text">{row.h2hWins1 * 5 + row.pointsFor1}</TableCell>
-                                            <TableCell className="tritable-text">{row.h2hWins2 ?? 0}</TableCell>
-                                            <TableCell className="tritable-text">{row.pointsFor2 ?? 0}</TableCell>
-                                            <TableCell className="vertical tritable-text">{row.h2hWins2 * 5 + row.pointsFor2}</TableCell>
-                                            <TableCell className="tritable-text">{row.h2hWins3 ?? 0}</TableCell>
-                                            <TableCell className="tritable-text">{row.pointsFor3 ?? 0}</TableCell>
-                                            <TableCell className="tritable-text">{row.h2hWins3 * 5 + row.pointsFor3}</TableCell>
+                                            {row.teamStandings.map((tm, i) => {
+                                                return (
+                                                    <>
+                                                    <TableCell className="tritable-text">{tm.h2hWins ?? 0}</TableCell>
+                                                    <TableCell className="tritable-text">{tm.pointsFor ?? 0}</TableCell>
+                                                    <TableCell className="vertical tritable-text">{tm.h2hWins * 10 + tm.pointsFor}</TableCell>
+                                                    </>
+                                                )
+                                            })}
+
                                         </TableRow>
                                     ))}
                                 </TableBody>

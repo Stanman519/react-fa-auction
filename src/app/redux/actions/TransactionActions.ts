@@ -1,5 +1,5 @@
 import { Transaction } from "../reducers/TransactionReducer";
-import { Action } from "@reduxjs/toolkit";
+import { Action, current } from "@reduxjs/toolkit";
 import GeneralApiSvc from "../../services/GeneralApiSvc";
 import { RootState } from "../reducers/RootReducer";
 import { updateDeadCapInfo } from "./DeadCapActions";
@@ -19,26 +19,101 @@ export const loadTransactions = (transactions: Transaction[]) : TransactionActio
 }
 
 
+export const loadDashboardData = () => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const { profile } = getState()
+    const { currentLeague } = getState().profile
+    if (!currentLeague) return
+    const newLeague: LeagueLoginInfo = {...currentLeague}
+    try{
+        var [deadCap, tagCandidates, taxiSquad, buyouts, waiverExtensions] = await Promise.all([
+            GeneralApiSvc.getDeadCapAndTransactions(currentLeague.league.leagueId),
+            GeneralApiSvc.getFranchiseTagCandidates(currentLeague.league.leagueId, currentLeague.leagueownerid, currentLeague.mflfranchiseid),
+            GeneralApiSvc.getTaxiSquadPlayers(currentLeague.league.leagueId, currentLeague.leagueownerid, currentLeague.mflfranchiseid),
+            GeneralApiSvc.getBuyoutCandidates(currentLeague.league.leagueId, currentLeague.leagueownerid, currentLeague.mflfranchiseid),
+            GeneralApiSvc.getWaiverExtensionCandidates(currentLeague.league.leagueId, currentLeague.leagueownerid, currentLeague.mflfranchiseid)
+        ])
+        newLeague.tagCandidates = tagCandidates
+        newLeague.cutCandidates = buyouts
+        newLeague.taxiPlayers = taxiSquad
+        newLeague.waiverExtensionPlayers = waiverExtensions
+        dispatch(loadTransactions(deadCap.leagueTransactions))
+        dispatch(updateDeadCapInfo({deadCap: deadCap.teamDeadCapData, selectedTeam: undefined}))
+        dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
+    } catch (e: any) {
+        console.log("ERROR: ", e)
+    }
 
-export const loadDataForHomeBase = (authUser: User) => async ( 
+}
+
+export const getLeagueCapInfo = () => async ( 
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
     dispatch(updateUI({isLoading: 'full-screen'}))
     const { currentLeague } = getState().profile
-    const dashboard = await GeneralApiSvc.fetchDashboardInitialLoad("", authUser, currentLeague?.league.leagueId)
-    const nav = useNavigate()
+    const dashboard = await GeneralApiSvc.getDeadCapAndTransactions(currentLeague?.league.leagueId)
+    console.log('dash', dashboard)
+    console.log('deadcap in dispatch', dashboard.teamDeadCapData)
     if (dashboard) {
-        const newCurrLeague = currentLeague ? dashboard.profile.leagues.find(l => l.league.leagueId == currentLeague.league.leagueId) : dashboard.profile.leagues.length > 0 ? dashboard.profile.leagues[0] : undefined
         dispatch(loadTransactions(dashboard.leagueTransactions))
-        dispatch(updateDeadCapInfo({deadCap: dashboard.teamDeadCaps, selectedTeam: undefined}))
-        dispatch(updateLoginInfo({owner: dashboard.profile, currentLeague: newCurrLeague}))
+        dispatch(updateDeadCapInfo({deadCap: dashboard.teamDeadCapData, selectedTeam: undefined}))
         dispatch(updateUI({modal: undefined}))
-        nav("/home");
     }
     dispatch(updateUI({isLoading: undefined}))
 }
 
+export const getFranchiseTagCandidates = () => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const { profile } = getState()
+    if (!profile.currentLeague) return
+    try {
+        const res = await GeneralApiSvc.getFranchiseTagCandidates(profile.currentLeague.league.leagueId, profile.currentLeague.leagueownerid, profile.currentLeague.mflfranchiseid)
+        const newLeague: LeagueLoginInfo = {...profile.currentLeague}
+        newLeague.tagCandidates = res
+        dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
+    } catch (e: any)
+    {
+
+    }
+}
+export const getTaxiSquadPlayers = () => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const { profile } = getState()
+    if (!profile.currentLeague) return
+    try {
+        const res = await GeneralApiSvc.getTaxiSquadPlayers(profile.currentLeague.league.leagueId, profile.currentLeague.leagueownerid, profile.currentLeague.mflfranchiseid)
+        const newLeague: LeagueLoginInfo = {...profile.currentLeague}
+        newLeague.taxiPlayers = res
+        dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
+    } catch (e: any)
+    {
+
+    }
+}
+export const getBuyoutCandidates = () => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const { profile } = getState()
+    if (!profile.currentLeague) return
+    try {
+        const res = await GeneralApiSvc.getBuyoutCandidates(profile.currentLeague.league.leagueId, profile.currentLeague.leagueownerid, profile.currentLeague.mflfranchiseid)
+        const newLeague: LeagueLoginInfo = {...profile.currentLeague}
+        console.log('cuts', res)
+        newLeague.cutCandidates = res
+        dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
+    } catch (e: any)
+    {
+
+    }
+}
 
 export const submitFranchiseTag = (leagueId: number, mflPlayerId: number, mflFranchiseId: number, tagSalary: number) => async ( 
     dispatch: Function,
@@ -49,6 +124,28 @@ export const submitFranchiseTag = (leagueId: number, mflPlayerId: number, mflFra
     if (!profile.currentLeague) return
     try {
         const res = await GeneralApiSvc.postFranchiseTagPlayer(requestBody)
+        //const newTags = profile.currentLeague?.tagCandidates.filter(t => t.player.mflId !== mflPlayerId) ?? []
+        const newLeague: LeagueLoginInfo = {...profile.currentLeague}
+        if (!newLeague) return
+        newLeague.tagCandidates = []
+        dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
+
+    } catch (e: any)
+    {
+
+    }
+    dispatch(updateUI({modal: undefined}))
+}
+
+export const submitWaiverExtension = (leagueId: number, mflPlayerId: number, mflFranchiseId: number, tagSalary: number) => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const { profile } = getState()
+    const requestBody = {leagueId, mflFranchiseId, mflPlayerId, tagSalary}
+    if (!profile.currentLeague) return
+    try {
+        const res = await GeneralApiSvc.postWaiverExtension(requestBody)
         //const newTags = profile.currentLeague?.tagCandidates.filter(t => t.player.mflId !== mflPlayerId) ?? []
         const newLeague: LeagueLoginInfo = {...profile.currentLeague}
         if (!newLeague) return

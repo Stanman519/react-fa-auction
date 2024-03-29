@@ -8,7 +8,7 @@ export const LandingPage = () => {
     const logo = './stanfan-color-logo.png'
     const dispatch = useDispatch();
     const nav = useNavigate()
-    const {owner} = useSelector((state: RootState) => state.profile)
+    const { profile } = useSelector((state: RootState) => state)
     const { user, isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
     useEffect(() => {
         if (isLoading) return
@@ -17,19 +17,27 @@ export const LandingPage = () => {
                 //nav('/auction')
                 dispatch(synchronizeAuth0WithDbLogin(user))
                 //DETERMINE NAVIGATION --- Check params, for from screen. if none... are there any leagues? go to dashboard, unless league isAuctioning, no leagues, go to games
-                if (owner.ownerId < 1) {
+                if (profile.owner.ownerId < 1) {
 
                 }//do something}
-                if (owner.leagues.length > 0) nav('/home')
-                if (owner.leagues.length == 0) nav('/games')
-                else nav('/games')
-
+                
             } else {
                 await loginWithRedirect();
             }
         }
         checkUser()
     }, [isAuthenticated, loginWithRedirect, isLoading, user])
+
+
+    useEffect(() => {
+        console.log('owner!!!!!', profile.owner)
+        if (profile.owner.ownerId > 0) {
+            if (profile.owner.leagues.length > 0) nav('/home')
+            if (profile.owner.leagues.length === 0) nav('/games')
+        }
+
+
+    }, [profile])
     return (
         <div className='flex flex-row justify-center items-center max-w-screen-sm min-h-screen '>
             <div className='flex-col justify-center items-center max-w-full p-4 m-4 '>

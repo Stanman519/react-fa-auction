@@ -4,14 +4,15 @@ import { RootState } from "../store";
 import DeadCapParentCard from "./nonAuction/DeadCapParentCard";
 import DashboardMenu from "./nonAuction/DashboardMenu";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardTabNav from "./nonAuction/DashboardTabNav";
 import BuyoutTile from "./nonAuction/BuyoutTile";
 import FranchiseTags from "./nonAuction/FranchiseTags";
 import TaxiSquadTile from "./nonAuction/TaxiSquadTile";
 import { CircularProgress } from "@mui/material";
-import { loadDataForHomeBase } from "../redux/actions/TransactionActions";
+import { getBuyoutCandidates, getFranchiseTagCandidates, getLeagueCapInfo, getTaxiSquadPlayers, loadDashboardData } from "../redux/actions/TransactionActions";
+import WaiverExtensions from "./nonAuction/WaiverExtensions";
 
 interface Tab {
     label: string;
@@ -28,26 +29,35 @@ const HomeBase = () => {
   const nav = useNavigate()
   const [currentTab, setCurrentTab] = useState('league');
   const leagueTab: Tab = { label: 'LEAGUE INFO', value: 'league' }
-  const [tabs, setTabs] = useState<Tab[]>([leagueTab])
-
-
-  useEffect(() => {
-    if (!currentLeague) dispatch(loadDataForHomeBase(user!))
-    if (!currentLeague) return
-    let additionalTabs: Tab[] = []
-    if (currentLeague.cutCandidates && currentLeague.cutCandidates.length > 0) additionalTabs.push({ label: 'BUYOUTS', value: 'buyouts' })
-    if (currentLeague.taxiPlayers && currentLeague.taxiPlayers.length > 0 ) additionalTabs.push({ label: 'TAXI CUTS', value: 'taxi' })
-    if (currentLeague.tagCandidates && currentLeague.tagCandidates.length > 0 ) additionalTabs.push({ label: 'FRANCHISE TAGS', value: 'tags' })
-    if (!additionalTabs.find(t => t.value === currentTab)) setCurrentTab('league')
-    //let newTabs = additionalTabs.map((t: Tab) => Object.assign({}, t)) //additionalTabs.map((t: Tab) => {return {label: t.label, value: t.value} as Tab}) ]
-    additionalTabs.unshift(leagueTab)
-    let newTabs = additionalTabs.map(t => t)
-    setTabs(newTabs)
-  }, [currentLeague])
+  const [tabs, setTabs] = useState<Tab[]>([leagueTab, { label: 'BUYOUTS', value: 'buyouts' }, { label: 'TAXI CUTS', value: 'taxi' }, { label: 'FRANCHISE TAGS', value: 'tags' }, {label: "WAIVER EXTENSION", value: 'waiver'}])
+  const {deadCap} = useSelector((state: RootState) => state.deadCap)
 
   useEffect(() => {
-    if (!user) nav('/')
-  }, [])
+      console.log('deadcap', deadCap)
+
+      if (!deadCap || deadCap.length === 0) {
+        dispatch(loadDashboardData())
+      }
+
+  },[])
+
+  // useEffect(() => {
+  //   //if (!currentLeague) dispatch(loadDataForHomeBase(user!))
+  //   if (!currentLeague) return
+  //   let additionalTabs: Tab[] = []
+  //   if (currentLeague.cutCandidates && currentLeague.cutCandidates.length > 0) additionalTabs.push({ label: 'BUYOUTS', value: 'buyouts' })
+  //   if (currentLeague.taxiPlayers && currentLeague.taxiPlayers.length > 0 ) additionalTabs.push({ label: 'TAXI CUTS', value: 'taxi' })
+  //   if (currentLeague.tagCandidates && currentLeague.tagCandidates.length > 0 ) additionalTabs.push({ label: 'FRANCHISE TAGS', value: 'tags' })
+  //   if (!additionalTabs.find(t => t.value === currentTab)) setCurrentTab('league')
+  //   //let newTabs = additionalTabs.map((t: Tab) => Object.assign({}, t)) //additionalTabs.map((t: Tab) => {return {label: t.label, value: t.value} as Tab}) ]
+  //   additionalTabs.unshift(leagueTab)
+  //   let newTabs = additionalTabs.map(t => t)
+  //   setTabs(newTabs)
+  // }, [currentLeague])
+
+  // useEffect(() => {
+  //   if (!user) nav('/')
+  // }, [])
 
   return (
     <div>
@@ -76,6 +86,7 @@ const HomeBase = () => {
           {currentTab === 'tags' && <FranchiseTags />}
           {currentTab === 'taxi' && <TaxiSquadTile />}
           {currentTab === 'buyouts' && <BuyoutTile />}
+          {currentTab === 'waiver' && <WaiverExtensions />}
         </div>
       </div> :
       <div>Your profile was not automatically linked to your MyFantasyLeague Account. Please contact the admin.</div>

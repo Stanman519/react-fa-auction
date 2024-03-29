@@ -31,6 +31,7 @@ export type Modals =
   'signIn' | 
   'register' | 
   'taxi-confirm' |
+  'waiver-confirm' |
   'buyout-confirm' |
   'tag-confirm' |
   'confidence-submit-success' |
