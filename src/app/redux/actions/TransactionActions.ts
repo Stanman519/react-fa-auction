@@ -129,12 +129,12 @@ export const submitFranchiseTag = (leagueId: number, mflPlayerId: number, mflFra
         if (!newLeague) return
         newLeague.tagCandidates = []
         dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
-
+        dispatch(updateUI({modal: 'dashboard-success'}))
     } catch (e: any)
     {
-
+        dispatch(updateUI({modal: 'error'}))
     }
-    dispatch(updateUI({modal: undefined}))
+
 }
 
 export const submitWaiverExtension = (leagueId: number, mflPlayerId: number, mflFranchiseId: number, tagSalary: number) => async ( 
@@ -151,12 +151,12 @@ export const submitWaiverExtension = (leagueId: number, mflPlayerId: number, mfl
         if (!newLeague) return
         newLeague.tagCandidates = []
         dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
-
+        dispatch(updateUI({modal: 'dashboard-success'}))
     } catch (e: any)
     {
-
+        dispatch(updateUI({modal: 'error'}))
     }
-    dispatch(updateUI({modal: undefined}))
+
 }
 
 export const submitBuyout = (leagueId: number, player: PlayerDTO, mflFranchiseId: number, rebate: number) => async ( 
@@ -172,12 +172,12 @@ export const submitBuyout = (leagueId: number, player: PlayerDTO, mflFranchiseId
         if (!newLeague) return
         newLeague.cutCandidates = []
         dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
-
+        dispatch(updateUI({modal: 'dashboard-success'}))
     } catch (e: any)
     {
-
+        dispatch(updateUI({modal: 'error'}))
     }
-    dispatch(updateUI({modal: undefined}))
+
 }
 
 export const submitTaxiCut = (leagueId: number, player: PlayerDTO, mflFranchiseId: number, rebate: number) => async ( 
@@ -195,10 +195,10 @@ export const submitTaxiCut = (leagueId: number, player: PlayerDTO, mflFranchiseI
         if (!newLeague) return
         newLeague.taxiPlayers = newTaxi
         dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
-
+        dispatch(updateUI({modal: 'dashboard-success'}))
     } catch (e: any)
     {
-
+        dispatch(updateUI({modal: 'error'}))
     }
-    dispatch(updateUI({modal: undefined}))
+    
 }

@@ -10,9 +10,10 @@ import DashboardTabNav from "./nonAuction/DashboardTabNav";
 import BuyoutTile from "./nonAuction/BuyoutTile";
 import FranchiseTags from "./nonAuction/FranchiseTags";
 import TaxiSquadTile from "./nonAuction/TaxiSquadTile";
-import { CircularProgress } from "@mui/material";
+import { Alert, CircularProgress, Snackbar } from "@mui/material";
 import { getBuyoutCandidates, getFranchiseTagCandidates, getLeagueCapInfo, getTaxiSquadPlayers, loadDashboardData } from "../redux/actions/TransactionActions";
 import WaiverExtensions from "./nonAuction/WaiverExtensions";
+import { updateUI } from "../redux/actions/UiActions";
 
 interface Tab {
     label: string;
@@ -23,6 +24,7 @@ interface Tab {
 const HomeBase = () => {
   const { currentLeague } = useSelector((state: RootState) => state.profile)
     const { profile } = useSelector((state: RootState) => state)
+    const { modal } = useSelector((state: RootState) => state.ui)
   const { user } = useAuth0();
   const isLoading = useSelector((state: RootState) => state.ui.isLoading === 'full-screen')
   const dispatch = useDispatch()
@@ -40,24 +42,6 @@ const HomeBase = () => {
       }
 
   },[])
-
-  // useEffect(() => {
-  //   //if (!currentLeague) dispatch(loadDataForHomeBase(user!))
-  //   if (!currentLeague) return
-  //   let additionalTabs: Tab[] = []
-  //   if (currentLeague.cutCandidates && currentLeague.cutCandidates.length > 0) additionalTabs.push({ label: 'BUYOUTS', value: 'buyouts' })
-  //   if (currentLeague.taxiPlayers && currentLeague.taxiPlayers.length > 0 ) additionalTabs.push({ label: 'TAXI CUTS', value: 'taxi' })
-  //   if (currentLeague.tagCandidates && currentLeague.tagCandidates.length > 0 ) additionalTabs.push({ label: 'FRANCHISE TAGS', value: 'tags' })
-  //   if (!additionalTabs.find(t => t.value === currentTab)) setCurrentTab('league')
-  //   //let newTabs = additionalTabs.map((t: Tab) => Object.assign({}, t)) //additionalTabs.map((t: Tab) => {return {label: t.label, value: t.value} as Tab}) ]
-  //   additionalTabs.unshift(leagueTab)
-  //   let newTabs = additionalTabs.map(t => t)
-  //   setTabs(newTabs)
-  // }, [currentLeague])
-
-  // useEffect(() => {
-  //   if (!user) nav('/')
-  // }, [])
 
   return (
     <div>
@@ -83,6 +67,11 @@ const HomeBase = () => {
                 <TriTable  />
               </div>
             </div>}
+            <Snackbar open={modal === 'dashboard-success'} autoHideDuration={800} onClose={() => dispatch(updateUI({modal: undefined}))} >
+              <Alert severity="success" onClose={() => dispatch(updateUI({modal: undefined}))}>
+                Submission Complete!
+              </Alert>
+            </Snackbar>
           {currentTab === 'tags' && <FranchiseTags />}
           {currentTab === 'taxi' && <TaxiSquadTile />}
           {currentTab === 'buyouts' && <BuyoutTile />}
