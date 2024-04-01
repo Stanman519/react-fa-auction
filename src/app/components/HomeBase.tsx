@@ -4,14 +4,14 @@ import { RootState } from "../store";
 import DeadCapParentCard from "./nonAuction/DeadCapParentCard";
 import DashboardMenu from "./nonAuction/DashboardMenu";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardTabNav from "./nonAuction/DashboardTabNav";
 import BuyoutTile from "./nonAuction/BuyoutTile";
 import FranchiseTags from "./nonAuction/FranchiseTags";
 import TaxiSquadTile from "./nonAuction/TaxiSquadTile";
 import { Alert, CircularProgress, Snackbar } from "@mui/material";
-import { getBuyoutCandidates, getFranchiseTagCandidates, getLeagueCapInfo, getTaxiSquadPlayers, loadDashboardData } from "../redux/actions/TransactionActions";
+import { loadDashboardData } from "../redux/actions/TransactionActions";
 import WaiverExtensions from "./nonAuction/WaiverExtensions";
 import { updateUI } from "../redux/actions/UiActions";
 
@@ -31,7 +31,7 @@ const HomeBase = () => {
   const nav = useNavigate()
   const [currentTab, setCurrentTab] = useState('league');
   const leagueTab: Tab = { label: 'LEAGUE INFO', value: 'league' }
-  const [tabs, setTabs] = useState<Tab[]>([leagueTab, { label: 'BUYOUTS', value: 'buyouts' }, { label: 'TAXI CUTS', value: 'taxi' }, { label: 'FRANCHISE TAGS', value: 'tags' }, {label: "WAIVER EXTENSION", value: 'waiver'}])
+  const [tabs, setTabs] = useState<Tab[]>([leagueTab, { label: 'AMNESTY BUYOUTS', value: 'buyouts' }, { label: 'FREE TAXI CUTS', value: 'taxi' }, { label: 'FRANCHISE TAGS', value: 'tags' }, {label: "WAIVER EXTENSION", value: 'waiver'}])
   const {deadCap} = useSelector((state: RootState) => state.deadCap)
 
   useEffect(() => {

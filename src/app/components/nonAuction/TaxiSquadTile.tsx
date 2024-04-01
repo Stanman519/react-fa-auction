@@ -51,7 +51,7 @@ const TaxiSquadTile = () => {
                 onClick={() => dispatch(updateUI({modal: 'taxi-confirm'}))}>
                     <div className="flex flex-row justify-center content-center pl-3 pr-4 pt-2 pb-2 ">
                         <DeleteOutlineIcon style={{ color: 'white', marginRight: 8, alignSelf: 'center' }} />
-                        <div className="lg:text-2xl text-white">CUT THIS TAXI PLAYER</div>
+                        <div className="lg:text-2xl text-white">CUT THIS TAXI PLAYER FOR NO DEAD CAP</div>
                     </div>
 
                 </Button>

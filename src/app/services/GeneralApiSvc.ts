@@ -22,6 +22,7 @@ export interface FranchiseTagBody{
     mflPlayerId: number
     mflFranchiseId: number
     tagSalary: number
+    leagueOwnerId: number
 }
 export interface CutRequestBody{
     leagueId: number

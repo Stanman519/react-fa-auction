@@ -64,7 +64,7 @@ const BuyoutTile = () => {
                             onClick={() => dispatch(updateUI({ modal: 'buyout-confirm' }))}>
                             <div className="flex flex-row justify-center content-center pl-3 pr-4 pt-2 pb-2 ">
                                 <DeleteOutlineIcon style={{ color: 'white', marginRight: 8, alignSelf: 'center' }} />
-                                <div className="lg:text-2xl text-white">BUYOUT THIS PLAYER</div>
+                                <div className="lg:text-2xl text-white">BUYOUT THIS PLAYER - 20% dead cap this year only</div>
                             </div>
 
                         </Button>

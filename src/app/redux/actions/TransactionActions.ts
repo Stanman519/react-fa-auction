@@ -1,6 +1,6 @@
 import { Transaction } from "../reducers/TransactionReducer";
 import { Action, current } from "@reduxjs/toolkit";
-import GeneralApiSvc from "../../services/GeneralApiSvc";
+import GeneralApiSvc, { FranchiseTagBody } from "../../services/GeneralApiSvc";
 import { RootState } from "../reducers/RootReducer";
 import { updateDeadCapInfo } from "./DeadCapActions";
 import { updateUI } from "./UiActions";
@@ -120,8 +120,9 @@ export const submitFranchiseTag = (leagueId: number, mflPlayerId: number, mflFra
     getState: () => RootState
 ): Promise<any> => {
     const { profile } = getState()
-    const requestBody = {leagueId, mflFranchiseId, mflPlayerId, tagSalary}
     if (!profile.currentLeague) return
+    var requestBody = {leagueId, mflFranchiseId, mflPlayerId, tagSalary} as FranchiseTagBody
+    requestBody.leagueOwnerId = profile.currentLeague.leagueownerid
     try {
         const res = await GeneralApiSvc.postFranchiseTagPlayer(requestBody)
         //const newTags = profile.currentLeague?.tagCandidates.filter(t => t.player.mflId !== mflPlayerId) ?? []
@@ -142,8 +143,9 @@ export const submitWaiverExtension = (leagueId: number, mflPlayerId: number, mfl
     getState: () => RootState
 ): Promise<any> => {
     const { profile } = getState()
-    const requestBody = {leagueId, mflFranchiseId, mflPlayerId, tagSalary}
     if (!profile.currentLeague) return
+    var requestBody = {leagueId, mflFranchiseId, mflPlayerId, tagSalary} as FranchiseTagBody
+    requestBody.leagueOwnerId = profile.currentLeague.leagueownerid
     try {
         const res = await GeneralApiSvc.postWaiverExtension(requestBody)
         //const newTags = profile.currentLeague?.tagCandidates.filter(t => t.player.mflId !== mflPlayerId) ?? []
