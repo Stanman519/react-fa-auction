@@ -29,7 +29,6 @@ export const synchronizeAuth0WithDbLogin = (user: User) => async(
 ) => {
     const { profile } = getState()
     const dbUser = await GeneralApiSvc.synchronizeAuth(user);
-    console.log('db User', dbUser)
     var newProfile = {...profile}
     newProfile.owner = dbUser
     let defaultLeague = dbUser.leagues.find(l => l.league.leagueId === 13894)
@@ -44,7 +43,6 @@ export const updateCurrentLeague = (leagueId: number, currentRoute: string, user
 ) => {
     const { profile } = getState()
     const newProfile = { ...profile }
-    console.log('newprofile', newProfile)
     const newCurrentLeague = newProfile.owner.leagues.find(l => l.league.leagueId === leagueId)
     dispatch(updateLoginInfo({...newProfile, currentLeague: newCurrentLeague}))
     if (currentRoute == '/auction') dispatch(getInitialAuctionData(user.sub))

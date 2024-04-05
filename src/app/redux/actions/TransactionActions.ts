@@ -55,8 +55,6 @@ export const getLeagueCapInfo = () => async (
     dispatch(updateUI({isLoading: 'full-screen'}))
     const { currentLeague } = getState().profile
     const dashboard = await GeneralApiSvc.getDeadCapAndTransactions(currentLeague?.league.leagueId)
-    console.log('dash', dashboard)
-    console.log('deadcap in dispatch', dashboard.teamDeadCapData)
     if (dashboard) {
         dispatch(loadTransactions(dashboard.leagueTransactions))
         dispatch(updateDeadCapInfo({deadCap: dashboard.teamDeadCapData, selectedTeam: undefined}))
@@ -106,7 +104,6 @@ export const getBuyoutCandidates = () => async (
     try {
         const res = await GeneralApiSvc.getBuyoutCandidates(profile.currentLeague.league.leagueId, profile.currentLeague.leagueownerid, profile.currentLeague.mflfranchiseid)
         const newLeague: LeagueLoginInfo = {...profile.currentLeague}
-        console.log('cuts', res)
         newLeague.cutCandidates = res
         dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
     } catch (e: any)

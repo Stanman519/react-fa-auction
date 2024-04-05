@@ -28,13 +28,16 @@ export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number)
 
     const getYearRange = () => {
         if (!deadCap) return
-        console.log('deadcap running', deadCap)
+        console.log('dead', deadCap)
         const shortRange = deadCap
-            .flatMap(d => Object.keys(d.amount))
+            .flatMap(d => {
+                let filteredTotals = Object.keys(d.amount).filter(key => d.amount[key] !== 0)
+                return filteredTotals
+            })
             .filter((value, index, array) => array.indexOf(value) === index)
             .filter(v => Number(v) >= lastYear + 1)
-        
-        return shortRange.length < 4 ? shortRange.concat((Number(shortRange[shortRange.length - 1]) + 1).toString()) : shortRange;
+
+        return shortRange//shortRange.length < 4 ? shortRange.concat((Number(shortRange[shortRange.length - 1]) + 1).toString()) : shortRange;
     }
 
     const YEAR_RANGE = getYearRange()
@@ -53,15 +56,15 @@ export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number)
 
 
     return (
-            <Card ref={ref} className="flex flex-shrink-1 m-0 sm:p-0">
-                <CardContent className="flex flex-col flex-1 m-0">
+            <Card ref={ref} className="flex m-0 justify-center">
+                <CardContent className="flex max-w-lg  flex-col md:flex-1 m-0">
                     <div className="text-xl text-center"> Dead Cap Tracker </div>
                     {!isLoading ?
-                        <div>
-                            <TableContainer className="" >
-                                <Table size="small" className="">
+                        <div >
+                            <TableContainer   className="" >
+                                <Table size="small"  className="">
                                     <TableHead>
-                                        <TableRow className="text-lg font-extrabold">
+                                        <TableRow className="md:text-lg font-extrabold">
                                             <TableCell className="">Team</TableCell>
                                             {YEAR_RANGE?.map(y => <TableCell className="" key={y}>{y}</TableCell>)}
                                         </TableRow>

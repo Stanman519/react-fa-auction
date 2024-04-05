@@ -17,7 +17,6 @@ const FranchiseTags = () => {
     const [selectedPlayerIndex, setSelectedPlayerIndex] = useState<number | undefined>(undefined)
     const franchiseId = currentLeague?.mflfranchiseid
     const tagPlayers = currentLeague?.tagCandidates ?? []
-    console.log('tag', tagPlayers)
 
 
     return (

@@ -17,7 +17,6 @@ const WaiverExtensions = () => {
     const [selectedPlayerIndex, setSelectedPlayerIndex] = useState<number | undefined>(undefined)
     const franchiseId = currentLeague?.mflfranchiseid
     const waivers = currentLeague?.waiverExtensionPlayers ?? []
-    console.log('waivers', waivers)
 
 
     return (

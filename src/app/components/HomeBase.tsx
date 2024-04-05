@@ -35,8 +35,6 @@ const HomeBase = () => {
   const {deadCap} = useSelector((state: RootState) => state.deadCap)
 
   useEffect(() => {
-      console.log('deadcap', deadCap)
-
       if (!deadCap || deadCap.length === 0) {
         dispatch(loadDashboardData())
       }
@@ -53,7 +51,7 @@ const HomeBase = () => {
       :
       <>
       {currentLeague ?
-      <div className="flex flex-col items-center pt-4" >
+      <div className="flex flex-col pt-4" >
 
         {currentLeague?.teamName &&
           <div className="text-2xl pb-4 m-1 text-center">Dashboard for {currentLeague?.teamName}</div>}
@@ -61,11 +59,9 @@ const HomeBase = () => {
 
         <div className="min-w-full">
           {currentTab === 'league' &&
-            <div className="flex flex-col content-center">
+            <div className="flex flex-col">
               <DeadCapParentCard />
-              <div className="max-w-5xl flex-1 m-1 self-center" >
-                <TriTable  />
-              </div>
+              <TriTable  />
             </div>}
             <Snackbar open={modal === 'dashboard-success'} autoHideDuration={800} onClose={() => dispatch(updateUI({modal: undefined}))} >
               <Alert severity="success" onClose={() => dispatch(updateUI({modal: undefined}))}>

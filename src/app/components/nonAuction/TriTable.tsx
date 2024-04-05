@@ -16,7 +16,6 @@ export default function TriTable() {
         axios.get(`https://capncrunch-api.azurewebsites.net/Mfl/standings/${thisYear}`)
             .then(res => {
                 let sorted = res.data.sort((a: FranchiseStandings, b: FranchiseStandings) => (a.teamStandings.reduce((sum, ts) => (sum + ts.pointsFor) + (ts.h2hWins * 10), 0)) > (b.teamStandings.reduce((sum, ts) => (sum + ts.pointsFor) + (ts.h2hWins * 10), 0)) ? -1 : 1);
-                console.log('standins ', sorted)
                 setStandings(sorted)
 
                 setYears(res.data.length > 0 ? 
@@ -26,17 +25,15 @@ export default function TriTable() {
             });
     }, []);
     return (
-        <div>
         <Card>
             <CardContent>
                 {!isLoading ?
                     standings.some(s => s.teamStandings.some(t => t.pointsFor > 0))  ?
                     <>
-                        <div className="title" style={{fontSize: 50}}>Tri-Year Trophy</div>
+                        <div className="title" style={{fontSize: 40}}>Tri-Year Trophy</div>
                         <div className="title">Presented By Taco Bell</div>
                         <TableContainer className="tri-scroll">
-                            <Table >
-
+                            <Table size={'small'} >
                                 <TableHead>
                                     <TableRow>
                                     <TableCell className="year-text"></TableCell>
@@ -92,6 +89,5 @@ export default function TriTable() {
 
             </CardContent>
         </Card>
-        </div>
     );
 } 

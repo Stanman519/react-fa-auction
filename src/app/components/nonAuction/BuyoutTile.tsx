@@ -15,7 +15,6 @@ const BuyoutTile = () => {
     const [selectedPlayerIndex, setSelectedPlayerIndex] = useState<number | undefined>(undefined)
     const theme = useTheme();
     const cutCandidates = currentLeague?.cutCandidates ?? []
-    console.log('cutCandidates', cutCandidates)
 
     return (
         <div className="m-4 flex justify-center">

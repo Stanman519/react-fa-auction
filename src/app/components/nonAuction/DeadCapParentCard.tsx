@@ -16,9 +16,9 @@ export default function DeadCapParentCard() {
 
     return (
         <div className="m-4 flex justify-center">
-            <Card className="p-0 max-w-5xl flex-1" >
-                <CardContent className="flex flex-col lg:flex-row lg:flex-1 p-0 flex-wrap">
-                    <div className="sm:flex-1 lg:w-8/12" style={{  }}>
+            <Card className="p-0 max-w-5xl" >
+                <CardContent className="flex flex-col lg:flex-row p-0 flex-wrap">
+                    <div className="lg:w-8/12" style={{  }}>
                         <DeadCapTable retHeight={(h) => setHeight(h)} />
                     </div>
                     {teamSelected &&

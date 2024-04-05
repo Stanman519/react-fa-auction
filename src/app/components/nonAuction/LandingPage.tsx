@@ -30,7 +30,6 @@ export const LandingPage = () => {
 
 
     useEffect(() => {
-        console.log('owner!!!!!', profile.owner)
         if (profile.owner.ownerId > 0) {
             if (profile.owner.leagues.length > 0) nav('/home')
             if (profile.owner.leagues.length === 0) nav('/games')
