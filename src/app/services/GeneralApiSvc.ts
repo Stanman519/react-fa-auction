@@ -6,6 +6,7 @@ import { DeadCapInfo, Transaction } from "../redux/reducers/TransactionReducer"
 import { URL } from "./AuctionApiSvc"
 import { CommunityMatchupStats, ConfidencePlayerResult, MatchupFormResponse, NflMatchup, NflPickSubmissionBody, NflTeam, PickResult, PickSubmission, Prop } from "../models/ConfidenceDTOs"
 import { Type } from "typescript"
+import { FranchiseWinTotal } from "../redux/reducers/OverUnderReducer"
 
 export interface LeagueCapInfo{
     leagueTransactions: Transaction[]
@@ -34,6 +35,14 @@ export interface CutRequestBody{
 export interface GenericResponse<Type> {
     success: boolean
     data?: Type
+}
+
+export interface OverUnderPick{
+    id?: number
+    lineId?: number
+    ownerId: number
+    isOver?: boolean
+    lineAdjustment: number
 }
 
 function extractErrorMsg<Type>(res: AxiosResponse): GenericResponse<string | Type> {
@@ -325,6 +334,30 @@ const setWinningProp = (propId: number, winningSide: string): Promise<Response> 
     })
 }
 
+const sendOverUnderPicks = (year: number, league: string, picks: OverUnderPick[]): Promise<Response> => {
+    return axios.post(`${URL}/games/year/${year}/leagues/${league}/team-win-totals}`, {picks: picks}, {headers: {
+        'Content-Type': 'application/json'
+    }})
+    .then((res) => {
+        return res.data
+    }).catch((e) => {
+        console.log(e)
+        return undefined
+    })
+}
+
+const getWinOverUndersForLeagueYear = (year: number, league: string): Promise<FranchiseWinTotal[]> => {
+    return axios.get(`${URL}/games/year/${year}/leagues/${league}/team-win-totals`, {headers: {
+        'Content-Type': 'application/json'
+    }})
+    .then((res) => {
+        return res.data
+    }).catch((e) => {
+        console.log(e)
+        return undefined
+    })
+}
+
 export default {
     synchronizeAuth,
     getCommunityStats,
@@ -349,5 +382,7 @@ export default {
     getTaxiSquadPlayers,
     getWaiverExtensionCandidates,
     getBuyoutCandidates,
-    setWinnerForMatchup
+    setWinnerForMatchup,
+    sendOverUnderPicks,
+    getWinOverUndersForLeagueYear
 }

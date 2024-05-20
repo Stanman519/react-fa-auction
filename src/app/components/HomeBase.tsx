@@ -14,6 +14,8 @@ import { Alert, CircularProgress, Snackbar } from "@mui/material";
 import { loadDashboardData } from "../redux/actions/TransactionActions";
 import WaiverExtensions from "./nonAuction/WaiverExtensions";
 import { updateUI } from "../redux/actions/UiActions";
+import { fetchFranchiseWinTotals } from "../redux/actions/OverUnderActions";
+import { OverUnderRow } from "./games/OverUnders/OverUnderRow";
 
 interface Tab {
     label: string;
@@ -23,6 +25,7 @@ interface Tab {
 
 const HomeBase = () => {
   const { currentLeague } = useSelector((state: RootState) => state.profile)
+  const { franchiseWinTotals } = useSelector((state:RootState) => state.overUnders)
     const { profile } = useSelector((state: RootState) => state)
     const { modal } = useSelector((state: RootState) => state.ui)
   const { user } = useAuth0();
@@ -31,14 +34,17 @@ const HomeBase = () => {
   const nav = useNavigate()
   const [currentTab, setCurrentTab] = useState('league');
   const leagueTab: Tab = { label: 'LEAGUE INFO', value: 'league' }
-  const [tabs, setTabs] = useState<Tab[]>([leagueTab, { label: 'AMNESTY BUYOUTS', value: 'buyouts' }, { label: 'FREE TAXI CUTS', value: 'taxi' }, { label: 'FRANCHISE TAGS', value: 'tags' }, {label: "WAIVER EXTENSION", value: 'waiver'}])
+  const [tabs, setTabs] = useState<Tab[]>([leagueTab, { label: 'FREE TAXI CUTS', value: 'taxi' }, ]) // { label: 'AMNESTY BUYOUTS', value: 'buyouts' }, { label: 'FRANCHISE TAGS', value: 'tags' }, {label: "WAIVER EXTENSION", value: 'waiver'}])
   const {deadCap} = useSelector((state: RootState) => state.deadCap)
 
   useEffect(() => {
       if (!deadCap || deadCap.length === 0) {
         dispatch(loadDashboardData())
-      }
 
+      }
+      if (franchiseWinTotals.length === 0) {
+        //dispatch(fetchFranchiseWinTotals(2024, 'NFL'))
+      }
   },[])
 
   return (
@@ -50,9 +56,9 @@ const HomeBase = () => {
       </div>
       :
       <>
+      {/* {franchiseWinTotals.map(f => <OverUnderRow prop={f}/>)} */}
       {currentLeague ?
       <div className="flex flex-col pt-4" >
-
         {currentLeague?.teamName &&
           <div className="text-2xl pb-4 m-1 text-center">Dashboard for {currentLeague?.teamName}</div>}
         {tabs.length > 1 && <DashboardTabNav onChange={(newTab) => setCurrentTab(newTab)} tabs={tabs} />}

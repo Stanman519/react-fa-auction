@@ -8,6 +8,7 @@ import { ownerReducer } from './OwnerReducer';
 import transactionReducer from './TransactionReducer';
 import uiReducer from './UiReducer';
 import { confidenceReducer } from './ConfidenceReducer';
+import { overUnderReducer } from './OverUnderReducer';
 
 
 export const RootReducer = combineReducers({
@@ -19,7 +20,8 @@ export const RootReducer = combineReducers({
     transactions: transactionReducer,
     franchises: franchiseReducer,
     deadCap: deadCapReducer,
-    confidence: confidenceReducer
+    confidence: confidenceReducer,
+    overUnders: overUnderReducer
 });
 
 export type RootState = ReturnType<typeof RootReducer>

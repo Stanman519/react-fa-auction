@@ -63,7 +63,7 @@ export default function TriTable() {
                                         <TableRow className="horizontal" key={row.franchiseId}>
                                             <TableCell className="team-text">
                                                 {ownerList.find(o => o.franchiseId === row.franchiseId)?.team}
-                                                <div className="total">{(row.teamStandings.reduce((sum, ts) => (sum + ts.pointsFor) + (ts.h2hWins * 10), 0)).toFixed(1)} PTS</div>
+                                                <div className="text-rose-800">{(row.teamStandings.reduce((sum, ts) => (sum + ts.pointsFor) + (ts.h2hWins * 10), 0)).toFixed(1)} Pts</div>
 
                                             </TableCell>
                                             {row.teamStandings.map((tm, i) => {

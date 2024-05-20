@@ -90,15 +90,15 @@ const register = async (name: string, username: string, password: string): Promi
     return res;
 }
 
-// const pageLoad = async (cookie: string = "", leagueId: number = 0): Promise<PageLoad> => {
-//     const rest = await axios.get(`${URL}/free-agency/leagues/${leagueId}/page-load`, 
-//     {
-//         params: { loginInfo: cookie }
-//     }).catch(error => {
-//         throw new Error(error.response.data.friendlyMessage)
-//     });
-//     return rest.data;
-// }
+const pageLoad = async (cookie: string = "", leagueId: number = 0): Promise<PageLoad> => {
+    const rest = await axios.get(`${URL}/free-agency/leagues/${leagueId}/page-load`, 
+    {
+        params: { loginInfo: cookie }
+    }).catch(error => {
+        throw new Error(error.response.data.friendlyMessage)
+    });
+    return rest.data;
+}
 
 async function handleErrorResponse<Type>(response: Response): Promise<Type | void> {
     const failureCodes = [400, 500]
@@ -133,7 +133,7 @@ const askCapn = async (PlayerTipRequest: PlayerTipRequest): Promise<Response> =>
 
 
 export default {
-    //pageLoad,
+    pageLoad,
     getFullPlayerBio,
     login,
     getBidHistoryByPlayerId,

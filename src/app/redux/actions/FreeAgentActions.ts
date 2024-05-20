@@ -26,19 +26,19 @@ export const getInitialAuctionData = (userSub: string = "") => async (
     getState: () => RootState
 ): Promise<any> => {
     try{
-        // const { currentLeague } = getState().profile
-        // dispatch(updateUI({isLoading: 'full-screen'}))
-        // const leagueId = currentLeague?.league?.leagueId ?? 0
-        // const initData = await AuctionApiSvc.pageLoad(userSub, leagueId);
-        // const user = await GeneralApiSvc.
+        const { currentLeague } = getState().profile
+        dispatch(updateUI({isLoading: 'full-screen'}))
+        const leagueId = currentLeague?.league?.leagueId ?? 0
+        const initData = await AuctionApiSvc.pageLoad(userSub, leagueId);
+        //const user = await GeneralApiSvc.
 
-        // dispatch(updateFreeAgents(initData.freeAgents));
-        // dispatch(updateLots(initData.lots))
-        // dispatch(updateOwners(initData.owners));
-        // if (initData.profile) {
-        //     dispatch(updateLoginInfo({owner: initData.profile, currentLeague: currentLeague ?? initData.profile.leagues[0]}));
+        dispatch(updateFreeAgents(initData.freeAgents));
+        dispatch(updateLots(initData.lots))
+        dispatch(updateOwners(initData.owners));
+        if (initData.profile) {
+            dispatch(updateLoginInfo({owner: initData.profile, currentLeague: currentLeague ?? initData.profile.leagues[0]}));
 
-        // }
+        }
         dispatch(updateUI({isLoading: undefined}))
     } catch (error: any){
         dispatch(updateUI({ isLoading: undefined, error: 'snackbar', errorText: error.message }));
