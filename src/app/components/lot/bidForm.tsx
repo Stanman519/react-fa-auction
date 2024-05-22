@@ -49,15 +49,6 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
         if (!currentLeague) return;
         if (bidMode && lot.bid) {
             setIsLoading(true);
-            // console.log('new sub', JSON.stringify({
-            //     leagueId: currentLeague.league.leagueId,
-            //     ownerId: currentLeague.leagueownerid,
-            //     ownername: owner.ownername,
-            //     bidSalary: bidSalary ?? 0,
-            //     bidLength: bidLength ?? 0,
-            //     lotId: lot.lotId,
-            //     player: { ...lot?.bid?.player }
-            // }))
             dispatch(makeNewBid({
                 leagueId: currentLeague.league.leagueId,
                 ownerId: currentLeague.leagueownerid,

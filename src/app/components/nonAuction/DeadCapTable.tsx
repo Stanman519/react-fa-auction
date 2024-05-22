@@ -28,7 +28,6 @@ export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number)
 
     const getYearRange = () => {
         if (!deadCap) return
-        console.log('dead', deadCap)
         const shortRange = deadCap
             .flatMap(d => {
                 let filteredTotals = Object.keys(d.amount).filter(key => d.amount[key] !== 0)
