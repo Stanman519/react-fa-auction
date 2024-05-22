@@ -26,7 +26,7 @@ export const selectPlayerToNominate = (selectedPlayer: PlayerDTO | null) => asyn
     const { owner, currentLeague } = getState().profile
     if (!owner.ownername || lots.length === 0 || !selectedPlayer || !currentLeague) return;
     let updatedLots = [...lots];
-    const  thisPlayersLotIndex = updatedLots.findIndex(l => l.nominatedBy === currentLeague.leagueownerid);
+    const  thisPlayersLotIndex = updatedLots.findIndex(l => !l.nominatedBy);
     if (thisPlayersLotIndex < 0 ) return;
     const newBid: Bid = { 
         leagueId: currentLeague.league.leagueId,

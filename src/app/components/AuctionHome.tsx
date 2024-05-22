@@ -24,7 +24,7 @@ function AuctionHome() {
   const { error, errorText, modal } = useSelector((state: RootState) => state.ui)
   const loading = useSelector((state: RootState) => state.ui.isLoading)
   const navigate = useNavigate()
-
+  console.log('active lots', activeLots)
   useEffect(() => {
 
     if (isLoading) return
@@ -38,6 +38,7 @@ function AuctionHome() {
         await loginWithRedirect({appState: {returnTo: '/auction'}});
       }
   }
+  console.log('lots', lots)
   checkUser()
     return () => {
         ChatClient.getInstance().chatInstance.disconnectUser();
