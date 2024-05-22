@@ -35,6 +35,7 @@ export type Modals =
   'waiver-confirm' |
   'buyout-confirm' |
   'tag-confirm' |
+  'free-agent-grid' |
   'confidence-submit-success' |
   'error'|
   'confidence-rules' |

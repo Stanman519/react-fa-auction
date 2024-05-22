@@ -24,10 +24,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
     const owners = useSelector((state: RootState) => state.owners);
     const lots = useSelector((state: RootState) => state.lots.filter(l => l.leagueId === currentLeague?.league.leagueId ?? 0));
-    const nomIsUsed = useSelector((state: RootState) => {
-        if (!owner.ownername) return false
-        return state.lots.find(l => l.nominatedBy === currentLeague?.leagueownerid)?.bid?.player
-    })
+    const {modal } = useSelector((state: RootState) => state.ui);
     const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [picAnchorEl, setPicAnchorEl] = useState<null | HTMLElement>(null);
@@ -51,7 +48,6 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
         dispatch(clearConfidenceStateBeforeNav()).then(() => {
             navigate(`/${route}`)
         })
-
     }
     
     const pfpMenuClick = (event: React.MouseEvent<HTMLImageElement>) => {
@@ -65,6 +61,9 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
         dispatch(turnOnNominationModeForThisOwnersLot())
     }
 
+    const seeFreeAgents = () => {
+        dispatch(updateUI({modal: 'free-agent-grid'}))
+    }
     const highBidsOnTheBoard = (ownerId: number): number => {
         return lots.filter(l => l.bid?.ownerId === ownerId).map(b => b.bid?.bidSalary)
             .reduce((prev, curr) => prev! + curr!, 0) ?? 0;
@@ -106,18 +105,31 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                                         setOpenDrawer('Salaries')
                                         setAnchorEl(null)
                                         }}>Salary Caps</MenuItem>
-                                        {!nomIsUsed && <MenuItem onClick={() => {
+                                        {owner.ownername && 
+                                        lots.filter(l => !l.bid).length > 0 && 
+                                        lots.filter(l => l.nominatedBy === currentLeague?.leagueownerid).length < 3 ? <MenuItem onClick={() => {
                                             addNominationCard()
                                             setAnchorEl(null)
-                                            }}>Nominate a Player</MenuItem>}
+                                            }}>Nominate a Player</MenuItem>: 
+                                            <MenuItem onClick={() => {
+                                                if (modal === 'free-agent-grid'){
+                                                    dispatch(updateUI({modal: undefined}))
+                                                    setAnchorEl(null)
+                                                } else {
+                                                    seeFreeAgents()
+                                                    setAnchorEl(null)
+                                                }
+
+                                            }}>{modal === 'free-agent-grid' ? 'Close ' : ''}Free Agents</MenuItem>
+                                            }
                                             </>
                                     }
                                     
                                     {barOptions.includes('confidence') && <MenuItem color='inherit' onClick={() => {
                                         setAnchorEl(null)
                                         dispatch(updateUI({modal: 'confidence-rules'}))}}>Rules</MenuItem>}
-                                    {isDemo && <MenuItem color='inherit' onClick={() => clearDemoStateAndNav('games')}> Confidence Pool </MenuItem>}
-                                    {!isDemo && <MenuItem color='inherit' onClick={() => clearDemoStateAndNav('demo')}> See Demo </MenuItem>}
+                                    {isDemo && <MenuItem color='inherit' onClick={() => clearDemoStateAndNav('games')}>Confidence Pool</MenuItem>}
+                                    {!isDemo && <MenuItem color='inherit' onClick={() => clearDemoStateAndNav('demo')}>See Demo</MenuItem>}
                                     {barOptions.includes('chat') &&  
                                         user?.sub && isDemo !== true && <MenuItem onClick={() => {
                                         setOpenDrawer('Chat')
@@ -158,10 +170,21 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                                         }}>League Info</Button>}
                                 {isDemo && <Button color='inherit' onClick={() => clearDemoStateAndNav('games')}> CONFIDENCE POOL </Button>}
                                 {!isDemo && <Button color='inherit' onClick={() => clearDemoStateAndNav('demo')}>See Demo</Button>}
-                                {barOptions.includes('fa-auction') &&  !nomIsUsed &&
+                                {barOptions.includes('fa-auction') &&  owner.ownername && 
+                                        lots.filter(l => !l.bid).length > 0 && 
+                                        lots.filter(l => l.nominatedBy === currentLeague?.leagueownerid).length < 3 ?
                                     <Button color='inherit' onClick={() => addNominationCard()}>
                                         Nominate a Player
-                                    </Button>}
+                                    </Button> :
+                                    <Button color='inherit' onClick={() =>        {                                         
+                                                if (modal === 'free-agent-grid'){
+                                                    dispatch(updateUI({modal: undefined}))
+                                                } else {
+                                                    seeFreeAgents()
+                                                }}
+                                            }>
+                                    {modal === 'free-agent-grid' ? 'Close ' : ''}Free Agents
+                                </Button>}
                                 {/* {owner.leagues.length > 1 && <LeagueSwitchMenu />} */}
 
                             </div>)}

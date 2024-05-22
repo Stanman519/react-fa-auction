@@ -66,8 +66,8 @@ export const turnOnNominationModeForThisOwnersLot = () => async (
     const { lots } = getState()
     const { profile } = getState()
     let updatedLots = [...lots];
-    if (!profile || lots.length === 0) return;
-    const  thisPlayersLotIndex = updatedLots.findIndex(l => l.nominatedBy === profile.currentLeague?.leagueownerid);
+    if (!profile || lots.length === 0) return
+    const  thisPlayersLotIndex = updatedLots.findIndex(l => l.nominatedBy === null);
     if (thisPlayersLotIndex < 0) return;
     updatedLots[thisPlayersLotIndex].newNom = true;
     dispatch(updateLots(updatedLots))

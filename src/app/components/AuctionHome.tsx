@@ -12,6 +12,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useNavigate } from 'react-router-dom';
 import { synchronizeAuth0WithDbLogin } from '../redux/actions/LoginActions';
 import { NoActiveAuctions } from './noActiveAuctions';
+import { FreeAgentGridModal } from './FreeAgentGridModal';
 
 function AuctionHome() {
   const theme = useTheme()
@@ -20,7 +21,7 @@ function AuctionHome() {
   const activeLots = useSelector((state: RootState) => state.lots.filter(l => l.bid && !l.newNom))
   const newNom = useSelector((state: RootState)=> state.lots.find(l => l.newNom))
 
-  const { error, errorText } = useSelector((state: RootState) => state.ui)
+  const { error, errorText, modal } = useSelector((state: RootState) => state.ui)
   const loading = useSelector((state: RootState) => state.ui.isLoading)
   const navigate = useNavigate()
 
@@ -60,6 +61,7 @@ function AuctionHome() {
             </Backdrop>
           </div> :
           <div className='p-2'>
+            {modal === 'free-agent-grid' && <FreeAgentGridModal isOpen={modal==='free-agent-grid'}/>}
             {newNom && <LotBody lot={newNom} key={newNom.lotId}/>}
             {activeLots.map(l => <LotBody lot={l} key={l.lotId}/>)}
           </div>}
