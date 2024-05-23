@@ -89,7 +89,7 @@ export const FreeAgentGridModal = ({isOpen = false}: {isOpen: boolean}): JSX.Ele
             >
                 <DialogContent style={{ paddingTop: 10 }}> */}
                 <Table
-                        
+                        rowKey={p => p.mflId}
                         columns={columns}
                         dataSource={freeAgents}
                         pagination={false}

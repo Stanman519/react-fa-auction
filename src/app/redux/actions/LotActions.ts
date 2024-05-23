@@ -50,10 +50,16 @@ export const updateLotWithFreshBid = (bid: Bid) => async (
     if (newLotIndex < 0) return; 
     let reformattedBid = bid
     //@ts-ignore
-    if (typeof reformattedBid.expires === 'string' && !reformattedBid.expires.endsWith('Z')){
+    if (typeof reformattedBid.expires === 'string'){
         //@ts-ignore
-        reformattedBid.expires = new Date(l.bid.expires += "Z"); //TODO: proabbly a database issue, these are actually coming in as strings, maybe need to use datetime offset on api
-    }
+        if (!reformattedBid.expires.endsWith('Z')){
+                    //@ts-ignore
+            reformattedBid.expires = new Date(bid.expires += "Z"); //TODO: proabbly a database issue, these are actually coming in as strings, maybe need to use datetime offset on api
+        } else {
+                    //@ts-ignore
+            reformattedBid.expires = new Date(bid.expires)
+        }
+        }
     // i was checking for  !updated[newLotIndex].bid here buti dont know why. took out because it was breaking nominations
     //const updatedBid = {...bid, player: updated[newLotIndex].bid?.player } as Bid 
     // this was here to just update bids but it was breaking nominations - (and now we are missing headshot and team and position)
