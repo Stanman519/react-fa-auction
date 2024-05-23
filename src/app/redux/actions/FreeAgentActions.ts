@@ -7,6 +7,7 @@ import { updateOwners } from "./OwnerActions";
 import { updateUI } from "./UiActions";
 import { RootState } from "../reducers/RootReducer";
 import GeneralApiSvc from "../../services/GeneralApiSvc";
+import { ignore } from "antd/es/theme/useToken";
 
 export const UPDATE_FREE_AGENTS = 'UPDATE_FREE_AGENTS';
 
@@ -31,7 +32,14 @@ export const getInitialAuctionData = (userSub: string = "") => async (
         const leagueId = currentLeague?.league?.leagueId ?? 0
         const initData = await AuctionApiSvc.pageLoad(userSub, leagueId);
         //const user = await GeneralApiSvc.
+        initData.lots.forEach(l => {
+                            //@ts-ignore
+            if (typeof l.bid?.expires === 'string' && !l.bid.expires.endsWith('Z')){
+                //@ts-ignore
+                l.bid.expires = new Date(l.bid.expires += "Z"); //TODO: proabbly a database issue, these are actually coming in as strings, maybe need to use datetime offset on api
+            }
 
+        })
         dispatch(updateFreeAgents(initData.freeAgents));
         dispatch(updateLots(initData.lots))
         dispatch(updateOwners(initData.owners));

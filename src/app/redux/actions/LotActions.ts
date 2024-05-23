@@ -26,7 +26,7 @@ export const selectPlayerToNominate = (selectedPlayer: PlayerDTO | null) => asyn
     const { owner, currentLeague } = getState().profile
     if (!owner.ownername || lots.length === 0 || !selectedPlayer || !currentLeague) return;
     let updatedLots = [...lots];
-    const  thisPlayersLotIndex = updatedLots.findIndex(l => !l.nominatedBy);
+    const  thisPlayersLotIndex = updatedLots.findIndex(l => l.newNom);
     if (thisPlayersLotIndex < 0 ) return;
     const newBid: Bid = { 
         leagueId: currentLeague.league.leagueId,
@@ -48,13 +48,18 @@ export const updateLotWithFreshBid = (bid: Bid) => async (
     const updated = [...lots];
     const newLotIndex = updated.findIndex(l => l.lotId === bid.lotId);
     if (newLotIndex < 0) return; 
-        
+    let reformattedBid = bid
+    //@ts-ignore
+    if (typeof reformattedBid.expires === 'string' && !reformattedBid.expires.endsWith('Z')){
+        //@ts-ignore
+        reformattedBid.expires = new Date(l.bid.expires += "Z"); //TODO: proabbly a database issue, these are actually coming in as strings, maybe need to use datetime offset on api
+    }
     // i was checking for  !updated[newLotIndex].bid here buti dont know why. took out because it was breaking nominations
     //const updatedBid = {...bid, player: updated[newLotIndex].bid?.player } as Bid 
     // this was here to just update bids but it was breaking nominations - (and now we are missing headshot and team and position)
     // once update api to get full player back to send with bid response, check if it is okay with bids
 
-    updated[newLotIndex] = {lotId: bid.lotId, newNom: false, bid: bid, isFresh: true} as Lot
+    updated[newLotIndex] = {lotId: bid.lotId, newNom: false, bid: reformattedBid, isFresh: true} as Lot
     //TODO: how can i add animation or sound here to show new bid -- add a flag on client side only to say isHotChange
     dispatch(updateLots(updated));
 }
@@ -67,7 +72,7 @@ export const turnOnNominationModeForThisOwnersLot = () => async (
     const { profile } = getState()
     let updatedLots = [...lots];
     if (!profile || lots.length === 0) return
-    const  thisPlayersLotIndex = updatedLots.findIndex(l => !l.nominatedBy); // this is really gross. i meant for it to be null, but somewhere it is turning into 0
+    const  thisPlayersLotIndex = updatedLots.findIndex(l => !l.nominatedBy && !l.bid); // this is really gross. i meant for it to be null, but somewhere it is turning into 0
     if (thisPlayersLotIndex < 0) return;
     updatedLots[thisPlayersLotIndex].newNom = true;
     dispatch(updateLots(updatedLots))

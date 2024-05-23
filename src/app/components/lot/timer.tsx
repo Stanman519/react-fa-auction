@@ -18,16 +18,17 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
     const [preventClockTick, setPreventClockTick] = useState<boolean>(false);
     const calculateTimeLeft = async (endTime: Date | undefined) => {
         if (!endTime) return
-        let now = new Date(new Date(Date.now()).toUTCString());
-        // 2023 edit! the end time doesnt need to be converted to UTC because it is in UTC in DB. just need NOW to be in UTC
-        let utcDate = new Date(
+        const now = new Date();
+        //console.log('end - now ', `${lot.bid?.player.lastName} ${endTime} - ${now}`)
+        let utcNow = Date.UTC(
             now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
-            now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+            now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
+        let utcEnd = Date.UTC(endTime.getUTCFullYear(), endTime.getUTCMonth(), endTime.getUTCDate(),
+            endTime.getUTCHours(), endTime.getUTCMinutes(), endTime.getUTCSeconds(), now.getUTCMilliseconds())
+        //console.log('end time - utcend', `${endTime} - ${utcEnd}`)
+        let difference = utcEnd - utcNow;
 
-
-        let difference = +endTime - +utcDate;
-
-        if (difference <= 0) {
+        if (utcEnd <= utcNow) {
             // NEED TO RESET THE CLOCK SO IT DOESN'T CALL API MULTIPLE TIMES
             setPreventClockTick(true)
             if(lot.bid) {

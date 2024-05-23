@@ -88,12 +88,12 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
                     onChange={b => setBidLength(Number.parseInt(b.target.value))}
                     style={{ flex: 1, marginLeft: 10, marginRight: 10 }}
                     className='number-input'
-                    label='Years' type='number' InputProps={{ inputProps: { min: 0, max: 5 } }} />
+                    label='Years' type='number' InputProps={{ inputProps: { min: 0, max: 5, inputMode: 'numeric' } }} />
                 <TextField value={bidSalary}
                     onChange={b => setBidSalary(Number.parseInt(b.target.value))}
                     style={{ flex: 1, marginLeft: 10, marginRight: 10 }}
                     className='number-input'
-                    label='Salary' type='number' InputProps={{ inputProps: { min: 0, max: 500 } }} />
+                    label='Salary' type='number' InputProps={{ inputProps: { min: 0, max: 500, inputMode: 'numeric' } }} />
                 <Tooltip 
                 title={ 
                 

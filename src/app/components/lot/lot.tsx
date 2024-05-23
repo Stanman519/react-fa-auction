@@ -12,16 +12,9 @@ interface LotProps {
 }
 
 export const LotBody = ({lot}: LotProps): JSX.Element => {
-  const dateProp = lot.bid?.expires ? new Date(lot.bid.expires) : undefined
+  const dateProp = lot.bid?.expires ? lot.bid.expires : undefined
   const bidMode = !lot.newNom;
   const theme = useTheme();
-  const getUTC = (endTime?: Date): Date | undefined => {
-    if (endTime){
-      return new Date(
-        endTime.getFullYear(), endTime.getUTCMonth(), endTime.getUTCDate(),
-      endTime.getUTCHours(), endTime.getUTCMinutes(), endTime.getUTCSeconds(), 10);
-    }
-  }
 
   useEffect(() => {
 }, [lot.isFresh])

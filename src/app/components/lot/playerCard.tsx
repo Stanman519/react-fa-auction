@@ -47,6 +47,7 @@ export const PlayerCard = ({ lot }: PlayerCardProps) => {
           :
           
             <Autocomplete
+              isOptionEqualToValue={(option, value) => option.mflId === value.mflId}
               disablePortal
               options={freeAgents}
               value={selectedPlayer ?? {firstName: '', lastName: ''} as PlayerDTO}

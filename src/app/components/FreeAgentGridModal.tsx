@@ -25,7 +25,7 @@ export const FreeAgentGridModal = ({isOpen = false}: {isOpen: boolean}): JSX.Ele
     const onChange: TableProps<PlayerDTO>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);
       };
-    console.log(freeAgents)
+
     const columns: TableColumnsType<PlayerDTO> = [
         {
           title: 'Name',
