@@ -1,4 +1,6 @@
 import { UIAction, UPDATE_UI } from "../actions/UiActions";
+import { PlayerBio } from "./FreeAgentReducer";
+import { Bid } from "./LotReducer";
 
 const defaultState: UIState = {
   isLoading: undefined,
@@ -8,10 +10,14 @@ const defaultState: UIState = {
   chatOpen: false,
   isMobile: true,
   audioOn: true,
-  multiLoader: []
+  multiLoader: [],
+  currentPlayerBio: undefined,
+  currentBidHistory: []
 };
 
 export interface UIState {
+  currentBidHistory?: Bid[]
+  currentPlayerBio?: PlayerBio
   isLoading?: LoadingStates;
   button?: ButtonLoads;
   error?: ErrorTypes;
@@ -35,13 +41,15 @@ export type Modals =
   'waiver-confirm' |
   'buyout-confirm' |
   'tag-confirm' |
+  'bid-history-slab' |
+  'player-bio-slab' |
   'free-agent-grid' |
   'confidence-submit-success' |
   'error'|
   'confidence-rules' |
   undefined;
 
-export type LoadingStates = 'full-screen' | 'button' | undefined
+export type LoadingStates = 'full-screen' | 'button' | 'slab' | undefined
 export type MultiLoads = 'con-matchups' | 'con-results'
 
 

@@ -1,110 +1,59 @@
 
 import { ListItem, ListItemAvatar, Avatar, ListItemText, List, Button, ButtonGroup, Drawer, Container, Typography, TableCell, Table, TableBody, TableContainer, TableHead, TableRow, Card, CardMedia, CardContent, useTheme, Divider, Skeleton } from "@mui/material";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { PlayerBio } from "../../redux/reducers/FreeAgentReducer";
 import { Bid } from "../../redux/reducers/LotReducer";
 import AuctionApiSvc from "../../services/AuctionApiSvc";
 import { getRankStringSuffix, lastYear, ownerMap, tmColorMap } from "../../services/Common";
 import { RootState } from "../../store";
+import { updateUI } from "../../redux/actions/UiActions";
 
 
-export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
-    const [showHistory, setShowHistory] = useState<boolean>(false);
-    const [bidHistory, setBidHistory] = useState<Bid[]>([]);
-    const [showBio, setShowBio] = useState<boolean>(false);
-    const [bio, setBio] = useState<PlayerBio>();
-    const [isLoading, setIsLoading] = useState(false);
-    const { currentLeague } = useSelector((state: RootState) => state.profile)
-    const { owners } = useSelector((state: RootState) => state)
-    const lastYr: number = lastYear
+export const PlayerBioSlab = (): JSX.Element => {
+    const { isLoading, modal, currentPlayerBio } = useSelector((state: RootState) => state.ui)
+    let bio = currentPlayerBio
     const theme = useTheme()
     const slabWidthMultiplier = window.innerWidth < 720 ? 0.7 : 0.4;
-
+const dispatch = useDispatch()
     const getLocalBidTimeStamp = (expires: Date) => {
         let dayBefore = new Date(expires);
         dayBefore.setUTCDate(expires.getUTCDate() - 1)
         return `${dayBefore.toLocaleDateString()} ${dayBefore.toLocaleTimeString()} `
     }
-
-    const loadHistory = async () => {
-        if (bidHistory.length === 0) {
-            const res = await AuctionApiSvc.getBidHistoryByPlayerId(currentLeague?.league.leagueId ?? 0, bid.player.mflId);
-            const historyRes = await AuctionApiSvc.handleErrorResponse(res) as Bid[];
-            setBidHistory(historyRes);
-        }
-        setShowHistory(true);
-    }
-    const loadBio = async () => {
-        if (!bio || !bid.expires || bid.player.mflId) {
-            // NEED TO FIGURE OUT IF THIS IS A NEW NOM BECAUSE WE DON't hit this block
-            setIsLoading(true)
-            setShowBio(true)
-            const hasAction: boolean = bid.player.actionShot ? true : false
-            const res = await AuctionApiSvc.getFullPlayerBio(lastYr, bid.player.mflId, bid.player.position, bid.player.firstName, bid.player.lastName, hasAction);
-            const bioRes = await AuctionApiSvc.handleErrorResponse(res) as PlayerBio;
-            setBio({...bioRes, actionShot: hasAction ? bid.player.actionShot ?? '' : bioRes.actionShot});
-            setIsLoading(false);
-        }
-        setShowBio(true);
-    }
-
     return (
-        <>
+        <> 
             <div style={{ display: 'flex', width: '100%' }}>
-
-                <Drawer
-                    open={showHistory}
-                    variant="temporary"
-                    anchor="right"
-                    onClose={() => setShowHistory(!showHistory)}
-                >
-                    <Container>
-                        <List dense>
-                            {bidHistory.map(p =>
-                                <ListItem key={p.bidId}>
-                                    <ListItemAvatar>
-                                        <Avatar src={owners.find(o => o.leagueownerid === p.ownerId)?.avatar}/>
-                                    </ListItemAvatar>
-                                    <ListItemText
-                                        primary={`$${p.bidSalary}, ${p.bidLength} ${p.bidLength=== 1 ? 'year' : 'years'}`}
-                                        secondary={`${getLocalBidTimeStamp(new Date(p.expires ?? ""))}`}
-                                    />
-                                </ListItem>)}
-                        </List>
-                    </Container>
-                </Drawer>
-
                 <Drawer 
 
                     sx={{backgroundColor: 'transparent'}}
-                    open={showBio}
+                    open={modal ===  'player-bio-slab'}
                     variant="temporary"
                     anchor="right"
-                    onClose={() => setShowBio(!showBio)}
+                    onClose={() => dispatch(updateUI({modal: undefined}))}
                 >
                     <Container style={{ backgroundColor: theme.palette.background.default, width: window.innerWidth * slabWidthMultiplier, maxWidth: 600, flexDirection: 'column', flex: 1 }}>
-                        {showBio && !isLoading && bio ?
+                        {isLoading !== 'slab' ?
                         <Card sx={{marginTop: '20px' }}>
                             <CardMedia component='img' image={bio?.actionShot} />
                                 <CardContent>
                                     <List>
                                         <ListItem>
                                             <ListItemText>
-                                                <Typography variant="h3">{bio.firstName.toUpperCase()} {bio?.lastName.toUpperCase()}</Typography>
+                                                <Typography variant="h3">{bio?.firstName.toUpperCase()} {bio?.lastName.toUpperCase()}</Typography>
                                             </ListItemText>
                                         </ListItem>
                                         <Divider /> 
                                         <ListItem >
                                             <ListItemText>
-                                                <Typography variant="h5"> {tmColorMap.find(tm => tm.team=== bio.team)?.nickname ?? "Free Agent"} {bio?.position}</Typography>
+                                                <Typography variant="h5"> {tmColorMap.find(tm => tm.team=== bio?.team)?.nickname ?? "Free Agent"} {bio?.position}</Typography>
                                             </ListItemText>
                                         </ListItem>
                                         <Divider /> 
                                         <ListItem>
                                             <ListItemText>
-                                                <Typography variant="h5">{Math.floor(bio?.height / 12)}'{Math.floor(bio?.height % 12)}"</Typography>
-                                            </ListItemText>
+                                                {bio?.height && bio?.weight && <Typography variant="h5">{Math.floor(bio?.height / 12)}'{Math.floor(bio?.height % 12)}"</Typography>
+}</ListItemText>
                                         </ListItem>
                                         <ListItem>
                                             <ListItemText>
@@ -113,7 +62,7 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
                                         </ListItem>
                                         <ListItem>
                                             <ListItemText>
-                                                <Typography variant="h5">Age: {bio.age}</Typography>
+                                                <Typography variant="h5">Age: {bio?.age}</Typography>
                                             </ListItemText>
                                         </ListItem>
                                         <Divider /> 
@@ -123,12 +72,12 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
                                             </ListItemText>
                                         </ListItem>
                                         <Divider />
-                                        {bio?.lastSeasonSalary > 0 && 
+                                        {/* {(bio?.lastSeasonSalary && bio.lastSeasonSalary > 0) && 
                                         <ListItem>
                                             <ListItemText secondary={`(${bio?.prevOwner})`}>
-                                                <Typography variant="h5">2021 Salary: ${bio?.lastSeasonSalary}</Typography>
+                                                <div>{`2023 Salary: ${bio?.lastSeasonSalary}`}</div>
                                             </ListItemText>
-                                        </ListItem>}
+                                        </ListItem>} */}
                                     </List>
                                 </CardContent> 
                         </Card>
@@ -143,7 +92,7 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
                         {bio?.positionRanks.some(yr => yr.points > 0) &&
                             <Card sx={{bgcolor: theme.palette.background.paper, marginTop: '20px', marginBottom: '20px'}}>
                                 <CardContent style={{padding: 8}}>
-                                    {showBio && !isLoading ? <TableContainer >
+                                    {!isLoading ? <TableContainer >
                                         <Table size="small">
                                             <TableHead >
                                                 <TableRow >
@@ -172,13 +121,58 @@ export const BioAndHistory = ({ bid}: { bid: Bid}): JSX.Element => {
                     </Container>
                 </Drawer>
 
-                <ButtonGroup sx={{ display: 'flex', width: '100%' }} aria-label="small button group">
+                {/* <ButtonGroup sx={{ display: 'flex', width: '100%' }} aria-label="small button group">
                     <Button  sx={{ flex: 1 }} onClick={() => loadBio()}>Bio</Button>
                     {bid?.expires && <Button sx={{ flex: 2, lineHeight: '14px' }} onClick={() => loadHistory()}>Bid History</Button>}
-                </ButtonGroup>
+                    <Button>Open Offer Sheet</Button>
+                </ButtonGroup> */}
 
+            </div> 
+        </>
+    );
+}
+
+export const BidHistorySlab = (): JSX.Element => {
+    const { owners } = useSelector((state: RootState) => state)
+    const { modal, currentBidHistory } = useSelector((state: RootState) => state.ui)
+    const dispatch = useDispatch()
+    const getLocalBidTimeStamp = (expires: Date) => {
+        let dayBefore = new Date(expires);
+        dayBefore.setUTCDate(expires.getUTCDate() - 1)
+        return `${dayBefore.toLocaleDateString()} ${dayBefore.toLocaleTimeString()} `
+    }
+    return (
+        <>
+            <div style={{ display: 'flex', width: '100%' }}>
+
+                <Drawer
+                    open={modal === 'bid-history-slab'}
+                    variant="temporary"
+                    anchor="right"
+                    onClose={() => dispatch(updateUI({modal: undefined}))}
+                >
+                    <Container>
+                        <List dense>
+                            {currentBidHistory?.map(p =>{
+                                const avatar = owners.find(o => o.leagueownerid === p.ownerId)?.avatar
+                                return (<ListItem key={p.bidId}>
+                                    <img onClick={() => console.log('hi')}  src={avatar} referrerPolicy="no-referrer" style={{ height: 0, width: 0 }} />
+                                    <ListItemAvatar>
+                                        <Avatar src={avatar}/>
+                                    </ListItemAvatar>
+                                    <ListItemText
+                                        primary={`$${p.bidSalary}, ${p.bidLength} ${p.bidLength=== 1 ? 'year' : 'years'}`}
+                                        secondary={`${getLocalBidTimeStamp(new Date(p.expires ?? ""))}`}
+                                    />
+                                </ListItem>)
+})}
+                        </List>
+                    </Container>
+                </Drawer>
             </div>
         </>
     );
 }
+
+
 

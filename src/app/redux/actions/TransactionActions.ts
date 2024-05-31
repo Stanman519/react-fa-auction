@@ -40,7 +40,7 @@ export const loadDashboardData = () => async (
         newLeague.taxiPlayers = taxiSquad
         newLeague.waiverExtensionPlayers = waiverExtensions
         dispatch(loadTransactions(deadCap.leagueTransactions))
-        dispatch(updateDeadCapInfo({deadCap: deadCap.teamDeadCapData, selectedTeam: undefined}))
+        dispatch(updateDeadCapInfo({deadCap: deadCap.teamDeadCapData, selectedTeam: deadCap.teamDeadCapData.length > 0 ? deadCap.teamDeadCapData[0].franchiseId : undefined}))
         dispatch(updateLoginInfo({...profile, currentLeague: newLeague}))
     } catch (e: any) {
         console.log("ERROR: ", e)
@@ -57,7 +57,7 @@ export const getLeagueCapInfo = () => async (
     const dashboard = await GeneralApiSvc.getDeadCapAndTransactions(currentLeague?.league.leagueId)
     if (dashboard) {
         dispatch(loadTransactions(dashboard.leagueTransactions))
-        dispatch(updateDeadCapInfo({deadCap: dashboard.teamDeadCapData, selectedTeam: undefined}))
+        dispatch(updateDeadCapInfo({deadCap: dashboard.teamDeadCapData, selectedTeam: dashboard.teamDeadCapData.length > 0 ? dashboard.teamDeadCapData[0].franchiseId : undefined}))
         dispatch(updateUI({modal: undefined}))
     }
     dispatch(updateUI({isLoading: undefined}))

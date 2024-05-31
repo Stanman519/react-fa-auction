@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { synchronizeAuth0WithDbLogin } from '../redux/actions/LoginActions';
 import { NoActiveAuctions } from './noActiveAuctions';
 import { FreeAgentGridModal } from './FreeAgentGridModal';
+import { BidHistorySlab, PlayerBioSlab } from './lot/bioAndHistory';
 
 function AuctionHome() {
   const theme = useTheme()
@@ -62,6 +63,8 @@ function AuctionHome() {
             </Backdrop>
           </div> :
           <div className='p-2'>
+            {modal === 'bid-history-slab' && < BidHistorySlab />}
+            < PlayerBioSlab />
             {modal === 'free-agent-grid' && <FreeAgentGridModal isOpen={modal==='free-agent-grid'}/>}
             {newNom && <LotBody lot={newNom} key={newNom.lotId}/>}
             {activeLots.map(l => <LotBody lot={l} key={l.lotId}/>)}

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { PlayerDTO } from '../../redux/reducers/FreeAgentReducer';
 import { Bid, Lot } from '../../redux/reducers/LotReducer';
 import { RootState } from '../../store';
-import { BioAndHistory } from './bioAndHistory';
+//import { BioAndHistory } from './bioAndHistory';
 import { BidInfo } from './bidInfo';
 import { Headshot, MemoHeadshot } from './headshot';
 import { PlayerInfo } from './playerInfo';
@@ -27,10 +27,10 @@ export const PlayerCard = ({ lot }: PlayerCardProps) => {
   }
 
   return (
-    <div className="flex flex-row items-center p-4" >
+    <div className="flex flex-row items-center px-4 pt-4" >
       <div className="flex flex-col items-center w-1/3" >
         <MemoHeadshot lotId={lot.lotId} img={lot.bid?.player?.headshot ?? ''} player={lot.bid?.player} />
-        {lot.bid && <BioAndHistory bid={lot.bid} />}
+        {/* {lot.bid && <BioAndHistory bid={lot.bid} />} */}
       </div>
       <div className="flex-col w-2/3">
         {lot.bid?.bidId && lot.bid.player ?

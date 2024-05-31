@@ -18,11 +18,12 @@ const Transition = forwardRef(function Transition(
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.Element => {
+export const BidForm = ({ bidMode, lot, bidTabExtended }: { bidMode: boolean, lot: Lot, bidTabExtended: boolean }): JSX.Element => {
     const capnWarning = process.env.PUBLIC_URL + '/capn-wtf.png';
     const [bidSalary, setBidSalary] = useState<number>(0);
     const [bidLength, setBidLength] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>();
+    console.log('child state: ', bidTabExtended)
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
     // const leagueOwnerData = owner.leagues.find(l => l.league.leagueId === currentLeague?.league.leagueId)
     const highBidsOnTheBoard = useSelector((state: RootState) => state.lots
@@ -78,11 +79,18 @@ export const BidForm = ({ bidMode, lot }: { bidMode: boolean, lot: Lot }): JSX.E
         }
         setConfirmModal(false);
     }
-
+    const bidFormStyle = {
+        maxHeight: bidTabExtended ? '80px' : '0',
+        overflow: 'hidden',
+        transition: 'maxHeight 0.3s ease-in-out, padding 0.3s ease-in-out',
+        background: 'white',
+        padding: bidTabExtended ? '20px' : '0 20px', // Adjust padding for the transition
+        //boxShadow: bidTabExtended ? '0 -2px 10px rgba(0, 0, 0, 0.1)' : 'none',
+      };
 
     return (
 
-        <div style={{ marginTop: 10 }}>
+        <div style={bidFormStyle}>
             <div style={{ display: 'flex', justifyContent: 'space-around' }}>
                 <TextField value={bidLength}
                     onChange={b => setBidLength(Number.parseInt(b.target.value))}
