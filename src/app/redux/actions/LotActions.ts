@@ -114,8 +114,13 @@ export const submitWin = (bid: Bid) => async (
     dispatch: Function,
     getState: () => RootState
 ) : Promise<any> => {
+    const {isConnected} = getState().signalR
     const oldLots = getState().lots;
     let lots = [...oldLots]
+    if (!isConnected) {
+        dispatch(updateUI({error: 'snackbar', errorText: 'Cancelling win submission because you may not have the latest bids currently. Site will reload when possible.'}))   
+        return
+    }
     try {
         const res = await AuctionApiSvc.sendWin(bid)
         const complete = await AuctionApiSvc.handleErrorResponse(res);
