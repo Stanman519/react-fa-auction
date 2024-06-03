@@ -138,6 +138,13 @@ export const freshenUpTheLotsAfterAbsence = () => async (
     const leagueId = getState().profile.currentLeague?.league.leagueId
     try {
         const res = await AuctionApiSvc.getLots(leagueId)
+                res.forEach(l => {
+                            //@ts-ignore
+            if (typeof l.bid?.expires === 'string' && !l.bid.expires.endsWith('Z')){
+                //@ts-ignore
+                l.bid.expires = new Date(l.bid.expires += "Z"); //TODO: proabbly a database issue, these are actually coming in as strings, maybe need to use datetime offset on api
+            }
+        })
         dispatch(updateLots(res))
     } catch (e: any) { 
         dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
