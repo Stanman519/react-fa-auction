@@ -130,9 +130,18 @@ const askCapn = async (PlayerTipRequest: PlayerTipRequest): Promise<Response> =>
         })
     return res;
 }
+const getLots = async (leagueId: number = 0): Promise<Lot[]> => {
+    const rest = await axios.get(`${URL}/free-agency/leagues/${leagueId}/lots`, 
+    {
 
+    }).catch(error => {
+        throw new Error(error.response.data.friendlyMessage)
+    });
+    return rest.data;
+}
 
 export default {
+    getLots,
     pageLoad,
     getFullPlayerBio,
     login,

@@ -16,20 +16,19 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
     const dispatch = useDispatch();
     const [remaining, setRemaining] = useState<ExpirationObj>();
     const [preventClockTick, setPreventClockTick] = useState<boolean>(false);
-    const calculateTimeLeft = async (endTime: Date | undefined) => {
+    const calculateTimeLeft = (endTime: Date | undefined) => {
         if (!endTime) return
         const now = new Date();
-        //console.log('end - now ', `${lot.bid?.player.lastName} ${endTime} - ${now}`)
+
         let utcNow = Date.UTC(
             now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
             now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
         let utcEnd = Date.UTC(endTime.getUTCFullYear(), endTime.getUTCMonth(), endTime.getUTCDate(),
             endTime.getUTCHours(), endTime.getUTCMinutes(), endTime.getUTCSeconds(), now.getUTCMilliseconds())
-        //console.log('end time - utcend', `${endTime} - ${utcEnd}`)
+
         let difference = utcEnd - utcNow;
 
         if (utcEnd <= utcNow) {
-            // NEED TO RESET THE CLOCK SO IT DOESN'T CALL API MULTIPLE TIMES
             setPreventClockTick(true)
             if(lot.bid) {
                 dispatch(submitWin(lot.bid))
@@ -60,10 +59,11 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
         else return 'linear-gradient(90deg, rgba(51,204,0,0) 0%, rgba(51,204,0,0.73) 50%, rgba(51,204,0,0) 100%)'
     }
     useEffect(() => {
-        const timer = setTimeout(async () => {
-            if (endTime && !preventClockTick) setRemaining(await calculateTimeLeft(endTime));
+        const timer = setInterval( () => {
+            if (endTime && !preventClockTick) setRemaining(calculateTimeLeft(endTime));
         }, 1000);
-    });
+        return () => clearInterval(timer);
+    }, [endTime, preventClockTick, lot, dispatch, setPreventClockTick]);
 
     return (
         <div className="mb-1 flex content-center" style={{ background: getTimerColor() }}>

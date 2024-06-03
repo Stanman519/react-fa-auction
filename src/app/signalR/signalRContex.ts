@@ -1,12 +1,16 @@
 import {
     JsonHubProtocol,
     HubConnectionState,
-    HubConnectionBuilder  } from '@microsoft/signalr';
+    HubConnectionBuilder,  
+    HubConnection} from '@microsoft/signalr';
 import { useDispatch } from 'react-redux';
+import { setConnection } from '../redux/actions/SignalRActions';
+import { RootState } from '../store';
+import { freshenUpTheLotsAfterAbsence } from '../redux/actions/LotActions';
   
   //const isDev = process.env.NODE_ENV === 'development';
   
-  const startSignalRConnection = async (connection :any) => {
+  const startSignalRConnection = async (connection :HubConnection) => {
     try {
       await connection.start();
       console.assert(connection.state === HubConnectionState.Connected);
@@ -21,9 +25,9 @@ import { useDispatch } from 'react-redux';
   // actionEventMap should be an object mapping event names, to eventHandlers that will
   // be dispatched with the message body.
   export const setupSignalRConnection = (connectionHub: any, actionEventMap: any = {}, getAccessToken: any = "") => 
-  (dispatch: Function = useDispatch(), getState: any) => {
+  (dispatch: Function = useDispatch(), getState: () => RootState) => {
     //  THIS PART SEEMS A LITTLE OVER THE TOP FOR NOW
-    // const options = {
+    // const options = { 
     //   logMessageContent: isDev,
     //   logger: isDev ? LogLevel.Warning : LogLevel.Error,
     //   accessTokenFactory: () => getAccessToken(getState())
@@ -37,7 +41,7 @@ import { useDispatch } from 'react-redux';
       .withHubProtocol(new JsonHubProtocol())
       //.configureLogging(LogLevel.Information)
       .build();
-  
+    const reduxConn = getState().signalR
     // Note: to keep the connection open the serverTimeout should be
     // larger than the KeepAlive value that is set on the server
     // keepAliveIntervalInMilliseconds default is 15000 and we are using default
@@ -52,23 +56,30 @@ import { useDispatch } from 'react-redux';
   
     connection.onreconnecting(error => {
       console.assert(connection.state === HubConnectionState.Reconnecting);
+      dispatch(setConnection({...reduxConn, hasReconnected: false, isConnected: false}))
       console.log('Connection lost due to error. Reconnecting.', error);
     });
   
     connection.onreconnected(connectionId => {
       console.assert(connection.state === HubConnectionState.Connected);
+      dispatch(freshenUpTheLotsAfterAbsence())
+      dispatch(setConnection({...reduxConn, hasReconnected: true, isConnected: true}))
       console.log('Connection reestablished. Connected with connectionId', connectionId);
     });
   
-    startSignalRConnection(connection);
-  
+
     connection.on('FreshBid', res => {
       console.log("made contact new bid is: ", res)
-      console.log(actionEventMap)
       const eventHandler = actionEventMap.FreshBid;
       console.log('dispatching', eventHandler)
       eventHandler && dispatch(eventHandler(res));
     });
+
+
   
+    startSignalRConnection(connection);
+    dispatch(setConnection({connection, isConnected: true, hasReconnected: false}))
+
+
     return connection;
   };

@@ -18,13 +18,41 @@ import { BidHistorySlab, PlayerBioSlab } from './lot/bioAndHistory';
 function AuctionHome() {
   const theme = useTheme()
   const dispatch = useDispatch();
+  const [reconSign, setReconSign] = useState<boolean>(false);
   const { user, isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
   const activeLots = useSelector((state: RootState) => state.lots.filter(l => l.bid && !l.newNom))
-  const newNom = useSelector((state: RootState)=> state.lots.find(l => l.newNom))
+  const newNom = useSelector((state: RootState) => state.lots.find(l => l.newNom))
   const lots = useSelector((state: RootState) => state.lots);
   const { error, errorText, modal } = useSelector((state: RootState) => state.ui)
   const loading = useSelector((state: RootState) => state.ui.isLoading)
   const navigate = useNavigate()
+  const {hasReconnected} = useSelector((state: RootState) => state.signalR)
+  // const { } = useSelector((state: RootState) => state.signalR.connection.)
+
+  // useEffect(() => {
+  //   const handleVisibilityChange = () => {
+  //     if (document.visibilityState === 'visible') {
+  //       // Reconnect SignalR
+  //       if (connection) {
+  //         connection.start()
+  //           .then(() => {
+  //             console.log('Reconnected!');
+  //             // Optionally, fetch fresh data from the server
+  //             fetchFreshBids();
+  //           })
+  //           .catch(e => console.log('Reconnection failed: ', e));
+  //       }
+  //     } else {
+  //       if (connection) {
+  //         connection.stop();
+  //       }
+  //     }
+  //   };
+  //   document.addEventListener('visibilitychange', handleVisibilityChange)
+  //   return () => {
+  //     document.removeEventListener('visibilitychange', handleVisibilityChange);
+  //   };
+  // }, [connection]);
 
   useEffect(() => {
 
@@ -36,23 +64,32 @@ function AuctionHome() {
         dispatch(getInitialAuctionData(user.sub))
         dispatch(signalR())
       } else {
-        await loginWithRedirect({appState: {returnTo: '/auction'}});
+        await loginWithRedirect({ appState: { returnTo: '/auction' } });
       }
-  }
+    }
 
-  checkUser()
+    checkUser()
     return () => {
-        ChatClient.getInstance().chatInstance.disconnectUser();
+      ChatClient.getInstance().chatInstance.disconnectUser();
     }
   }, [isAuthenticated, loginWithRedirect, isLoading, user])
 
-  return (
-    <div className="App" style={{backgroundColor: theme.palette.background.default}}>
-                <div className='menu-container'>
-            <MenuBar barOptions={['chat', 'fa-auction', 'salary-league']}/>
-          </div>
 
-      <div style={{display: 'flex', justifyContent: 'center'}}>
+  useEffect(() => {
+    if (hasReconnected) {
+      setReconSign(true)
+      setTimeout(() => setReconSign(false), 5000)
+    }
+  }, [hasReconnected])
+
+  return (
+
+    <div className="App" style={{ backgroundColor: theme.palette.background.default }}>
+      <div className='menu-container'>
+        <MenuBar barOptions={['chat', 'fa-auction', 'salary-league']} />
+      </div>
+      {reconSign && <div> Reconnected. </div>}
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
         {loading === 'full-screen' ?
           <div>
             <Backdrop
@@ -65,19 +102,19 @@ function AuctionHome() {
           <div className='p-2'>
             {modal === 'bid-history-slab' && < BidHistorySlab />}
             < PlayerBioSlab />
-            {modal === 'free-agent-grid' && <FreeAgentGridModal isOpen={modal==='free-agent-grid'}/>}
-            {newNom && <LotBody lot={newNom} key={newNom.lotId}/>}
-            {activeLots.map(l => <LotBody lot={l} key={l.lotId}/>)}
+            {modal === 'free-agent-grid' && <FreeAgentGridModal isOpen={modal === 'free-agent-grid'} />}
+            {newNom && <LotBody lot={newNom} key={newNom.lotId} />}
+            {activeLots.map(l => <LotBody lot={l} key={l.lotId} />)}
           </div>}
-        {!newNom && activeLots.length === 0 && loading !== 'full-screen' && 
-        <div style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
-          <NoActiveAuctions />
-        </div>
+        {!newNom && activeLots.length === 0 && loading !== 'full-screen' &&
+          <div style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+            <NoActiveAuctions />
+          </div>
         }
 
       </div>
       <Snackbar open={error === 'snackbar'} autoHideDuration={6000}>
-        <Alert onClose={() => dispatch(updateUI({error: undefined}))} severity="error" sx={{ width: '100%' }}>
+        <Alert onClose={() => dispatch(updateUI({ error: undefined }))} severity="error" sx={{ width: '100%' }}>
           {errorText}
         </Alert>
       </Snackbar>

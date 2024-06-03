@@ -9,6 +9,7 @@ import transactionReducer from './TransactionReducer';
 import uiReducer from './UiReducer';
 import { confidenceReducer } from './ConfidenceReducer';
 import { overUnderReducer } from './OverUnderReducer';
+import { signalRReducer } from './SignalRReducer';
 
 
 export const RootReducer = combineReducers({
@@ -21,7 +22,8 @@ export const RootReducer = combineReducers({
     franchises: franchiseReducer,
     deadCap: deadCapReducer,
     confidence: confidenceReducer,
-    overUnders: overUnderReducer
+    overUnders: overUnderReducer,
+    signalR: signalRReducer
 });
 
 export type RootState = ReturnType<typeof RootReducer>

@@ -131,3 +131,17 @@ export const submitWin = (bid: Bid) => async (
     }
 }
 
+export const freshenUpTheLotsAfterAbsence = () => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const leagueId = getState().profile.currentLeague?.league.leagueId
+    try {
+        const res = await AuctionApiSvc.getLots(leagueId)
+        dispatch(updateLots(res))
+    } catch (e: any) { 
+        dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
+    }
+
+
+}

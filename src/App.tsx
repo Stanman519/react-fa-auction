@@ -32,6 +32,7 @@ function App() {
           // }}
         >
 
+
           <Routes>
             <Route path='/' element={<LandingPage />} />
             <Route path='/home' element={<HomeBase />} />
@@ -44,6 +45,7 @@ function App() {
             
             <Route path='/privacy-policy' element={<PrivacyPolicy />} />
           </Routes> 
+
         </Auth0ProviderWithHistory>
       </BrowserRouter>
     </div>

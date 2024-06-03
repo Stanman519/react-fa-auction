@@ -23,7 +23,7 @@ export const BidForm = ({ bidMode, lot, bidTabExtended }: { bidMode: boolean, lo
     const [bidSalary, setBidSalary] = useState<number>(0);
     const [bidLength, setBidLength] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>();
-    console.log('child state: ', bidTabExtended)
+
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
     // const leagueOwnerData = owner.leagues.find(l => l.league.leagueId === currentLeague?.league.leagueId)
     const highBidsOnTheBoard = useSelector((state: RootState) => state.lots
