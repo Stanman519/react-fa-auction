@@ -1,19 +1,36 @@
 import { NflTeam } from "../../models/ConfidenceDTOs";
+import { OverUnderPick } from "../../services/GeneralApiSvc";
 import { OverUnderAction, OverUnderState } from "../actions/OverUnderActions";
 
+export interface OverUnderLoadResponse{
+    winLines: FranchiseWinTotal[]
+    otherUsers: string[]
+}
 export interface FranchiseWinTotal {
-    id: string,
+    id: number,
     overUnder: number,
     year: number,
     realWins: number,
     gamesRemaining: number,
-    franchise: NflTeam
+    franchise: NflTeam,
+    userPick: OverUnderPick
 }
+
+// export interface OverUnderPick {
+//     id: number
+//     lineId: number
+//     ownerId: number
+//     isOver?: boolean
+//     lineAdjustment: number
+// }
 
 export const UPDATE_OUS = 'UPDATE_OUS'
 
 const defaultState: OverUnderState = {
-    franchiseWinTotals: []
+    franchiseWinTotals: [],
+    userPicks: [],
+    selectedLine: 12,
+    otherUsers: []
 }
 
 export const overUnderReducer = (state: OverUnderState = defaultState, action: OverUnderAction): OverUnderState => {

@@ -24,7 +24,7 @@ const TaxiSquadTile = () => {
         mainText={`Are you sure you want to cut ${taxiPlayers[selectedPlayerIndex ?? 0].fullName}?`} 
         onAction={() => dispatch(submitTaxiCut(currentLeague?.league?.leagueId ?? 0, 
             taxiPlayers[selectedPlayerIndex!], currentLeague?.mflfranchiseid ?? 0,  Number((Math.round(taxiPlayers[selectedPlayerIndex!].salary! * 0.4 * 10) / 10).toFixed(1))))} />}
-        <Card className="max-w-4xl flex-1">
+        {taxiPlayers.length > 0 ? <Card className="max-w-4xl flex-1">
             <div>
             <div  className="flex flex-row ml-2 mr-3 flex-1 " >
                     <div className="w-3/4 lg:w-3/5"/>
@@ -56,7 +56,7 @@ const TaxiSquadTile = () => {
 
                 </Button>
                 </div>}
-        </Card>
+        </Card> : <Card><div>There are no players on your taxi squad.</div></Card>}
         </div>
     )
 }

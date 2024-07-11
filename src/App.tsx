@@ -10,6 +10,7 @@ import GamesHome from './app/components/games/GamesHome';
 import { ConfidenceAdminHome } from './app/components/confidence/admin/AdminHome';
 import { TermsOfService } from './app/components/legal/TermsOfService';
 import { PrivacyPolicy } from './app/components/legal/PrivacyPolicy';
+import OverUnderHome from './app/components/games/OverUnders/OverUnderHome';
 
 
 function App() {
@@ -40,7 +41,8 @@ function App() {
             <Route path='/games' element={<GamesHome />}/>
             <Route path='/demo' element={<GamesHome isDemo/>}/>
             <Route path='/admin' element={<ConfidenceAdminHome />} />
-            
+            <Route path='/over-unders' element={<OverUnderHome />}/>
+
             <Route path='/terms-of-service' element={<TermsOfService />} />
             
             <Route path='/privacy-policy' element={<PrivacyPolicy />} />

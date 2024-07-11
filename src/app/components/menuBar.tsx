@@ -167,9 +167,9 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                                 {barOptions.includes('salary-league') && <Button color="inherit"
                                     onClick={() => {
                                         navigate('/home')
-                                        }}>League Info</Button>}
+                                        }}>{currentLeague?.league.name}</Button>}
                                 {isDemo && <Button color='inherit' onClick={() => clearDemoStateAndNav('games')}> CONFIDENCE POOL </Button>}
-                                {!isDemo && <Button color='inherit' onClick={() => clearDemoStateAndNav('demo')}>See Demo</Button>}
+                                {!isDemo && !barOptions.includes('fa-auction') && <Button color='inherit' onClick={() => clearDemoStateAndNav('demo')}>See Demo</Button>}
                                 {barOptions.includes('fa-auction') &&  owner.ownername && 
                                         lots.filter(l => !l.bid).length > 0 && 
                                         lots.filter(l => l.nominatedBy === currentLeague?.leagueownerid).length < 3 ?
@@ -290,7 +290,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                         //onClick={() => closeDrawer()}
                         bgcolor={palette.background.default}
                     > */}
-                        <FAChatWindow chatChannel={chatChannel}/>
+                        <FAChatWindow leagueId={currentLeague?.league.leagueId.toString()}/>
 
                     {/* </Box> */}
                 </Drawer>

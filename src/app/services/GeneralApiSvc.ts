@@ -6,7 +6,7 @@ import { DeadCapInfo, Transaction } from "../redux/reducers/TransactionReducer"
 import { URL } from "./AuctionApiSvc"
 import { CommunityMatchupStats, ConfidencePlayerResult, MatchupFormResponse, NflMatchup, NflPickSubmissionBody, NflTeam, PickResult, PickSubmission, Prop } from "../models/ConfidenceDTOs"
 import { Type } from "typescript"
-import { FranchiseWinTotal } from "../redux/reducers/OverUnderReducer"
+import { FranchiseWinTotal, OverUnderLoadResponse } from "../redux/reducers/OverUnderReducer"
 
 export interface LeagueCapInfo{
     leagueTransactions: Transaction[]
@@ -334,8 +334,8 @@ const setWinningProp = (propId: number, winningSide: string): Promise<Response> 
     })
 }
 
-const sendOverUnderPicks = (year: number, league: string, picks: OverUnderPick[]): Promise<Response> => {
-    return axios.post(`${URL}/games/year/${year}/leagues/${league}/team-win-totals}`, {picks: picks}, {headers: {
+const sendOverUnderPicks = (year: number, league: string, picks: OverUnderPick[]):  Promise<GenericResponse<string | Type>> => {
+    return axios.post(`${URL}/games/year/${year}/leagues/${league}/team-win-totals`, picks, {headers: {
         'Content-Type': 'application/json'
     }})
     .then((res) => {
@@ -346,8 +346,8 @@ const sendOverUnderPicks = (year: number, league: string, picks: OverUnderPick[]
     })
 }
 
-const getWinOverUndersForLeagueYear = (year: number, league: string): Promise<FranchiseWinTotal[]> => {
-    return axios.get(`${URL}/games/year/${year}/leagues/${league}/team-win-totals`, {headers: {
+const getWinOverUndersForLeagueYear = (poolId: number, year: number, league: string, ownerId: number): Promise<OverUnderLoadResponse> => {
+    return axios.get(`${URL}/games/pools/${poolId}/year/${year}/leagues/${league}/owners/${ownerId}/team-win-totals`, {headers: {
         'Content-Type': 'application/json'
     }})
     .then((res) => {
@@ -358,6 +358,29 @@ const getWinOverUndersForLeagueYear = (year: number, league: string): Promise<Fr
     })
 }
 
+const getAllOverUnderPicksByLeagueYear  = (poolId: number): Promise<OverUnderPick[]> => {
+    return axios.get(`${URL}/games/pools/${poolId}/ou-league-picks`, {headers: {
+        'Content-Type': 'application/json'
+    }})
+    .then((res) => {
+        return res.data
+    }).catch((e) => {
+        console.log(e)
+        return undefined
+    })
+}
+
+const getAllOverUnderUsers = (poolId: number): Promise<Owner[]> => {
+    return axios.get(`${URL}/games/pools/${poolId}/ou-users`, {headers: {
+        'Content-Type': 'application/json'
+    }})
+    .then((res) => {
+        return res.data
+    }).catch((e) => {
+        console.log(e)
+        return undefined
+    })
+}
 export default {
     synchronizeAuth,
     getCommunityStats,
@@ -384,5 +407,7 @@ export default {
     getBuyoutCandidates,
     setWinnerForMatchup,
     sendOverUnderPicks,
-    getWinOverUndersForLeagueYear
+    getWinOverUndersForLeagueYear,
+    getAllOverUnderPicksByLeagueYear,
+    getAllOverUnderUsers
 }

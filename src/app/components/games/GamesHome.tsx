@@ -15,6 +15,7 @@ import "boarding.js/styles/themes/basic.css";
 import { RootState } from "../../redux/reducers/RootReducer";
 import { updateUI } from "../../redux/actions/UiActions";
 import { getError } from "../../redux/actions/ConfidenceActions";
+import { useNavigate } from "react-router-dom";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -139,13 +140,14 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
     setValue(newValue);
   };
 
-
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col justify-start items-center" style={{ overflowX: 'hidden', overflowY: 'hidden', minHeight: '100vh' }}>
 
       <MenuBar isDemo={isDemo} chatChannel={'confidence'} barOptions={['confidence', 'chat']} />
       <Rules />
+      <Button onClick={() => navigate(`/over-unders`)}>OVER UNDERS</Button>
       <TabContext value={value}>
         <div className="flex flex-row w-full justify-center ">
           <TabList 

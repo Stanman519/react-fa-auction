@@ -86,7 +86,7 @@ function AuctionHome() {
 
     <div className="App" style={{ backgroundColor: theme.palette.background.default }}>
       <div className='menu-container'>
-        <MenuBar barOptions={['chat', 'fa-auction', 'salary-league']} />
+        <MenuBar barOptions={['chat', 'fa-auction', 'salary-league']} chatChannel={"messaging"}/>
       </div>
       {reconSign && <div> Reconnected. </div>}
       <div style={{ display: 'flex', justifyContent: 'center' }}>

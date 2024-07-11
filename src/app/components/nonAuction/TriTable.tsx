@@ -8,12 +8,13 @@ import { lastYear } from '../../services/Common';
 
 export default function TriTable() {
     const ownerList = useSelector((state: RootState) => state.deadCap.deadCap);
+    const leagueId = useSelector((state: RootState) => state.profile.currentLeague?.league?.leagueId)
     const [standings, setStandings] = useState<FranchiseStandings[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [years, setYears] = useState<number[]>([])
     const thisYear = lastYear + 1;
     useEffect(() => {
-        axios.get(`https://capncrunch-api.azurewebsites.net/Mfl/standings/${thisYear}`)
+        axios.get(`https://capncrunch-api.azurewebsites.net/Mfl/leagues/${leagueId}/years/${thisYear}/standings`)
             .then(res => {
                 let sorted = res.data.sort((a: FranchiseStandings, b: FranchiseStandings) => (a.teamStandings.reduce((sum, ts) => (sum + ts.pointsFor) + (ts.h2hWins * 10), 0)) > (b.teamStandings.reduce((sum, ts) => (sum + ts.pointsFor) + (ts.h2hWins * 10), 0)) ? -1 : 1);
                 setStandings(sorted)

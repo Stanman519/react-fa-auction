@@ -31,9 +31,8 @@ export const synchronizeAuth0WithDbLogin = (user: User) => async(
     const dbUser = await GeneralApiSvc.synchronizeAuth(user);
     var newProfile = {...profile}
     newProfile.owner = dbUser
-    let defaultLeague = dbUser.leagues.find(l => l.league.leagueId === 13894)
-    if (!defaultLeague && dbUser.leagues.length > 0) defaultLeague = dbUser.leagues[0]
-    newProfile.currentLeague = defaultLeague
+    console.log('owner in auction', newProfile.owner)
+    newProfile.currentLeague =  dbUser.leagues.length > 0 ? dbUser.leagues[0] : undefined
     dispatch(updateLoginInfo(newProfile))
 }
 

@@ -27,8 +27,9 @@ export const LotBody = ({lot}: LotProps): JSX.Element => {
 
   return (
         <div
-        className="rounded mt-1 mb-1 pb-1 relative h-fit overflow-hidden" 
+        className="rounded mt-1 mb-1 pb-1 relative h-fit" 
         style={{ 
+          overflow: bidMode  ? 'hidden' : undefined,
         backgroundColor: theme.palette.background.paper, 
         borderStyle: lot.isFresh ? 'ridge' : 'none',
         borderWidth: 4,

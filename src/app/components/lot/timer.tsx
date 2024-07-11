@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { submitWin } from "../../redux/actions/LotActions";
 import { Lot } from "../../redux/reducers/LotReducer";
 import { ownerMap } from "../../services/Common";
+import { RootState } from "../../redux/reducers/RootReducer";
 
 export interface ExpirationObj {
     days: number
@@ -16,6 +17,7 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
     const dispatch = useDispatch();
     const [remaining, setRemaining] = useState<ExpirationObj>();
     const [preventClockTick, setPreventClockTick] = useState<boolean>(false);
+    const { isConnected } = useSelector((state: RootState) => state.signalR)
     const calculateTimeLeft = (endTime: Date | undefined) => {
         if (!endTime) return
         const now = new Date();
@@ -28,7 +30,7 @@ export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Eleme
 
         let difference = utcEnd - utcNow;
 
-        if (utcEnd <= utcNow) {
+        if (utcEnd <= utcNow && isConnected ) {
             setPreventClockTick(true)
             if(lot.bid) {
                 dispatch(submitWin(lot.bid))

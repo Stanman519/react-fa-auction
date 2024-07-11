@@ -2,7 +2,9 @@ import {
     JsonHubProtocol,
     HubConnectionState,
     HubConnectionBuilder,  
-    HubConnection} from '@microsoft/signalr';
+    HubConnection,
+    HttpTransportType,
+    LogLevel} from '@microsoft/signalr';
 import { useDispatch } from 'react-redux';
 import { setConnection } from '../redux/actions/SignalRActions';
 import { RootState } from '../store';
@@ -36,10 +38,13 @@ import { freshenUpTheLotsAfterAbsence } from '../redux/actions/LotActions';
     // withAutomaticReconnect will automatically try to reconnect
     // and generate a new socket connection if needed
     const connection = new HubConnectionBuilder()
-      .withUrl(connectionHub) //,options
+      .withUrl(connectionHub, {
+        transport: HttpTransportType.WebSockets,
+        accessTokenFactory: () => getAccessToken()
+      }) //,options
       .withAutomaticReconnect()
       .withHubProtocol(new JsonHubProtocol())
-      //.configureLogging(LogLevel.Information)
+      .configureLogging(LogLevel.Error) 
       .build();
     const reduxConn = getState().signalR
     // Note: to keep the connection open the serverTimeout should be
@@ -47,6 +52,7 @@ import { freshenUpTheLotsAfterAbsence } from '../redux/actions/LotActions';
     // keepAliveIntervalInMilliseconds default is 15000 and we are using default
     // serverTimeoutInMilliseconds default is 30000 and we are using 60000 set below
     connection.serverTimeoutInMilliseconds = 60000;
+    connection.keepAliveIntervalInMilliseconds = 60000;
   
     // re-establish the connection if connection dropped
     connection.onclose(error => {

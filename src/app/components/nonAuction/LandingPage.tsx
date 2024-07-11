@@ -31,7 +31,9 @@ export const LandingPage = () => {
 
     useEffect(() => {
         if (profile.owner.ownerId > 0) {
-            if (profile.owner.leagues.length > 0) nav('/home')
+            if (profile.owner.leagues.length > 0) {
+                profile.currentLeague?.league.isAuctioning ? nav('/auction') : nav('/home')
+            }
             if (profile.owner.leagues.length === 0) nav('/games')
         }
 

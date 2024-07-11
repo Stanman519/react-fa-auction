@@ -41,6 +41,12 @@ export interface LeagueLoginInfo {
 export interface LeagueInfo {
     leagueId: number
     name: string
+    firstYear: number
+    isAuctioning: boolean
+    isFranchiseTagSzn: boolean
+    isTaxiCutSzn: boolean
+    isBuyoutSzn: boolean
+    
 }
 
 export interface TagCandidate{

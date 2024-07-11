@@ -32,7 +32,8 @@ export class ChatClient {
     }
 
     public static finishSetup = async (user: any, token: string, leagueId: number | string) => {
-        if (!ChatClient.instance.isInitialized){
+        console.log('instance ', ChatClient.instance)
+        if (!ChatClient.instance.isInitialized || !ChatClient.instance.chatInstance.activeChannels[`messaging:${leagueId}`]){
             try{
                 const resp = await ChatClient.instance.chatInstance.connectUser(
                     //{
@@ -50,7 +51,7 @@ export class ChatClient {
             
             ChatClient.instance.isInitialized = true;
         }
-        return ChatClient.instance.chatInstance.channel('messaging', `${leagueId}`); //'chat');
+        return ChatClient.instance.chatInstance.channel(`messaging`, `${leagueId}`); //'chat');
     } 
 
     public static disconnectUser = async () => {
@@ -60,26 +61,26 @@ export class ChatClient {
 
 
 
-// export const initChat = async () => {
-//     return StreamChat.getInstance<{
-//         attachmentType: AttachmentType;
-//         channelType: ChannelType;
-//         commandType: CommandType;
-//         eventType: EventType;
-//         messageType: MessageType;
-//         reactionType: ReactionType;
-//         userType: UserType;
-//     }>(apiKey!, { enableWSFallback: true });
-// }
+export const initChat = async () => {
+    return StreamChat.getInstance<{
+        attachmentType: AttachmentType;
+        channelType: ChannelType;
+        commandType: CommandType;
+        eventType: EventType;
+        messageType: MessageType;
+        reactionType: ReactionType;
+        userType: UserType;
+    }>(apiKey!, { enableWSFallback: true });
+}
 
-// export const finishSetup = async (client: StreamChat, user: any, token: string) => {
-//     await client.connectUser({
-//         id: user.id,
-//         name: user.name,
-//         role: 'admin',
-//         image: user.image,
-//         },
-//         token);
-//     //@ts-ignore
-//     setChannel(client.channel('messaging', 'chat'));
-// }
+export const finishSetup = async (client: StreamChat, user: any, token: string) => {
+    await client.connectUser({
+        id: user.id,
+        name: user.name,
+        role: 'admin',
+        image: user.image,
+        },
+        token);
+    //@ts-ignore
+    setChannel(client.channel('messaging', 'chat'));
+}

@@ -16,12 +16,15 @@ import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../redux/reducers/RootReducer';
 import LeagueSwitchMenu from '../menu/LeagueSwitchMenu';
 import { useSelector } from 'react-redux';
+import { current } from '@reduxjs/toolkit';
 
-const pages = [{label:'Games', route: "/games"}, {label:'Auction', route: "/auction"}];
+
 const settings = ['logout'];
 
 function ResponsiveAppBar() {
-  const { owner } = useSelector((state: RootState) => state.profile)
+  const { owner, currentLeague } = useSelector((state: RootState) => state.profile)
+  const pages = [];// {label:'Games', route: "/games"}
+  if (currentLeague?.league.isAuctioning) pages.push({label:'Auction', route: "/auction"})
   const navigate = useNavigate()
   const { user } = useAuth0();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);

@@ -6,8 +6,6 @@ import { updateLots } from "./LotActions";
 import { updateOwners } from "./OwnerActions";
 import { updateUI } from "./UiActions";
 import { RootState } from "../reducers/RootReducer";
-import GeneralApiSvc from "../../services/GeneralApiSvc";
-import { ignore } from "antd/es/theme/useToken";
 
 export const UPDATE_FREE_AGENTS = 'UPDATE_FREE_AGENTS';
 
@@ -40,6 +38,7 @@ export const getInitialAuctionData = (userSub: string = "") => async (
             }
 
         })
+        console.log('free agents' , initData.freeAgents)
         dispatch(updateFreeAgents(initData.freeAgents));
         dispatch(updateLots(initData.lots))
         dispatch(updateOwners(initData.owners));

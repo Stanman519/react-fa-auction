@@ -37,11 +37,11 @@ type ChatWindowProps = {
         sort: ChannelSort;
     };
 }
-export const FAChatWindow = ({chatChannel = ""}: {chatChannel?: string }): JSX.Element | null => {
+export const FAChatWindow = ({leagueId}: {leagueId?: string }): JSX.Element | null => {
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile)
     const {profile} = useSelector((state: RootState) => state)
     const { user } = useAuth0();
-    const [channel, setChannel] = useState<any>(ChatClient.getInstance().chatInstance.activeChannels[`messaging:${currentLeague?.league.leagueId}`]);
+    const [channel, setChannel] = useState<any>(ChatClient.getInstance().chatInstance.activeChannels[`messaging${currentLeague?.league.leagueId}`]);
     const [isMobileNavVisible, setMobileNav] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const [giphyState, setGiphyState] = useState(false);
@@ -51,7 +51,7 @@ export const FAChatWindow = ({chatChannel = ""}: {chatChannel?: string }): JSX.E
     useEffect(() => {
         let chatClientToUpdate = ChatClient.getInstance()
         const chatSetup = async () => {
-            if(!chatClientToUpdate.isInitialized || !chatClientToUpdate.chatInstance.activeChannels[`messaging:${currentLeague?.league.leagueId}`]){
+            if(!chatClientToUpdate.isInitialized || !chatClientToUpdate.chatInstance.activeChannels[`messaging${currentLeague?.league.leagueId}`]){
                 let channel = await ChatClient.finishSetup({
                     user_id: `${owner.ownerId}`,
                     id: `${owner.ownerId}`,
@@ -59,13 +59,13 @@ export const FAChatWindow = ({chatChannel = ""}: {chatChannel?: string }): JSX.E
                     role: 'admin',
                     image: user?.picture,
                     
-                }, owner.streamToken, chatChannel)
+                }, owner.streamToken, leagueId ?? '')
                 setChannel(channel)
                 setChatClient(chatClientToUpdate.chatInstance)
 
             }
         }
-        if (owner.streamToken && (!chatIsInitialized) || !chatClientToUpdate.chatInstance.activeChannels[`messaging:${currentLeague?.league.leagueId}`]){
+        if (leagueId && owner.streamToken && (!chatIsInitialized) || !chatClientToUpdate.chatInstance.activeChannels[`messaging${currentLeague?.league.leagueId}`]){
             chatSetup()
             setChatIsInitialized(true);
         }
