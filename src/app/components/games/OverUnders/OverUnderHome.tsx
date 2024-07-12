@@ -21,15 +21,14 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
     const { franchiseWinTotals } = useSelector((state: RootState) => state.overUnders)
     const totalPicks = franchiseWinTotals.filter(p => p.userPick.isOver !== undefined).length
     const totalDoubles = franchiseWinTotals.filter(p => p.userPick.lineAdjustment !== 0).length
-    console.log('owner', owner.ownerId)
+
     const CURRENT_YEAR = 2024
     const CURRENT_LEAGUE = "NFL"
 
     useEffect(() => {
         if (isLoading || isDemo) return
         const checkUser = async () => {
-            console.log('is auth', isAuthenticated)
-            console.log('user sub', user?.sub)
+
             if (isAuthenticated && user?.sub) {
                 dispatch(fetchFranchiseWinTotals(CURRENT_YEAR, CURRENT_LEAGUE))
                 //TODO: store this in cookies because it is set once and saved?
