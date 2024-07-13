@@ -172,7 +172,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                                 {!isDemo && !barOptions.includes('fa-auction') && <Button color='inherit' onClick={() => clearDemoStateAndNav('demo')}>See Demo</Button>}
                                 {barOptions.includes('fa-auction') &&  owner.ownername && 
                                         lots.filter(l => !l.bid).length > 0 && 
-                                        lots.filter(l => l.nominatedBy === currentLeague?.leagueownerid).length < 3 ?
+                                        lots.filter(l => l.nominatedBy === currentLeague?.leagueownerid).length <= 3 ?
                                     <Button color='inherit' onClick={() => addNominationCard()}>
                                         Nominate a Player
                                     </Button> :
