@@ -30,6 +30,7 @@ export const getInitialAuctionData = (userSub: string = "") => async (
         const leagueId = currentLeague?.league?.leagueId ?? 0
         const initData = await AuctionApiSvc.pageLoad(userSub, leagueId);
         //const user = await GeneralApiSvc.
+
         initData.lots.forEach(l => {
                             //@ts-ignore
             if (typeof l.bid?.expires === 'string' && !l.bid.expires.endsWith('Z')){
@@ -38,8 +39,9 @@ export const getInitialAuctionData = (userSub: string = "") => async (
             }
 
         })
-        console.log('free agents' , initData.freeAgents)
+
         dispatch(updateFreeAgents(initData.freeAgents));
+
         dispatch(updateLots(initData.lots))
         dispatch(updateOwners(initData.owners));
         if (initData.profile) {

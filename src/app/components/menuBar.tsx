@@ -20,6 +20,7 @@ type DrawerType = 'Salaries' | 'Chat' | 'pfp-click' | undefined
 type BarOption = 'fa-auction' | 'salary-league' | 'chat' | 'confidence'
 
 export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatChannel?: string, barOptions: BarOption[], isDemo?: boolean}) {
+
     const { user, isAuthenticated, loginWithRedirect, isLoading, logout } = useAuth0();
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
     const owners = useSelector((state: RootState) => state.owners);
@@ -170,6 +171,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                                         }}>{currentLeague?.league.name}</Button>}
                                 {isDemo && <Button color='inherit' onClick={() => clearDemoStateAndNav('games')}> CONFIDENCE POOL </Button>}
                                 {!isDemo && !barOptions.includes('fa-auction') && <Button color='inherit' onClick={() => clearDemoStateAndNav('demo')}>See Demo</Button>}
+                                
                                 {barOptions.includes('fa-auction') &&  owner.ownername && 
                                         lots.filter(l => !l.bid).length > 0 && 
                                         lots.filter(l => l.nominatedBy === currentLeague?.leagueownerid).length <= 3 ?

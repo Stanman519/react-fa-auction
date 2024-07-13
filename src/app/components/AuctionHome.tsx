@@ -104,7 +104,9 @@ function AuctionHome() {
             < PlayerBioSlab />
             {modal === 'free-agent-grid' && <FreeAgentGridModal isOpen={modal === 'free-agent-grid'} />}
             {newNom && <LotBody lot={newNom} key={newNom.lotId} />}
+            <div className=' flex flex-col md:flex-row flex-wrap items-center justify-center'>
             {activeLots.map(l => <LotBody lot={l} key={l.lotId} />)}
+            </div>
           </div>}
         {!newNom && activeLots.length === 0 && loading !== 'full-screen' &&
           <div style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>

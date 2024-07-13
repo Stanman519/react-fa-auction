@@ -21,7 +21,7 @@ export interface Lot {
     leagueId: number
 }
 
-const defaultState = Array.from(Array(13).keys()).map(l => { return { lotId: l + 1, newNom: false}}) as Lot[]
+const defaultState = [] as Lot[]//Array.from(Array(13).keys()).map(l => { return { lotId: l + 1, newNom: false}}) as Lot[]
 
 
 export const lotReducer = (state = defaultState, action: LotAction): Lot[] => {
