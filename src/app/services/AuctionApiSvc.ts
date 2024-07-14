@@ -108,7 +108,16 @@ async function handleErrorResponse<Type>(response: Response): Promise<Type | voi
     }
     if (response.status === 204) return Promise.resolve();
     if (response.status !== 200 && response.statusText !== 'OK') throw new Error('Service unreachable.');
-    return response.json();
+    try {
+        return await response.json();
+    } catch (e) {
+        if (e instanceof SyntaxError) {
+            // Handle cases where there is no JSON response
+            return Promise.resolve();
+        } else {
+            throw e;
+        }
+    }
 }
 
 const sendWin = async (bid: Bid): Promise<Response> => {
