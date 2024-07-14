@@ -157,3 +157,36 @@ export const freshenUpTheLotsAfterAbsence = () => async (
 
 
 }
+
+export const sortLots = (sortBy: string) => async ( 
+    dispatch: Function,
+    getState: () => RootState
+): Promise<any> => {
+    const {lots} = getState()
+    const newLots = [...lots]
+
+    if (sortBy === 'time') {
+        newLots.sort((a, b) => {
+
+            const dateA = a?.bid?.expires ? new Date(a?.bid?.expires).getTime() : 0;
+            const dateB = b?.bid?.expires ? new Date(b?.bid?.expires).getTime() : 0;
+            return dateA - dateB ;
+          });
+    } else if (sortBy == 'salary'){
+        newLots.sort((a, b) => {
+            const lengthA = a?.bid?.bidSalary ?? Number.MAX_SAFE_INTEGER;
+            const lengthB = b?.bid?.bidSalary ?? Number.MAX_SAFE_INTEGER;
+            return lengthB - lengthA;
+          });
+    } else if (sortBy == 'position') {
+        newLots.sort((a, b) => {
+            const positionA = a?.bid?.player?.position ?? '';
+            const positionB = b?.bid?.player?.position ?? '';
+            return positionA.localeCompare(positionB);
+          });
+    }
+
+    dispatch(updateLots(newLots))
+
+
+}

@@ -4,7 +4,7 @@ import { getInitialAuctionData } from '../redux/actions/FreeAgentActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { MenuBar } from '../components/menuBar';
-import { Alert, Backdrop, CircularProgress, Snackbar, useTheme } from '@mui/material';
+import { Alert, Backdrop, CircularProgress, Snackbar, ToggleButton, ToggleButtonGroup, useTheme } from '@mui/material';
 import { updateUI } from '../redux/actions/UiActions';
 import signalR from '../signalR/socketMiddleware';
 import { ChatClient } from '../services/ChatUtils';
@@ -14,6 +14,7 @@ import { synchronizeAuth0WithDbLogin } from '../redux/actions/LoginActions';
 import { NoActiveAuctions } from './noActiveAuctions';
 import { FreeAgentGridModal } from './FreeAgentGridModal';
 import { BidHistorySlab, PlayerBioSlab } from './lot/bioAndHistory';
+import { sortLots } from '../redux/actions/LotActions';
 
 function AuctionHome() {
   const theme = useTheme()
@@ -27,6 +28,7 @@ function AuctionHome() {
   const loading = useSelector((state: RootState) => state.ui.isLoading)
   const navigate = useNavigate()
   const {hasReconnected} = useSelector((state: RootState) => state.signalR)
+  const [sortBy, setSortBy] = useState<string|undefined>(undefined)
   // const { } = useSelector((state: RootState) => state.signalR.connection.)
 
   // useEffect(() => {
@@ -74,6 +76,9 @@ function AuctionHome() {
     }
   }, [isAuthenticated, loginWithRedirect, isLoading, user])
 
+  useEffect(() => {
+    
+  }, [sortBy])
 
   useEffect(() => {
     if (hasReconnected) {
@@ -81,7 +86,20 @@ function AuctionHome() {
       setTimeout(() => setReconSign(false), 5000)
     }
   }, [hasReconnected])
+  useEffect(() => {
+    if (!sortBy) return;
+    dispatch(sortLots(sortBy))
+  },[sortBy])
 
+
+  const handleSort = (
+    event: React.MouseEvent<HTMLElement>,
+    sort: string | null,
+  ) => {
+    if (sort !== null) {
+      setSortBy(sort);
+    }
+  };
   return (
 
     <div className="App" style={{ backgroundColor: theme.palette.background.default }}>
@@ -100,6 +118,30 @@ function AuctionHome() {
             </Backdrop>
           </div> :
           <div className='p-2'>
+                          {lots.length > 0 && 
+            <div style={{display: 'flex', justifyContent:'center', alignItems:'center'}}>
+
+
+                <div style={{marginRight: 7}}>Sort By: </div>
+                  <ToggleButtonGroup
+                    value={sortBy}
+                    onChange={handleSort}
+                    exclusive
+                    aria-label="device"
+                  >
+                      <ToggleButton value="position" aria-label="laptop">
+                        Position
+                      </ToggleButton>
+                      <ToggleButton value="salary" aria-label="tv">
+                        Salary
+                      </ToggleButton>
+                      <ToggleButton value="time" aria-label="phone">
+                        Time
+                      </ToggleButton>
+                  </ToggleButtonGroup>
+                  </div>
+
+                  }
             {modal === 'bid-history-slab' && < BidHistorySlab />}
             < PlayerBioSlab />
             {modal === 'free-agent-grid' && <FreeAgentGridModal isOpen={modal === 'free-agent-grid'} />}
