@@ -4,12 +4,13 @@ import { PlayerDTO } from '../../redux/reducers/FreeAgentReducer';
 import { Bid, Lot } from '../../redux/reducers/LotReducer';
 import { RootState } from '../../store';
 //import { BioAndHistory } from './bioAndHistory';
-import { BidInfo } from './bidInfo';
+
 import { Headshot, MemoHeadshot } from './headshot';
 import { PlayerInfo } from './playerInfo';
 import { tmColorMap } from '../../services/Common';
 import { useState } from 'react';
 import { selectPlayerToNominate } from '../../redux/actions/LotActions';
+import BidInfo from './BidInfo';
 
 interface PlayerCardProps {
   lot: Lot

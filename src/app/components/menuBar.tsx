@@ -14,6 +14,7 @@ import { FAChatWindow } from "./chat";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 import { clearConfidenceStateBeforeNav } from "../redux/actions/ConfidenceActions";
+import { AuctionTeamSalaryCapsSlab } from "./AuctionTeamSalaryCapsSlab";
 
 type DrawerType = 'Salaries' | 'Chat' | 'pfp-click' | undefined
 
@@ -23,7 +24,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
 
     const { user, isAuthenticated, loginWithRedirect, isLoading, logout } = useAuth0();
     const { owner, currentLeague } = useSelector((state: RootState) => state.profile);
-    const owners = useSelector((state: RootState) => state.owners);
+
     const lots = useSelector((state: RootState) => state.lots.filter(l => l.leagueId === currentLeague?.league.leagueId ?? 0));
     const {modal } = useSelector((state: RootState) => state.ui);
     const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
@@ -35,7 +36,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
     const open = Boolean(anchorEl);
     const pfpMenuOpen = Boolean(picAnchorEl)
     const dispatch = useAppThunkDispatch();
-    const { palette } = useTheme();
+
     const navigate = useNavigate();
     const closeDrawer = () => {
         setOpenDrawer(undefined);
@@ -65,10 +66,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
     const seeFreeAgents = () => {
         dispatch(updateUI({modal: 'free-agent-grid'}))
     }
-    const highBidsOnTheBoard = (ownerId: number): number => {
-        return lots.filter(l => l.bid?.ownerId === ownerId).map(b => b.bid?.bidSalary)
-            .reduce((prev, curr) => prev! + curr!, 0) ?? 0;
-    }
+
     return (
         <div className="w-full">
 
@@ -103,7 +101,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                                     
                                     <>
                                     <MenuItem onClick={() => {
-                                        setOpenDrawer('Salaries')
+                                        dispatch(updateUI({modal: 'team-caps-slab'}))
                                         setAnchorEl(null)
                                         }}>Salary Caps</MenuItem>
                                         {owner.ownername && 
@@ -151,7 +149,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                             (<div style={{ display: 'flex', flexDirection: 'row', flex: 1, alignItems: 'center'}}>
                                 <img src={logo} style={{ maxHeight: 20, aspectRatio: 'auto', marginRight: 20 }} />
                                 {barOptions.includes('fa-auction') && <Button color="inherit"
-                                    onClick={() => setOpenDrawer('Salaries')}>
+                                    onClick={() => dispatch(updateUI({modal: 'team-caps-slab'}))}>
                                     Salary Caps
                                 </Button>}
                                 {barOptions.includes('confidence') && <Button color='inherit' onClick={() => {
@@ -251,51 +249,25 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                         </Toolbar>
                     </AppBar>
                 </Box>
+                <AuctionTeamSalaryCapsSlab />
                 <Drawer
-                    anchor={'left'}
-                    open={openDrawer=== 'Salaries'}
-                    onClose={() => closeDrawer()}
-                >
-                    <Box
-                        sx={{ width: 250, height: '100%' }}
-                        role="presentation"
-                        onClick={() => closeDrawer()}
-                        bgcolor={palette.background.default}
-                    >
-                        <List>
-                            {owners.map((o, index) => (
-                                <ListItem key={o.teamName} style={{ backgroundColor: index % 2 === 0 ? palette.background.default : palette.background.paper }}>
-                                    <img src={o.avatar} referrerPolicy="no-referrer" style={{ height: 0, width: 0 }} />
-                                    <Avatar style={{ marginRight: 8, cursor: 'pointer' }} sx={{ height: 50, width: 50 }} alt={o.ownerName} src={o.avatar}  />
-                                    <div style={{flexDirection: 'column'}}>
-                                        <ListItemText style={{}} primary={`${o.ownerName} - $${o?.capRoom}`} secondary={highBidsOnTheBoard(o.leagueownerid) ?? 0 > 0 ? `outstanding bids: $${highBidsOnTheBoard(o.leagueownerid)}`: ''} />
-                                    </div>
-                                
-                                </ListItem>
-                            ))}
-                            <Divider />
-                        </List>
-
-                    </Box>
-                </Drawer>
-                <Drawer
-                    PaperProps={{
-                        sx: { width: "40%", minWidth: 350}
-                      }}
-                    anchor={'left'}
-                    open={openDrawer=== 'Chat'}
-                    onClose={() => closeDrawer()}
-                >
-                    {/* <Box
-                        sx={{ width: 350, height: 500 }}
-                        role="presentation"
-                        //onClick={() => closeDrawer()}
-                        bgcolor={palette.background.default}
-                    > */}
-                        <FAChatWindow leagueId={currentLeague?.league.leagueId.toString()}/>
-
-                    {/* </Box> */}
-                </Drawer>
+PaperProps={{
+    sx: { width: "40%", minWidth: 350}
+  }}
+anchor={'left'}
+open={openDrawer=== 'Chat'}
+onClose={() => closeDrawer()}
+>
+{/* <Box
+    sx={{ width: 350, height: 500 }}
+    role="presentation"
+    //onClick={() => closeDrawer()}
+    bgcolor={palette.background.default}
+> */}
+    <FAChatWindow leagueId={currentLeague?.league.leagueId.toString()}/>
+    
+{/* </Box> */}
+</Drawer>
             </Fragment>
         </div>
 

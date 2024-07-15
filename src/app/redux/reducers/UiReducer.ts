@@ -43,6 +43,7 @@ export type Modals =
   'tag-confirm' |
   'bid-history-slab' |
   'player-bio-slab' |
+  'team-caps-slab' |
   'free-agent-grid' |
   'confidence-submit-success' |
   'error'|
