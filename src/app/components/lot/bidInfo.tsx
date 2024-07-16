@@ -15,7 +15,7 @@ interface BidInfoProps {
 
 
 
-const BidInfo = React.memo(({ lot }: BidInfoProps): JSX.Element => {
+export const BidInfo = React.memo(({ lot }: BidInfoProps): JSX.Element => {
     const dispatch = useDispatch()
 
 
@@ -49,4 +49,3 @@ const BidInfo = React.memo(({ lot }: BidInfoProps): JSX.Element => {
     );
 });
 
-export default BidInfo

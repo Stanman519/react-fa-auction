@@ -10,8 +10,7 @@ import { PlayerInfo } from './playerInfo';
 import { tmColorMap } from '../../services/Common';
 import { useState } from 'react';
 import { selectPlayerToNominate } from '../../redux/actions/LotActions';
-// @ts-ignore
-import BidInfo from './BidInfo.tsx';
+import { BidInfo } from './bidInfo';
 
 interface PlayerCardProps {
   lot: Lot
