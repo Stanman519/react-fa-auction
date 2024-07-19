@@ -15,7 +15,7 @@ interface BidInfoProps {
 
 
 
-export const BidInfo = React.memo(({ lot }: BidInfoProps): JSX.Element => {
+export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
     const dispatch = useDispatch()
 
 
@@ -47,5 +47,5 @@ export const BidInfo = React.memo(({ lot }: BidInfoProps): JSX.Element => {
         <Divider variant='middle' flexItem />
         </div>
     );
-});
+};
 

@@ -21,9 +21,9 @@ function AuctionHome() {
   const dispatch = useDispatch();
   const [reconSign, setReconSign] = useState<boolean>(false);
   const { user, isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
-  const activeLots = useSelector((state: RootState) => state.lots.filter(l => l.bid && !l.newNom))
   const newNom = useSelector((state: RootState) => state.lots.find(l => l.newNom))
   const lots = useSelector((state: RootState) => state.lots);
+  const activeLots = lots.filter(l => l.bid && !l.newNom)
   const { error, errorText, modal } = useSelector((state: RootState) => state.ui)
   const loading = useSelector((state: RootState) => state.ui.isLoading)
   const navigate = useNavigate()
