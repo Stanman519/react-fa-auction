@@ -18,7 +18,7 @@ const groupOwners = (owners: OpposingFranchiseDTO[]) => {
 
         if (!groupedOwners[mflfranchiseid]) {
             groupedOwners[mflfranchiseid] = { ...owner, ownerName: '', avatar: avatar };
-        }3
+        }
         if (groupedOwners[mflfranchiseid].ownerName) {
             groupedOwners[mflfranchiseid].ownerName += ` AKA ${ownerName}`;
         } else {
