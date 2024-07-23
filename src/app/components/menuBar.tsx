@@ -1,12 +1,8 @@
-import { AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, Toolbar, useTheme } from "@mui/material";
+import { AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, Toolbar } from "@mui/material";
 import { Fragment, useState } from "react";
 import MenuIcon from '@mui/icons-material/Menu';
 import Drawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState, useAppThunkDispatch } from "../store";
 import { turnOnNominationModeForThisOwnersLot } from "../redux/actions/LotActions";
 import { updateUI } from "../redux/actions/UiActions";
@@ -258,12 +254,7 @@ anchor={'left'}
 open={openDrawer=== 'Chat'}
 onClose={() => closeDrawer()}
 >
-{/* <Box
-    sx={{ width: 350, height: 500 }}
-    role="presentation"
-    //onClick={() => closeDrawer()}
-    bgcolor={palette.background.default}
-> */}
+
     <FAChatWindow leagueId={currentLeague?.league.leagueId.toString()}/>
     
 {/* </Box> */}

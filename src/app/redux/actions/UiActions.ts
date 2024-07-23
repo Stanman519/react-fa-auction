@@ -39,7 +39,7 @@ export const updatePlayerBio = (bid?: Bid) => async (
     dispatch(updateUI({
         modal: 'player-bio-slab', isLoading: 'slab'}));
     const hasAction: boolean = bid.player.actionShot ? true : false
-    const res = await AuctionApiSvc.getFullPlayerBio(lastYear, bid.player.mflId, bid.player.position, bid.player.firstName, bid.player.lastName, hasAction);
+    const res = await AuctionApiSvc.getFullPlayerBio(lastYear, bid.player.mflId, bid.player.position, bid.player.firstName, bid.player.lastName, true);//fix later I ran out of quota for the bing images
     const bioRes = await AuctionApiSvc.handleErrorResponse(res) as PlayerBio;
     dispatch(updateUI({
         currentPlayerBio: {...bioRes, actionShot: hasAction ? bid.player.actionShot ?? '' : bioRes.actionShot}, 

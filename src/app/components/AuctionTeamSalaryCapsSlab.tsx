@@ -1,15 +1,10 @@
 import { Avatar, Box, Divider, Drawer, List, ListItem, ListItemText, useTheme } from "@mui/material"
 import { useDispatch, useSelector } from "react-redux";
-
 import { updateUI } from "../redux/actions/UiActions";
-import { useMemo } from "react";
 import { OpposingFranchiseDTO } from "../redux/reducers/OwnerReducer";
 import { RootState } from "../store";
+import { useEffect, useState } from "react";
 
-interface CurrentBids {
-    ownerId: number;
-    bidSalary: number;
-}
 
 const groupOwners = (owners: OpposingFranchiseDTO[]) => {
     const groupedOwners: { [key: number]: OpposingFranchiseDTO } = {};
@@ -19,6 +14,7 @@ const groupOwners = (owners: OpposingFranchiseDTO[]) => {
         if (!groupedOwners[mflfranchiseid]) {
             groupedOwners[mflfranchiseid] = { ...owner, ownerName: '', avatar: avatar };
         }
+
         if (groupedOwners[mflfranchiseid].ownerName) {
             groupedOwners[mflfranchiseid].ownerName += ` AKA ${ownerName}`;
         } else {
@@ -29,28 +25,37 @@ const groupOwners = (owners: OpposingFranchiseDTO[]) => {
 };
 
 export const AuctionTeamSalaryCapsSlab = (): JSX.Element => {
+
     const owners = useSelector((state: RootState) => state.owners);
-    const groupedOwners = useMemo(() => groupOwners(owners), [owners]);
+
     const { palette } = useTheme();
     const { currentLeague } = useSelector((state: RootState) => state.profile);
     const openSlab = useSelector((state: RootState) => state.ui.modal === 'team-caps-slab');
     const dispatch = useDispatch();
-    const lots = useSelector((state: RootState) => state.lots.filter(l => l.leagueId === currentLeague?.league.leagueId ?? 0));
+    const {lots} = useSelector((state: RootState) => state);
+    const [groupedOwners, setGroupedOwners] = useState<OpposingFranchiseDTO[]>([]);
+    const [highBidsForOwners, setHighBidsForOwners] = useState<{ [key: number]: number }>({});
 
-    const highBidsForOwners = useMemo(() => {
-        const bids: { [key: number]: number } = {};
-        groupedOwners.forEach(owner => {
-            bids[owner.leagueownerid] = lots
-                .filter(l => l.bid?.ownerId === owner.leagueownerid)
-                .map(b => b.bid?.bidSalary ?? 0)
-                .reduce((prev, curr) => prev + curr, 0);
-        });
-        return bids;
-    }, [lots, groupedOwners]);
-
+    useEffect(() => {
+        if (openSlab) {
+            const newGroupedOwners = groupOwners(owners);
+            setGroupedOwners(newGroupedOwners);
+            const bids: { [key: number]: number } = {};
+            newGroupedOwners.forEach(owner => {
+                var testing = lots
+                    .filter(l => l.bid?.ownerId === owner.leagueownerid)
+                    .map(b => b.bid?.bidSalary ?? 0)
+                    console.log(`${owner.leagueownerid} - ${testing}`)
+                    var testingReduced = testing.reduce((prev, curr) => prev + curr, 0);
+                    bids[owner.leagueownerid] = testingReduced
+            });
+            setHighBidsForOwners(bids);
+        }
+    }, [openSlab, owners, lots]);
 
     return (
     <Drawer
+            
             anchor={'left'}
             open={openSlab}
             onClose={() => dispatch(updateUI({modal: undefined}))}
