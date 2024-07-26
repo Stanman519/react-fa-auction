@@ -17,7 +17,7 @@ function AuctionRosters() {
         if (currentLeague?.league.leagueId){
 
             const res = await AuctionApiSvc.getRosters(currentLeague.league.leagueId)
-
+            setRosters(res)
             const owners = res.map(r => {return {...r} as OpposingFranchiseDTO})
 
             setOwners(owners)
@@ -25,7 +25,7 @@ function AuctionRosters() {
     }
     ugh()
   }, [])
-
+  console.log('select', selection)
   const handleChange = (event: SelectChangeEvent) => {
     const id = event.target.value
     const selection = rosters.find(r => r.mflfranchiseid == +id)
@@ -48,12 +48,12 @@ function AuctionRosters() {
           onChange={handleChange}
         >
         {owners.map(o => {
-            return ( <MenuItem value={o.mflfranchiseid}>{o.ownerName}</MenuItem>)
+            return ( <MenuItem key={o.mflfranchiseid} value={o.mflfranchiseid}>{o.ownerName}</MenuItem>)
         })}
         </Select>
         
       </FormControl>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} style={{maxWidth: 800}}>
             <Table>
                 {(selection?.players?.length ?? 0) > 0 && <TableHead>
                     <TableRow>
@@ -69,9 +69,9 @@ function AuctionRosters() {
                     return (<TableRow>
                                   <TableCell>{p.firstName}</TableCell>
                                   <TableCell>{p.lastName}</TableCell>
-                                  <TableCell align="right">{p.position}</TableCell>
-                                  <TableCell align="right">{p.salary}</TableCell>
-                                  <TableCell align="right">{p.length}</TableCell>
+                                  <TableCell >{p.position}</TableCell>
+                                  <TableCell >{p.salary}</TableCell>
+                                  <TableCell >{p.length}</TableCell>
                     </TableRow>)
                 })}
             </Table>
