@@ -37,6 +37,7 @@ export const AuctionTeamSalaryCapsSlab = (): JSX.Element => {
     const [highBidsForOwners, setHighBidsForOwners] = useState<{ [key: number]: number }>({});
 
     useEffect(() => {
+        console.log('lots', lots)
         if (openSlab) {
             const newGroupedOwners = groupOwners(owners);
             setGroupedOwners(newGroupedOwners);

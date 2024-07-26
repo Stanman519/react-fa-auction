@@ -14,7 +14,7 @@ import { AuctionTeamSalaryCapsSlab } from "./AuctionTeamSalaryCapsSlab";
 
 type DrawerType = 'Salaries' | 'Chat' | 'pfp-click' | undefined
 
-type BarOption = 'fa-auction' | 'salary-league' | 'chat' | 'confidence'
+type BarOption = 'fa-auction' | 'salary-league' | 'chat' | 'confidence' 
 
 export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatChannel?: string, barOptions: BarOption[], isDemo?: boolean}) {
 

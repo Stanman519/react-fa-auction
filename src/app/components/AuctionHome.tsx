@@ -29,32 +29,6 @@ function AuctionHome() {
   const navigate = useNavigate()
   const {hasReconnected} = useSelector((state: RootState) => state.signalR)
   const [sortBy, setSortBy] = useState<string|undefined>(undefined)
-  // const { } = useSelector((state: RootState) => state.signalR.connection.)
-
-  // useEffect(() => {
-  //   const handleVisibilityChange = () => {
-  //     if (document.visibilityState === 'visible') {
-  //       // Reconnect SignalR
-  //       if (connection) {
-  //         connection.start()
-  //           .then(() => {
-  //             console.log('Reconnected!');
-  //             // Optionally, fetch fresh data from the server
-  //             fetchFreshBids();
-  //           })
-  //           .catch(e => console.log('Reconnection failed: ', e));
-  //       }
-  //     } else {
-  //       if (connection) {
-  //         connection.stop();
-  //       }
-  //     }
-  //   };
-  //   document.addEventListener('visibilitychange', handleVisibilityChange)
-  //   return () => {
-  //     document.removeEventListener('visibilitychange', handleVisibilityChange);
-  //   };
-  // }, [connection]);
 
   useEffect(() => {
 
@@ -65,6 +39,7 @@ function AuctionHome() {
 
         dispatch(getInitialAuctionData(user.sub))
         dispatch(signalR())
+
       } else {
         await loginWithRedirect({ appState: { returnTo: '/auction' } });
       }
@@ -76,10 +51,11 @@ function AuctionHome() {
     }
   }, [isAuthenticated, loginWithRedirect, isLoading, user])
 
-  useEffect(() => {
-    
-  }, [sortBy])
 
+  useEffect(() => {
+    if (lots.length > 0) setSortBy('time')
+  },[lots.length > 0])
+  
   useEffect(() => {
     if (hasReconnected) {
       setReconSign(true)
@@ -104,7 +80,7 @@ function AuctionHome() {
 
     <div className="App" style={{ backgroundColor: theme.palette.background.default }}>
       <div className='menu-container'>
-        <MenuBar barOptions={['chat', 'fa-auction', 'salary-league']} chatChannel={"messaging"}/>
+        <MenuBar barOptions={['chat', 'fa-auction', 'salary-league', 'confidence']} chatChannel={"messaging"}/>
       </div>
       {reconSign && <div> Reconnected. </div>}
       <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -137,6 +113,9 @@ function AuctionHome() {
                       </ToggleButton>
                       <ToggleButton value="time" aria-label="phone">
                         Time
+                      </ToggleButton>
+                      <ToggleButton value="bids" aria-label="phone">
+                        My Bids First
                       </ToggleButton>
                   </ToggleButtonGroup>
                   </div>
