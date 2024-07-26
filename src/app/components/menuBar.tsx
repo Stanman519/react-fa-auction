@@ -96,6 +96,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                                     {barOptions.includes('fa-auction') && 
                                     
                                     <>
+                                    <MenuItem onClick={(() => navigate('/rosters'))}>Rosters</MenuItem>
                                     <MenuItem onClick={() => {
                                         dispatch(updateUI({modal: 'team-caps-slab'}))
                                         setAnchorEl(null)
@@ -147,6 +148,10 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                                 {barOptions.includes('fa-auction') && <Button color="inherit"
                                     onClick={() => dispatch(updateUI({modal: 'team-caps-slab'}))}>
                                     Salary Caps
+                                </Button>}
+                                {barOptions.includes('fa-auction') && <Button color="inherit"
+                                    onClick={() => navigate('/rosters')}>
+                                    Rosters
                                 </Button>}
                                 {barOptions.includes('confidence') && <Button color='inherit' onClick={() => {
                                     setAnchorEl(null)

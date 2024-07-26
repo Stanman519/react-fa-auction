@@ -37,7 +37,6 @@ export const AuctionTeamSalaryCapsSlab = (): JSX.Element => {
     const [highBidsForOwners, setHighBidsForOwners] = useState<{ [key: number]: number }>({});
 
     useEffect(() => {
-        console.log('lots', lots)
         if (openSlab) {
             const newGroupedOwners = groupOwners(owners);
             setGroupedOwners(newGroupedOwners);
@@ -46,7 +45,7 @@ export const AuctionTeamSalaryCapsSlab = (): JSX.Element => {
                 var testing = lots
                     .filter(l => l.bid?.ownerId === owner.leagueownerid)
                     .map(b => b.bid?.bidSalary ?? 0)
-                    console.log(`${owner.leagueownerid} - ${testing}`)
+
                     var testingReduced = testing.reduce((prev, curr) => prev + curr, 0);
                     bids[owner.leagueownerid] = testingReduced
             });

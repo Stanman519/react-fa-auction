@@ -11,6 +11,7 @@ import { ConfidenceAdminHome } from './app/components/confidence/admin/AdminHome
 import { TermsOfService } from './app/components/legal/TermsOfService';
 import { PrivacyPolicy } from './app/components/legal/PrivacyPolicy';
 import OverUnderHome from './app/components/games/OverUnders/OverUnderHome';
+import AuctionRosters from './app/components/AuctionRosters';
 
 
 function App() {
@@ -42,7 +43,8 @@ function App() {
             <Route path='/demo' element={<GamesHome isDemo/>}/>
             <Route path='/admin' element={<ConfidenceAdminHome />} />
             <Route path='/over-unders' element={<OverUnderHome />}/>
-
+            <Route path='/rosters' element={<AuctionRosters />}/>
+ 
             <Route path='/terms-of-service' element={<TermsOfService />} />
             
             <Route path='/privacy-policy' element={<PrivacyPolicy />} />

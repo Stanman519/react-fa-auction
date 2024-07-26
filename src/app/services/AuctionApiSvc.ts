@@ -29,6 +29,9 @@ export interface PlayerTipResponse {
     yearMin: number
     yearMax: number
 }
+export interface RosterOwner extends OpposingFranchiseDTO{
+    players: PlayerDTO[]
+}
 
 const makeNewBid = async (bid: Bid): Promise<Response> => {
     return await fetch(`${URL}/free-agency/bid`, {
@@ -54,6 +57,15 @@ const getBundledConfidenceLoadData = async (year: number) : Promise<Response> =>
     return await fetch(`${process.env.REACT_APP_AUCTION_API_URL}/confidence/home?year=${year}`)
 }
 
+const getRosters = async (leagueId: number) : Promise<RosterOwner[]> => {
+    const rest = await axios.get(`${process.env.REACT_APP_AUCTION_API_URL}/free-agency/leagues/${leagueId}/rosters`, 
+    {
+       
+    }).catch(error => {
+        throw new Error(error.response.data.friendlyMessage)
+    });
+    return rest.data;
+}
 
 const getFullPlayerBio = async (lastYear: number, id: number, position: string, firstName: string, lastName: string, actionShot: boolean, leagueId: number = 13894) : Promise<Response> => {
     return await fetch(`${URL}/free-agency/leagues/${leagueId}/year/${lastYear}/playerId/${id}/position/${position}/firstName/${firstName}/lastName/${lastName}?hasAction=${actionShot}`)
@@ -159,6 +171,7 @@ export default {
     handleErrorResponse,
     makeNewBid,
     makeNewNom,
+    getRosters,
     sendWin,
     askCapn,
     getBundledConfidenceLoadData
