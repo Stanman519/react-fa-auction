@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { Alert, Button, Snackbar } from "@mui/material";
+import { Alert, Box, Button, Snackbar } from "@mui/material";
 import "boarding.js/styles/main.css";
 import "boarding.js/styles/themes/basic.css";
 import { fetchAllUsers, fetchFranchiseWinTotals, fetchUserPicks, submitOverUnderPicks } from "../../../redux/actions/OverUnderActions";
@@ -46,8 +46,6 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
 
 
 
-
-
     return (
         <div className="flex flex-col justify-start items-center" style={{ overflowX: 'hidden', overflowY: 'hidden', minHeight: '100vh' }}>
 
@@ -55,9 +53,17 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
             <Rules />
 
             <UserPickChartForTeam />
-            {franchiseWinTotals.map(f => <OverUnderRow key={f.id} prop={f} />)}
             <div>Total Picks: {totalPicks}</div>
             <div>Total Double Up/Downs: {totalDoubles}</div>
+            <Box sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 2,
+                justifyContent: 'center',
+                p: 2,
+                }}>
+                {franchiseWinTotals.map(f => <OverUnderRow key={f.id} prop={f} />)}
+                </Box>
             <Button variant='outlined' color='primary' disabled={(totalPicks !== 24 || totalDoubles !== 3)} 
             onClick={() => dispatch(submitOverUnderPicks(CURRENT_YEAR, CURRENT_LEAGUE))}>Submit Picks</Button>
             <Snackbar open={modal === 'confidence-submit-success'} autoHideDuration={800} onClose={() => dispatch(updateUI({ modal: undefined }))} >

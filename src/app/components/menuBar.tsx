@@ -14,7 +14,7 @@ import { AuctionTeamSalaryCapsSlab } from "./AuctionTeamSalaryCapsSlab";
 
 type DrawerType = 'Salaries' | 'Chat' | 'pfp-click' | undefined
 
-type BarOption = 'fa-auction' | 'salary-league' | 'chat' | 'confidence' 
+type BarOption = 'fa-auction' | 'salary-league' | 'chat' | 'confidence'  | 'games'
 
 export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatChannel?: string, barOptions: BarOption[], isDemo?: boolean}) {
 
@@ -124,7 +124,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                                     {barOptions.includes('confidence') && <MenuItem color='inherit' onClick={() => {
                                         setAnchorEl(null)
                                         dispatch(updateUI({modal: 'confidence-rules'}))}}>Rules</MenuItem>}
-                                    {isDemo && <MenuItem color='inherit' onClick={() => clearDemoStateAndNav('games')}>Confidence Pool</MenuItem>}
+                                    <MenuItem color='inherit' onClick={() => clearDemoStateAndNav('games')}>Confidence Pool</MenuItem>
                                     {!isDemo && <MenuItem color='inherit' onClick={() => clearDemoStateAndNav('demo')}>See Demo</MenuItem>}
                                     {barOptions.includes('chat') &&  
                                         user?.sub && isDemo !== true && <MenuItem onClick={() => {
@@ -168,7 +168,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                                     onClick={() => {
                                         navigate('/home')
                                         }}>{currentLeague?.league.name}</Button>}
-                                {isDemo && <Button color='inherit' onClick={() => clearDemoStateAndNav('games')}> CONFIDENCE POOL </Button>}
+                               
                                 {!isDemo && !barOptions.includes('fa-auction') && <Button color='inherit' onClick={() => clearDemoStateAndNav('demo')}>See Demo</Button>}
                                 
                                 {barOptions.includes('fa-auction') &&  owner.ownername && 
@@ -187,7 +187,7 @@ export function MenuBar({chatChannel = "", barOptions, isDemo = false}: {chatCha
                                     {modal === 'free-agent-grid' ? 'Close ' : ''}Free Agents
                                 </Button>}
                                 {/* {owner.leagues.length > 1 && <LeagueSwitchMenu />} */}
-
+                                <Button color='inherit' onClick={() => clearDemoStateAndNav('games')}> CONFIDENCE POOL </Button>
                             </div>)}
 
                             <Avatar onClick={pfpMenuClick} alt={user?.displayName} src={user?.picture} sx={{cursor: 'pointer'}} />

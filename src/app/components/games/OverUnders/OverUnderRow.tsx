@@ -2,7 +2,7 @@ import { handleOverUnderRowUpdate } from "../../../redux/actions/OverUnderAction
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { FranchiseWinTotal } from "../../../redux/reducers/OverUnderReducer";
-import { ToggleButton, ToggleButtonGroup, ToggleButtonProps, keyframes, useTheme } from "@mui/material";
+import { Box, Paper, ToggleButton, ToggleButtonGroup, ToggleButtonProps, Typography, keyframes, useTheme } from "@mui/material";
 import styled from "@emotion/styled";
 
 export const OverUnderRow = ({ prop }: {prop: FranchiseWinTotal}): JSX.Element => {
@@ -68,22 +68,67 @@ const onChange = (e: React.MouseEvent<HTMLElement>, newValue: boolean | '') => {
 
 }
   return (
-    <div>
-      {prop.franchise.city}
-      <ToggleButtonGroup color='info' onChange={onChange} exclusive defaultValue={undefined} value={userPick.isOver ?? ''}>
-        <MyToggleButton disableTouchRipple={userPick.isOver === false}  onMouseDown={e => mouseDown(e)} onMouseUp={(e) => mouseUp(e)} value={false}>{userPick.lineAdjustment === -1 ? 'Doubled Down!' : 'Under'}</MyToggleButton>
-        <MyToggleButton style={{backgroundColor: prop.userPick.lineAdjustment !== 0 ? 'gold' : undefined}} value={''}>{prop.overUnder + prop.userPick.lineAdjustment}</MyToggleButton>
-        <MyToggleButton disableTouchRipple={userPick.isOver === true}  onMouseDown={e => mouseDown(e)} onMouseUp={e => mouseUp(e)} value={true}>{userPick.lineAdjustment === 1 ? 'Doubled Up!' : 'Over'}</MyToggleButton>
-      </ToggleButtonGroup>
-      {/* <Button
-        disabled={userPick.isOver === undefined || userPick.isOver === null}
-        style={{ backgroundColor: userPick.lineAdjustment === 0 ? 'white' : 'gold' }}
-        onClick={onDouble}
-      >
-        {userPick.lineAdjustment === 0 ? 'Double' : 'Doubled'} {userPick.isOver === false ? 'Down' : 'Up'}
-        {userPick.lineAdjustment === 0 ? '?' : '!'}
-      </Button> */}
-    </div>
+    <Paper 
+      elevation={3}
+      sx={{
+        width: 320,
+        height: 150, // Fixed height for consistency
+        p: 2,
+        display: 'flex',
+        transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+        '&:hover': {
+          transform: 'translateY(-2px)',
+          boxShadow: 6,
+        },
+      }}
+    >
+      <Box sx={{ width: '33%', mr: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <img 
+          src={prop.franchise.logo} 
+          alt={`${prop.franchise.city} ${prop.franchise.name} logo`}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+          }}
+          loading="lazy"
+        />
+      </Box>
+      <Box sx={{ width: '60%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold' }}>
+          {prop.franchise.city} {prop.franchise.name}
+        </Typography>
+        <ToggleButtonGroup 
+          color='info' 
+          onChange={onChange} 
+          exclusive 
+          defaultValue={undefined} 
+          value={userPick.isOver ?? ''}
+          size='medium'
+          orientation="horizontal"
+          sx={{ width: '100%' }}
+        >
+          <ToggleButton 
+            value={false}
+            disabled={userPick.isOver === false}
+          >
+            {userPick.lineAdjustment === -1 ? 'Doubled Down!' : 'Under'}
+          </ToggleButton>
+          <ToggleButton 
+            value={''}
+            sx={{ backgroundColor: userPick.lineAdjustment !== 0 ? 'gold' : undefined }}
+          >
+            {prop.overUnder + userPick.lineAdjustment}
+          </ToggleButton>
+          <ToggleButton 
+            value={true}
+            disabled={userPick.isOver === true}
+          >
+            {userPick.lineAdjustment === 1 ? 'Doubled Up!' : 'Over'}
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+    </Paper>
   );
 };
 const ProgressBar = styled('div')(({ theme }) => ({

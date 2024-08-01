@@ -1,4 +1,4 @@
-import { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { MouseEvent, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Avatar, Button, Popover, Typography, useMediaQuery } from "@mui/material";
 import { RootState } from "../../../store";
@@ -152,11 +152,11 @@ export const UserPickChartForTeam = (): JSX.Element => {
                     container={anchorEl?.parentNode ?? null}
                     anchorOrigin={{
                       vertical: 'bottom',
-                      horizontal: 'left',
+                      horizontal: 'center',
                     }}
                     transformOrigin={{
                       vertical: 'top',
-                      horizontal: 'left',
+                      horizontal: 'center',
                     }}
                     onClose={(e,r) => {
                       console.log('reason', r)
