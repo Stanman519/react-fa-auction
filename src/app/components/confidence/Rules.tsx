@@ -1,29 +1,32 @@
-
-import { ListItem, ListItemAvatar, Avatar, ListItemText, List, Button, ButtonGroup, Drawer, Container, Typography, TableCell, Table, TableBody, TableContainer, TableHead, TableRow, Card, CardMedia, CardContent, useTheme, Divider, Skeleton, Dialog, Slide, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
-import { useState } from "react";
+import {
+  Button,
+  Dialog,
+  Slide,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { PlayerBio } from "../../redux/reducers/FreeAgentReducer";
-import { Bid } from "../../redux/reducers/LotReducer";
-import AuctionApiSvc from "../../services/AuctionApiSvc";
-import { getRankStringSuffix, lastYear, ownerMap, tmColorMap } from "../../services/Common";
 import { RootState } from "../../store";
 import React from "react";
 import { TransitionProps } from "@mui/material/transitions";
 import { updateUI } from "../../redux/actions/UiActions";
+import { useLocation } from "react-router-dom";
 
 const Transition = React.forwardRef(function Transition(
-    props: TransitionProps & {
-      children: React.ReactElement<any, any>;
-    },
-    ref: React.Ref<unknown>,
-  ) {
-    return <Slide direction="up" ref={ref} {...props} />;
-  });
-  
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>;
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 export const Rules = (): JSX.Element => {
-    const {modal} = useSelector((state: RootState) => state.ui)
-    const dispatch = useDispatch()
-    const rulesText = `Before the first game starts each weekend of the playoffs, you'll submit your list of who you think will win each game. The list will be in order of your confidence in your picks, from most confident to least confident.
+  const location = useLocation();
+  const { modal } = useSelector((state: RootState) => state.ui);
+  const dispatch = useDispatch();
+  const confidenceRulesText = `Before the first game starts each weekend of the playoffs, you'll submit your list of who you think will win each game. The list will be in order of your confidence in your picks, from most confident to least confident.
 
     Pick the winner of each game, then drag and drop the games in order. The number next to each game is how many points you'll get if you pick the correct winner.
 
@@ -40,28 +43,44 @@ export const Rules = (): JSX.Element => {
 
     Standings are tracked live here on this page.
     
-    Good luck! Have fun!`
-    return (
+    Good luck! Have fun!`;
 
-        <Dialog
-          open={modal === 'confidence-rules'}
-          TransitionComponent={Transition}
-          keepMounted
-          onClose={() => dispatch(updateUI({modal: undefined}))}
-          aria-describedby="alert-dialog-slide-description"
+  const overUndersRulesText = `The number displayed on the middle button of each team card is the expected wins for that team this season. There is a .5 after each one to prevent you tying the number. 
+    
+    You are trying to correctly guess whether a team will have OVER or UNDER that amount of wins at the end of this season. You must make a selection for 24 teams, so you can pass on some teams you are unsure about.
+    
+    Additionally, 2 of those selections must be a "double up" or "double down".  In this case you will still pick over or under but you'll have to move the expected wins +1 or -1, respectively, to make it more difficult.  Do this by making your selection and then holding down on your choice a second time.
+    
+    You'll get 1 point for every team that you guess correctly. And 2 points for every correct double up or double down.
+    
+    You can edit your picks in the preseason. Once the season starts, your picks will be locked in and you'll be able to view everyone else's picks and scores.
+    
+    Good luck! Have fun!`;
+
+  return (
+    <Dialog
+      open={modal === "confidence-rules"}
+      TransitionComponent={Transition}
+      keepMounted
+      onClose={() => dispatch(updateUI({ modal: undefined }))}
+      aria-describedby="alert-dialog-slide-description"
+    >
+      <DialogTitle>{"How it works"}</DialogTitle>
+      <DialogContent>
+        <div
+          style={{ whiteSpace: "pre-line" }}
+          id="alert-dialog-slide-description"
         >
-          <DialogTitle>{"How it works"}</DialogTitle>
-          <DialogContent>
-            <div style={{whiteSpace: 'pre-line'}} id="alert-dialog-slide-description">
-                {rulesText}
-            </div>
-          </DialogContent>
-          <DialogActions>
-
-            <Button onClick={() => dispatch(updateUI({modal: undefined}))}>OKAY</Button>
-          </DialogActions>
-        </Dialog>
-
-    );
-}
-
+          {location.pathname === "/confidence"
+            ? confidenceRulesText
+            : overUndersRulesText}
+        </div>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => dispatch(updateUI({ modal: undefined }))}>
+          OKAY
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};

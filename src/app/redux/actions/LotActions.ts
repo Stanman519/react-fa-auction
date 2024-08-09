@@ -74,16 +74,13 @@ export const turnOnNominationModeForThisOwnersLot = () => async (
     dispatch: Function,
     getState: () => RootState
 ): Promise<any> => {
-    console.log('nom action')
     const { lots } = getState()
     const { profile } = getState()
     let updatedLots = [...lots];
     if (!profile || lots.length === 0) return
-    console.log('updated', updatedLots)
     const  thisPlayersLotIndex = updatedLots.findIndex(l => !l.nominatedBy && !l.bid); // this is really gross. i meant for it to be null, but somewhere it is turning into 0
     if (thisPlayersLotIndex < 0) return;
     updatedLots[thisPlayersLotIndex].newNom = true;
-    console.log('update lots')
     dispatch(updateLots(updatedLots))
     
 }

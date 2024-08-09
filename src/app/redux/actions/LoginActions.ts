@@ -8,72 +8,48 @@ import { Route } from "../../services/Routing";
 import { getInitialAuctionData } from "./FreeAgentActions";
 import GeneralApiSvc from "../../services/GeneralApiSvc";
 import { getLeagueCapInfo } from "./TransactionActions";
+import { updateOverUnders } from "./OverUnderActions";
 
-
-export const UPDATE_LOGIN = 'UPDATE_LOGIN';
+export const UPDATE_LOGIN = "UPDATE_LOGIN";
 
 export interface LoginAction extends Action {
-    payload: LoginState
+  payload: LoginState;
 }
 
 export const updateLoginInfo = (profile: LoginState): LoginAction => {
-    return {
-        type: UPDATE_LOGIN,
-        payload: profile
-    }
-}
+  return {
+    type: UPDATE_LOGIN,
+    payload: profile,
+  };
+};
 
-export const synchronizeAuth0WithDbLogin = (user: User) => async(
-    dispatch: Function,
-    getState: () => RootState
-) => {
-    const { profile } = getState()
+export const synchronizeAuth0WithDbLogin =
+  (user: User) => async (dispatch: Function, getState: () => RootState) => {
+    const { profile } = getState();
+    const { overUnders } = getState();
     const dbUser = await GeneralApiSvc.synchronizeAuth(user);
-    var newProfile = {...profile}
-    newProfile.owner = dbUser
-    newProfile.currentLeague =  dbUser.leagues.length > 0 ? dbUser.leagues[0] : undefined
-    dispatch(updateLoginInfo(newProfile))
-}
 
-export const updateCurrentLeague = (leagueId: number, currentRoute: string, user: User) => async(
-    dispatch: Function,
-    getState: () => RootState
-) => {
-    const { profile } = getState()
-    const newProfile = { ...profile }
-    const newCurrentLeague = newProfile.owner.leagues.find(l => l.league.leagueId === leagueId)
-    dispatch(updateLoginInfo({...newProfile, currentLeague: newCurrentLeague}))
-    if (currentRoute == '/auction') dispatch(getInitialAuctionData(user.sub))
-    if (currentRoute == '/home') dispatch(getLeagueCapInfo())
-}
+    var newProfile = { ...profile };
+    newProfile.owner = dbUser;
+    newProfile.currentLeague =
+      dbUser.leagues.length > 0 ? dbUser.leagues[0] : undefined;
+    newProfile.authSynchronized = true;
+    var pool = dbUser.pools.length > 0 ? dbUser.pools[0] : undefined;
+    dispatch(updateOverUnders({ ...overUnders, currentPool: pool }));
+    dispatch(updateLoginInfo(newProfile));
+  };
 
-
-// export const loginAuthUserWithRedirect = () => async (
-//     dispatch: Function,
-//     getState: () => RootState
-//     ) => {
-//         try {
-//             const login = getState().profile
-//             const { loginWithRedirect, user } = useAuth0();
-//             await loginWithRedirect()
-//             // call api, does db owner exist with this userid?
-//                 // if not, create one?
-//             // if so, return the user
-//             dispatch(updateLoginInfo({...login, authUser: user}))
-//         } catch (e: any) { 
-//             dispatch(updateUI({ error: 'snackbar', errorText: e.message}))
-//         }
-    
-//     }
-
-// export const askCapn = (mflId: string, position: string, age: number) => async(
-//     dispatch: Function,
-//     getState: () => RootState
-// ) => {
-//     const { profile } = getState()
-//     const askRequest = {mflId, position, age, ownerId: profile.ownerId} as PlayerTipRequest
-//     const res = await AuctionApiSvc.askCapn(askRequest);
-//     const tip = await AuctionApiSvc.handleErrorResponse(res) as PlayerTipResponse;
-
-//     dispatch(updateLoginInfo({...profile, tipsUsed: [...profile.tipsUsed, tip]}))
-// }
+export const updateCurrentLeague =
+  (leagueId: number, currentRoute: string, user: User) =>
+  async (dispatch: Function, getState: () => RootState) => {
+    const { profile } = getState();
+    const newProfile = { ...profile };
+    const newCurrentLeague = newProfile.owner.leagues.find(
+      (l) => l.league.leagueId === leagueId,
+    );
+    dispatch(
+      updateLoginInfo({ ...newProfile, currentLeague: newCurrentLeague }),
+    );
+    if (currentRoute == "/auction") dispatch(getInitialAuctionData(user.sub));
+    if (currentRoute == "/home") dispatch(getLeagueCapInfo());
+  };

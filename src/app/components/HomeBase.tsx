@@ -17,77 +17,104 @@ import { updateUI } from "../redux/actions/UiActions";
 import { OverUnderRow } from "./games/OverUnders/OverUnderRow";
 
 interface Tab {
-    label: string;
-    value: string;
+  label: string;
+  value: string;
 }
 
-
 const HomeBase = () => {
-  const { currentLeague } = useSelector((state: RootState) => state.profile)
-  const { franchiseWinTotals } = useSelector((state:RootState) => state.overUnders)
-  const { modal } = useSelector((state: RootState) => state.ui)
-
-  const isLoading = useSelector((state: RootState) => state.ui.isLoading === 'full-screen')
-  const dispatch = useDispatch()
-  const nav = useNavigate()
-  const [currentTab, setCurrentTab] = useState('league');
-  const leagueTab: Tab = { label: 'LEAGUE INFO', value: 'league' }
-  var draftTabs: Tab[] = [leagueTab, { label: 'FREE TAXI CUTS', value: 'taxi' }]
-  if (currentLeague?.league.isBuyoutSzn) draftTabs.push({ label: 'AMNESTY BUYOUTS', value: 'buyouts' })
-  if (currentLeague?.league.isFranchiseTagSzn) draftTabs.push({ label: 'FRANCHISE TAGS', value: 'tags' })
-  if (currentLeague?.league.isFranchiseTagSzn) draftTabs.push({label: "WAIVER EXTENSION", value: 'waiver'})
-  const [tabs, setTabs] = useState<Tab[]>(draftTabs)
-  const {deadCap} = useSelector((state: RootState) => state.deadCap)
+  const { currentLeague } = useSelector((state: RootState) => state.profile);
+  const { franchiseWinTotals } = useSelector(
+    (state: RootState) => state.overUnders,
+  );
+  const { modal } = useSelector((state: RootState) => state.ui);
+  const {} = useSelector((state: RootState) => state);
+  const isLoading = useSelector(
+    (state: RootState) => state.ui.isLoading === "full-screen",
+  );
+  const dispatch = useDispatch();
+  const nav = useNavigate();
+  const [currentTab, setCurrentTab] = useState("league");
+  const leagueTab: Tab = { label: "LEAGUE INFO", value: "league" };
+  var draftTabs: Tab[] = [
+    leagueTab,
+    { label: "FREE TAXI CUTS", value: "taxi" },
+  ];
+  if (currentLeague?.league.isBuyoutSzn)
+    draftTabs.push({ label: "AMNESTY BUYOUTS", value: "buyouts" });
+  if (currentLeague?.league.isFranchiseTagSzn)
+    draftTabs.push({ label: "FRANCHISE TAGS", value: "tags" });
+  if (currentLeague?.league.isFranchiseTagSzn)
+    draftTabs.push({ label: "WAIVER EXTENSION", value: "waiver" });
+  const [tabs, setTabs] = useState<Tab[]>(draftTabs);
+  const { deadCap } = useSelector((state: RootState) => state.deadCap);
 
   useEffect(() => {
-      if (!deadCap || deadCap.length === 0) {
-        dispatch(loadDashboardData())
+    if (!deadCap || deadCap.length === 0) {
+      dispatch(loadDashboardData());
+    }
+  }, []);
 
-      }
-      if (franchiseWinTotals.length === 0) {
-        //dispatch(fetchFranchiseWinTotals(2024, 'NFL'))
-      }
-  },[])
+  useEffect(() => {
+    dispatch(loadDashboardData());
+  }, [currentLeague?.league?.leagueId]);
 
   return (
     <div>
       <DashboardMenu />
-      {isLoading ? 
-      <div className="flex-1 flex justify-center">
-        <CircularProgress />
-      </div>
-      :
-      <>
-
-      {currentLeague ?
-      <div className="flex flex-col pt-4" >
-        {currentLeague?.teamName &&
-          <div className="text-2xl pb-4 m-1 text-center">{currentLeague?.league.name} Dashboard</div>}
-        {tabs.length > 1 && <DashboardTabNav onChange={(newTab) => setCurrentTab(newTab)} tabs={tabs} />}
-
-        <div className="min-w-full">
-          {currentTab === 'league' &&
-            <div className="flex flex-col">
-              <DeadCapParentCard />
-              <TriTable  />
-            </div>}
-            <Snackbar open={modal === 'dashboard-success'} autoHideDuration={800} onClose={() => dispatch(updateUI({modal: undefined}))} >
-              <Alert severity="success" onClose={() => dispatch(updateUI({modal: undefined}))}>
-                Submission Complete!
-              </Alert>
-            </Snackbar>
-          {currentTab === 'tags' && <FranchiseTags />}
-          {currentTab === 'taxi' && <TaxiSquadTile />}
-          {currentTab === 'buyouts' && <BuyoutTile />}
-          {currentTab === 'waiver' && <WaiverExtensions />}
+      {isLoading ? (
+        <div className="flex-1 flex justify-center">
+          <CircularProgress />
         </div>
-      </div> :
-      <div>Your profile was not automatically linked to your MyFantasyLeague Account. Please contact the admin.</div>
-      }
-      </>
-      }
+      ) : (
+        <>
+          {currentLeague ? (
+            <div className="flex flex-col pt-4">
+              {currentLeague?.teamName && (
+                <div className="text-2xl pb-4 m-1 text-center">
+                  {currentLeague?.league.name} Dashboard
+                </div>
+              )}
+              {tabs.length > 1 && (
+                <DashboardTabNav
+                  onChange={(newTab) => setCurrentTab(newTab)}
+                  tabs={tabs}
+                />
+              )}
 
+              <div className="min-w-full">
+                {currentTab === "league" && (
+                  <div className="flex flex-col">
+                    <DeadCapParentCard />
+                    <TriTable />
+                  </div>
+                )}
+                <Snackbar
+                  open={modal === "dashboard-success"}
+                  autoHideDuration={800}
+                  onClose={() => dispatch(updateUI({ modal: undefined }))}
+                >
+                  <Alert
+                    severity="success"
+                    onClose={() => dispatch(updateUI({ modal: undefined }))}
+                  >
+                    Submission Complete!
+                  </Alert>
+                </Snackbar>
+                {currentTab === "tags" && <FranchiseTags />}
+                {currentTab === "taxi" && <TaxiSquadTile />}
+                {currentTab === "buyouts" && <BuyoutTile />}
+                {currentTab === "waiver" && <WaiverExtensions />}
+              </div>
+            </div>
+          ) : (
+            <div>
+              Your profile was not automatically linked to your MyFantasyLeague
+              Account. Please contact the admin.
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
-}
+};
 export default HomeBase;

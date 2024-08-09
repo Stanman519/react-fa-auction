@@ -1,88 +1,176 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
-import { Alert, Box, Button, Snackbar } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Alert, Box, Card, Fab, Snackbar, Typography } from "@mui/material";
 import "boarding.js/styles/main.css";
 import "boarding.js/styles/themes/basic.css";
-import { fetchAllUsers, fetchFranchiseWinTotals, fetchUserPicks, submitOverUnderPicks } from "../../../redux/actions/OverUnderActions";
+import {
+  fetchFranchiseWinTotals,
+  fetchUserPicks,
+  submitOverUnderPicks,
+} from "../../../redux/actions/OverUnderActions";
 import { OverUnderRow } from "./OverUnderRow";
 import { MenuBar } from "../../menuBar";
 import { Rules } from "../../confidence/Rules";
 import { updateUI } from "../../../redux/actions/UiActions";
 import { ChatClient } from "../../../services/ChatUtils";
 import { RootState } from "../../../store";
-import UserPickChartForTeam from "./UserPickChartForTeam";
+import SendIcon from "@mui/icons-material/Send";
 
 function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
-    const dispatch = useDispatch();
-    const { user, isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
-    const { modal, errorText } = useSelector((state: RootState) => state.ui)
-    const { owner } = useSelector((state: RootState) => state.profile)
-    const { franchiseWinTotals } = useSelector((state: RootState) => state.overUnders)
-    const totalPicks = franchiseWinTotals.filter(p => p.userPick.isOver !== undefined).length
-    const totalDoubles = franchiseWinTotals.filter(p => p.userPick.lineAdjustment !== 0).length
+  const dispatch = useDispatch();
+  const { user, isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
+  const { modal, errorText } = useSelector((state: RootState) => state.ui);
+  const { authSynchronized } = useSelector((state: RootState) => state.profile);
+  const { franchiseWinTotals, currentPool } = useSelector(
+    (state: RootState) => state.overUnders,
+  );
+  const totalPicks = franchiseWinTotals.filter(
+    (p) => p.userPick.isOver !== undefined,
+  ).length;
+  const totalDoubles = franchiseWinTotals.filter(
+    (p) => p.userPick.lineAdjustment !== 0,
+  ).length;
+  const [translateY, setTranslateY] = useState(64); // Initial translateY to match the menu bar height
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user?.sub && authSynchronized) {
+      dispatch(fetchFranchiseWinTotals());
+      //TODO: store this in cookies because it is set once and saved?
+      dispatch(fetchUserPicks());
+    }
+    return () => {
+      ChatClient.getInstance().chatInstance.disconnectUser();
+    };
+  }, [isLoading, isAuthenticated, user, authSynchronized]);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setTranslateY(0);
+      } else {
+        setTranslateY(64); // Adjust this value based on the height of your menu bar
+      }
+    };
 
-    const CURRENT_YEAR = 2024
-    const CURRENT_LEAGUE = "NFL"
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+  return (
+    <div
+      className="flex flex-col justify-start items-center"
+      style={{ overflowX: "hidden", overflowY: "hidden", minHeight: "100vh" }}
+    >
+      <MenuBar
+        isDemo={isDemo}
+        chatChannel={"overunder"}
+        barOptions={["games", "chat", "ou-standings", "rules"]}
+      />
+      <Rules />
+      {/* <Card className="w-11/12 mb-4 p-4 shadow-lg">
+        <Typography variant="h5" className="text-center font-bold mb-2">
+          Team Pick Distribution
+        </Typography>
+      </Card> 
+      <UserPickChartForTeam />*/}
 
-    useEffect(() => {
-        if (isLoading || isDemo) return
-        const checkUser = async () => {
-
-            if (isAuthenticated && user?.sub) {
-                dispatch(fetchFranchiseWinTotals(CURRENT_YEAR, CURRENT_LEAGUE))
-                //TODO: store this in cookies because it is set once and saved?
-                dispatch(fetchUserPicks(CURRENT_YEAR, CURRENT_LEAGUE))
-                dispatch(fetchAllUsers())
-            } else {
-                await loginWithRedirect({ appState: { returnTo: '/over-under' } });
-            }
-        }
-        checkUser()
-        return () => {
-            ChatClient.getInstance().chatInstance.disconnectUser();
-        }
-    }, [isAuthenticated, loginWithRedirect, isLoading, user, isDemo])
-
-
-
-    return (
-        <div className="flex flex-col justify-start items-center" style={{ overflowX: 'hidden', overflowY: 'hidden', minHeight: '100vh' }}>
-
-            <MenuBar isDemo={isDemo} chatChannel={'overunder'} barOptions={['confidence', 'chat']} />
-            <Rules />
-
-            <UserPickChartForTeam />
-            <div>Total Picks: {totalPicks}</div>
-            <div>Total Double Up/Downs: {totalDoubles}</div>
-            <Box sx={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 2,
-                justifyContent: 'center',
-                p: 2,
-                }}>
-                {franchiseWinTotals.map(f => <OverUnderRow key={f.id} prop={f} />)}
-                </Box>
-            <Button variant='outlined' color='primary' disabled={(totalPicks !== 24 || totalDoubles !== 3)} 
-            onClick={() => dispatch(submitOverUnderPicks(CURRENT_YEAR, CURRENT_LEAGUE))}>Submit Picks</Button>
-            <Snackbar open={modal === 'confidence-submit-success'} autoHideDuration={800} onClose={() => dispatch(updateUI({ modal: undefined }))} >
-                <Alert severity="success" onClose={() => dispatch(updateUI({ modal: undefined }))}>
-                    Submission Complete!
-                </Alert>
-            </Snackbar>
-            <Snackbar open={modal === 'error'} autoHideDuration={8000} onClose={() => {
-
-                dispatch(updateUI({ modal: undefined }))
-            }}>
-                <Alert severity="error" onClose={() => dispatch(updateUI({ modal: undefined }))}>
-                    {errorText}
-                </Alert>
-            </Snackbar>
-
-
+      <Card
+        className={`fixed left-0  p-4 shadow-lg rounded-md bg-white flex items-center transition-opacity ease-in-out hover:opacity-100 ${translateY === 0 ? "opacity-50" : "opacity-100"}`}
+        sx={{
+          zIndex: 1000,
+          transform: `translateY(${translateY}px)`,
+          transition: "transform 0.2s ease-in-out, opacity 0.3s ease-in-out", // Smooth transition for both properties
+          border: "1px solid #ddd",
+        }}
+      >
+        <div className="flex flex-row justify-between items-start">
+          <div
+            className={`text-center px-4 py-2 rounded  mr-1  ${
+              totalPicks === 24 ? "bg-green-100" : "bg-red-100"
+            }`}
+          >
+            <Typography variant="h6" className="text-gray-700">
+              Total Picks: <span className="font-bold">{totalPicks}</span>
+            </Typography>
+            <Typography variant="caption" className="text-gray-600">
+              Required: 24
+            </Typography>
+          </div>
+          <div
+            className={`text-center px-4 py-2 rounded ${
+              totalDoubles === 2 ? "bg-green-100" : "bg-red-100"
+            }`}
+          >
+            <Typography variant="h6" className="text-gray-700">
+              Total Double Up/Downs:{" "}
+              <span className="font-bold">{totalDoubles}</span>
+            </Typography>
+            <Typography variant="caption" className="text-gray-600">
+              Required: 2 (Hold down on selection)
+            </Typography>
+          </div>
         </div>
-    );
+      </Card>
+      <div style={{ marginTop: "100px", width: "100%" }}></div>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 2,
+          justifyContent: "center",
+          p: 2,
+        }}
+      >
+        {franchiseWinTotals.map((f) => (
+          <OverUnderRow key={f.id} prop={f} />
+        ))}
+      </Box>
+      <Box
+        sx={{
+          position: "fixed",
+          bottom: 24,
+          right: 24,
+          zIndex: 1,
+        }}
+      >
+        <Fab
+          variant="extended"
+          color="primary"
+          disabled={totalPicks !== 24 || totalDoubles !== 2}
+          onClick={() => dispatch(submitOverUnderPicks())}
+        >
+          <SendIcon className="mr-2" />
+          Submit Picks
+        </Fab>
+      </Box>
+      <Snackbar
+        open={modal === "confidence-submit-success"}
+        autoHideDuration={6000}
+        onClose={() => dispatch(updateUI({ modal: undefined }))}
+      >
+        <Alert
+          severity="success"
+          onClose={() => dispatch(updateUI({ modal: undefined }))}
+        >
+          Submission Complete!
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={modal === "error"}
+        autoHideDuration={8000}
+        onClose={() => {
+          dispatch(updateUI({ modal: undefined }));
+        }}
+      >
+        <Alert
+          severity="error"
+          onClose={() => dispatch(updateUI({ modal: undefined }))}
+        >
+          {errorText}
+        </Alert>
+      </Snackbar>
+    </div>
+  );
 }
 
 export default OverUnderHome;

@@ -1,69 +1,85 @@
+import { OverUnderPick } from "../../services/GeneralApiSvc";
 import { OwnerAction, UPDATE_OWNERS } from "../actions/OwnerActions";
 import { PlayerDTO } from "./FreeAgentReducer";
 
-
 export default interface Owner {
-    ownerId: number
-    ownername: string
-    password: string
-    premium: boolean
-    displayName: string
-    streamToken: string
-    leagues: LeagueLoginInfo[]
-    avatar: string
-    confidencePaid: boolean
-    //tipsUsed: PlayerTipResponse[]
+  ownerId: number;
+  ownername: string;
+  password: string;
+  premium: boolean;
+  displayName: string;
+  streamToken: string;
+  leagues: LeagueLoginInfo[];
+  pools: Pool[];
+  avatar: string;
+  confidencePaid: boolean;
+  //tipsUsed: PlayerTipResponse[]
 }
-
+export interface PoolUser {
+  id: number;
+  owner: Owner;
+  picks: OverUnderPick[];
+}
+export interface Pool {
+  id: number;
+  type: string;
+  league: string;
+  year: number;
+  openDate: Date;
+  startDate: Date;
+  name: string;
+  poolOwnerId: number;
+  myOverUnderPicks: OverUnderPick[];
+}
 export interface OpposingFranchiseDTO {
-    capRoom: number
-    yearsLeft: number
-    mflfranchiseid: number
-    leagueownerid: number
-    teamName: string
-    ownerName: string
-    avatar: string
+  capRoom: number;
+  yearsLeft: number;
+  mflfranchiseid: number;
+  leagueownerid: number;
+  teamName: string;
+  ownerName: string;
+  avatar: string;
 }
 
 export interface LeagueLoginInfo {
-    capRoom: number
-    yearsLeft: number
-    mflfranchiseid: number
-    leagueownerid: number
-    teamName: string
-    league: LeagueInfo
-    tagCandidates: TagCandidate[]
-    taxiPlayers: PlayerDTO[]
-    cutCandidates: PlayerDTO[]
-    waiverExtensionPlayers: PlayerDTO[]
+  capRoom: number;
+  yearsLeft: number;
+  mflfranchiseid: number;
+  leagueownerid: number;
+  teamName: string;
+  league: LeagueInfo;
+  tagCandidates: TagCandidate[];
+  taxiPlayers: PlayerDTO[];
+  cutCandidates: PlayerDTO[];
+  waiverExtensionPlayers: PlayerDTO[];
 }
 
 export interface LeagueInfo {
-    leagueId: number
-    name: string
-    firstYear: number
-    isAuctioning: boolean
-    isFranchiseTagSzn: boolean
-    isTaxiCutSzn: boolean
-    isBuyoutSzn: boolean
-    
+  leagueId: number;
+  name: string;
+  firstYear: number;
+  isAuctioning: boolean;
+  isFranchiseTagSzn: boolean;
+  isTaxiCutSzn: boolean;
+  isBuyoutSzn: boolean;
 }
 
-export interface TagCandidate{
-    lastSeasonSalary: number
-    player: PlayerDTO
-    tagAmount: number
+export interface TagCandidate {
+  lastSeasonSalary: number;
+  player: PlayerDTO;
+  tagAmount: number;
 }
 
+const defaultState = [] as OpposingFranchiseDTO[];
 
-const defaultState = [] as OpposingFranchiseDTO[]
-
-
-export const ownerReducer = (state = defaultState, action: OwnerAction): OpposingFranchiseDTO[] => {
-    switch (action.type) {
-        case UPDATE_OWNERS:
-            return action.payload;
-        default:
-            return state;
-    }
-}
+export const ownerReducer = (
+  state = defaultState,
+  action: OwnerAction,
+): OpposingFranchiseDTO[] => {
+  switch (action.type) {
+    case UPDATE_OWNERS:
+      return action.payload;
+    default:
+      return state;
+  }
+};
