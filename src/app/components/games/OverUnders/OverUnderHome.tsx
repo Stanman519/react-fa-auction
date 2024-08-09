@@ -119,6 +119,7 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
           gap: 2,
           justifyContent: "center",
           p: 2,
+          pb: 8,
         }}
       >
         {franchiseWinTotals.map((f) => (
