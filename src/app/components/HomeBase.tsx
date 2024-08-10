@@ -57,7 +57,6 @@ const HomeBase = () => {
   }, []);
 
   useEffect(() => {
-    console.log("top of useeffect for cur", currentLeague);
     dispatch(loadDashboardData());
   }, [currentLeague?.league?.leagueId]);
 
