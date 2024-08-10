@@ -90,7 +90,7 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
             }`}
           >
             <Typography variant="h6" className="text-gray-700">
-              Total Picks: <span className="font-bold">{totalPicks}</span>
+              Picks: <span className="font-bold">{totalPicks}</span>
             </Typography>
             <Typography variant="caption" className="text-gray-600">
               Required: 24
@@ -102,8 +102,7 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
             }`}
           >
             <Typography variant="h6" className="text-gray-700">
-              Total Double Up/Downs:{" "}
-              <span className="font-bold">{totalDoubles}</span>
+              Double Downs: <span className="font-bold">{totalDoubles}</span>
             </Typography>
             <Typography variant="caption" className="text-gray-600">
               Required: 2 (Hold down on selection)

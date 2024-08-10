@@ -29,8 +29,8 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
     >
       <MenuBar barOptions={[]} />
       <div className="flex flex-col lg:flex-row w-full items-center justify-center">
-        {THA_GAMES.map((g) => {
-          return <GamesTile {...g} />;
+        {THA_GAMES.map((g, i) => {
+          return <GamesTile key={i} {...g} />;
         })}
       </div>
     </div>
