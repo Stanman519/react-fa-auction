@@ -55,6 +55,7 @@ export const GamesTile = ({
             alt={altTitle}
             style={{
               objectFit: "contain",
+              filter: `saturate(${disabled ? "20%" : "100%"})`,
             }}
             loading="lazy"
           />
