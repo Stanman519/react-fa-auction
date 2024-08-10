@@ -45,15 +45,15 @@ export const Rules = (): JSX.Element => {
     
     Good luck! Have fun!`;
 
-  const overUndersRulesText = `The number displayed on the middle button of each team card is the expected wins for that team this season. There is a .5 after each one to prevent you tying the number. 
+  const overUndersRulesText = `Select whether you think each team will win OVER or UNDER the amount of wins displayed on each card. 
     
-    You are trying to correctly guess whether a team will have OVER or UNDER that amount of wins at the end of this season. You must make a selection for 24 teams, so you can pass on some teams you are unsure about.
+    You must make a selection for 24 teams, so you can pass on some teams you are unsure about.
     
-    Additionally, 2 of those selections must be a "double up" or "double down".  In this case you will still pick over or under but you'll have to move the expected wins +1 or -1, respectively, to make it more difficult.  Do this by making your selection and then holding down on your choice a second time.
+    Additionally, 2 of those selections must be a "double down".  In this case you will still pick over or under but you'll have to move the expected wins +1 or -1, respectively, to make it more difficult.  Do this by making your selection and then holding down on your choice a second time.
     
-    You'll get 1 point for every team that you guess correctly. And 2 points for every correct double up or double down.
+    1 point for every team that you guess correctly and 2 points for every correct double down.
     
-    You can edit your picks in the preseason. Once the season starts, your picks will be locked in and you'll be able to view everyone else's picks and scores.
+    You can edit your picks in the preseason. Once the season starts, your picks will be locked in and you'll be able to view everyone else's picks.
     
     Good luck! Have fun!`;
 
