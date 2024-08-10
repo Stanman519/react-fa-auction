@@ -33,6 +33,7 @@ type BarOption =
   | "rules"
   | "games"
   | "ou-standings"
+  | "league-home"
   | "games";
 
 export function MenuBar({
@@ -240,10 +241,19 @@ export function MenuBar({
                     {barOptions.includes("salary-league") && (
                       <MenuItem
                         onClick={() => {
-                          navigate("/home");
+                          navigate("/");
                         }}
                       >
                         League Info
+                      </MenuItem>
+                    )}
+                    {barOptions.includes("league-home") && (
+                      <MenuItem
+                        onClick={() => {
+                          navigate("/");
+                        }}
+                      >
+                        {currentLeague?.league.name}
                       </MenuItem>
                     )}
                   </Menu>
@@ -336,13 +346,22 @@ export function MenuBar({
                     <Button
                       color="inherit"
                       onClick={() => {
-                        navigate("/home");
+                        navigate("/");
                       }}
                     >
                       {currentLeague?.league.name}
                     </Button>
                   )}
-
+                  {barOptions.includes("league-home") && (
+                    <Button
+                      color="inherit"
+                      onClick={() => {
+                        navigate("/");
+                      }}
+                    >
+                      {currentLeague?.league.name}
+                    </Button>
+                  )}
                   {!isDemo && barOptions.includes("confidence") && (
                     <Button
                       color="inherit"

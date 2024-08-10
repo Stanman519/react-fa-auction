@@ -9,6 +9,7 @@ import { getInitialAuctionData } from "./FreeAgentActions";
 import GeneralApiSvc from "../../services/GeneralApiSvc";
 import { getLeagueCapInfo } from "./TransactionActions";
 import { updateOverUnders } from "./OverUnderActions";
+import { useNavigate } from "react-router-dom";
 
 export const UPDATE_LOGIN = "UPDATE_LOGIN";
 
@@ -28,12 +29,12 @@ export const synchronizeAuth0WithDbLogin =
     const { profile } = getState();
     const { overUnders } = getState();
     const dbUser = await GeneralApiSvc.synchronizeAuth(user);
-
     var newProfile = { ...profile };
     newProfile.owner = dbUser;
     newProfile.currentLeague =
       dbUser.leagues.length > 0 ? dbUser.leagues[0] : undefined;
     newProfile.authSynchronized = true;
+    newProfile.owner.leagues = dbUser.leagues;
     var pool = dbUser.pools.length > 0 ? dbUser.pools[0] : undefined;
     dispatch(updateOverUnders({ ...overUnders, currentPool: pool }));
     dispatch(updateLoginInfo(newProfile));

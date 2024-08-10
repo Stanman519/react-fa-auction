@@ -1,9 +1,12 @@
 import { MenuBar } from "../menuBar";
 import { useNavigate } from "react-router-dom";
 import GamesTile, { GamesTileProps } from "./GamesTile";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/reducers/RootReducer";
 
 function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
   const navigate = useNavigate();
+  const { profile } = useSelector((state: RootState) => state);
   const THA_GAMES: GamesTileProps[] = [
     {
       altTitle: "Over/Unders Game",
@@ -27,7 +30,9 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
       className="flex flex-col justify-start items-center "
       style={{ overflowX: "hidden", overflowY: "hidden", minHeight: "100vh" }}
     >
-      <MenuBar barOptions={[]} />
+      <MenuBar
+        barOptions={profile.owner.leagues.length > 0 ? ["league-home"] : []}
+      />
       <div className="flex flex-col lg:flex-row w-full items-center justify-center">
         {THA_GAMES.map((g, i) => {
           return <GamesTile key={i} {...g} />;

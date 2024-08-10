@@ -22,7 +22,9 @@ interface Tab {
 }
 
 const HomeBase = () => {
-  const { currentLeague } = useSelector((state: RootState) => state.profile);
+  const { currentLeague, authSynchronized } = useSelector(
+    (state: RootState) => state.profile,
+  );
   const { franchiseWinTotals } = useSelector(
     (state: RootState) => state.overUnders,
   );
@@ -55,9 +57,13 @@ const HomeBase = () => {
   }, []);
 
   useEffect(() => {
+    console.log("top of useeffect for cur", currentLeague);
     dispatch(loadDashboardData());
   }, [currentLeague?.league?.leagueId]);
 
+  useEffect(() => {
+    if (authSynchronized && !currentLeague) nav("/games");
+  }, [authSynchronized]);
   return (
     <div>
       <DashboardMenu />

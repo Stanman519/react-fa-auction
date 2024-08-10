@@ -91,7 +91,9 @@ const AuthProviderWrapper: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { isAuthenticated, loginWithRedirect, isLoading, user } = useAuth0();
+  const { profile } = useSelector((state: RootState) => state);
   const dispatch = useDispatch();
+  const nav = useNavigate();
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       loginWithRedirect();
