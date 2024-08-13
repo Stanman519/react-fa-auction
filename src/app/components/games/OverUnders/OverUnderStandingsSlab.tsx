@@ -8,7 +8,7 @@ export const OverUnderStandingsSlab = (): JSX.Element => {
   const users = useSelector((state: RootState) => state.overUnders.otherUsers);
   const dispatch = useDispatch();
   const { palette } = useTheme();
-  const { currentLeague } = useSelector((state: RootState) => state.profile);
+  const { currentPool } = useSelector((state: RootState) => state.overUnders);
   const openSlab = useSelector(
     (state: RootState) => state.ui.modal === "ou-standings",
   );
@@ -27,7 +27,7 @@ export const OverUnderStandingsSlab = (): JSX.Element => {
       >
         <List>
           {users.map((o, index) => (
-            <StandingsRow key={o.ownerId} user={o} />
+            <StandingsRow key={o.id} user={o} currentPool={currentPool?.id} />
           ))}
         </List>
       </Box>

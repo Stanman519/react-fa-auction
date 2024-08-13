@@ -1,5 +1,5 @@
 import { MouseEvent, useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Avatar,
   Button,
@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { RootState } from "../../../store";
 import { OverUnderPick } from "../../../services/GeneralApiSvc";
+import { seePicksForUser } from "../../../redux/actions/OverUnderActions";
 
 export const UserPickChartForTeam = (): JSX.Element => {
   const isMobile = useMediaQuery("(max-width:600px)");
@@ -22,6 +23,7 @@ export const UserPickChartForTeam = (): JSX.Element => {
     Map<string, OverUnderPick[]>
   >(new Map());
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const handleClickOutside = (event: Event) => {
@@ -119,7 +121,6 @@ export const UserPickChartForTeam = (): JSX.Element => {
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
-        width: "80%",
       }}
     >
       {Array.from(groupedPicks.entries()).map(([key, picks], i) => {
@@ -152,7 +153,7 @@ export const UserPickChartForTeam = (): JSX.Element => {
             </Typography>
             <div style={{ display: "flex", flexDirection: "row" }}>
               {picks.map((p) => {
-                const user = otherUsers.find((u) => u.ownerId === p.userId);
+                const user = otherUsers.find((u) => u.id === p.userId);
                 return (
                   <div
                     onMouseEnter={(e) => handlePopoverOpen(e, p.id ?? 0)}
@@ -177,27 +178,29 @@ export const UserPickChartForTeam = (): JSX.Element => {
 
                     {anchorEl && (
                       <Popover
-                        sx={{ pointerEvents: "none" }}
+                        sx={{
+                          pointerEvents: "none",
+                          zIndex: 500,
+                          overflow: "visible",
+                        }}
                         ref={popoverRef}
                         id={`mouse-over-popover-${p.id}`}
                         open={hoveredId === p.id}
                         anchorEl={anchorEl}
                         //@ts-ignore
-                        container={anchorEl?.parentNode ?? null}
+                        container={anchorEl}
                         anchorOrigin={{
-                          vertical: "bottom",
+                          vertical: "top",
                           horizontal: "center",
                         }}
                         transformOrigin={{
-                          vertical: "top",
+                          vertical: "bottom",
                           horizontal: "center",
                         }}
                         onClose={(e, r) => {
                           handlePopoverClose();
                         }}
-                        disableEnforceFocus
                         transitionDuration={0} // Disable animation
-                        // sx={{zIndex: 0}}
                       >
                         <div
                           style={{
@@ -207,21 +210,21 @@ export const UserPickChartForTeam = (): JSX.Element => {
                           }}
                         >
                           <img
-                            src={user?.avatar}
+                            src={user?.owner.avatar}
                             referrerPolicy="no-referrer"
                             style={{ height: 0, width: 0 }}
                           />
                           <Button
                             onClick={() => {
-                              console.log("clickity");
+                              dispatch(seePicksForUser(user?.id));
                             }}
                           >
                             {" "}
                             <Avatar
-                              src={user?.avatar}
+                              src={user?.owner.avatar}
                               style={{ marginRight: 4 }}
                             />{" "}
-                            {user?.displayName}'s picks
+                            {user?.owner.displayName}'s picks
                           </Button>
                         </div>
                       </Popover>

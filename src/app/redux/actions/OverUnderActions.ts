@@ -3,15 +3,15 @@ import { FranchiseWinTotal, UPDATE_OUS } from "../reducers/OverUnderReducer";
 import { RootState } from "../reducers/RootReducer";
 import GeneralApiSvc, { OverUnderPick } from "../../services/GeneralApiSvc";
 import { updateUI } from "./UiActions";
-import Owner, { Pool } from "../reducers/OwnerReducer";
+import Owner, { Pool, PoolUser } from "../reducers/OwnerReducer";
 
 export interface OverUnderState {
   franchiseWinTotals: FranchiseWinTotal[];
   userPicks: OverUnderPick[];
   selectedLine?: number;
-  otherUsers: Owner[];
+  otherUsers: PoolUser[];
   currentPool?: Pool;
-  selectedUser?: Owner;
+  selectedUser?: PoolUser;
 }
 
 export interface OverUnderAction extends Action {
@@ -48,16 +48,20 @@ export const fetchUserPicks =
   () =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const id = getState().overUnders.currentPool?.id;
+    const { ownerId } = getState().profile.owner;
     if (!id) return;
     const res = await GeneralApiSvc.getAllOverUnderUsersAndPicks(id);
     const { overUnders } = getState();
     const allPicks = res.flatMap((u) => u.picks);
-    const allUsers = res.map((u) => u.owner);
+    const allUsers = res.map((u) => u);
+    const me = allUsers.find((u) => u.owner.ownerId);
+
     dispatch(
       updateOverUnders({
         ...overUnders,
         otherUsers: allUsers,
         userPicks: allPicks,
+        selectedUser: me,
       }),
     );
   };
@@ -118,11 +122,11 @@ export const submitOverUnderPicks =
   };
 
 export const viewPicksForOverUnderUser =
-  (ownerId: number) =>
+  (userId: number) =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const overUnderState = getState().overUnders;
     const newSelectedUser = overUnderState.otherUsers.find(
-      (u) => u.ownerId === ownerId,
+      (u) => u.id === userId,
     );
     if (!newSelectedUser) return;
     dispatch(
@@ -159,4 +163,24 @@ export const handleOverUnderRowUpdate =
     newPicks[foundIndex].userPick = updatedPick;
 
     dispatch(updateOverUnders({ ...overUnders, franchiseWinTotals: newPicks }));
+  };
+
+export const selectALine =
+  (id: number) =>
+  async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    const { overUnders } = getState();
+    dispatch(updateOverUnders({ ...overUnders, selectedLine: id }));
+  };
+
+export const seePicksForUser =
+  (userId?: number) =>
+  async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    const { overUnders } = getState();
+    const currentPoolId = overUnders.currentPool?.id;
+    if (currentPoolId === undefined || userId === undefined) return;
+    const newSelectedUser = overUnders.otherUsers.find((u) => u.id === userId);
+    if (newSelectedUser)
+      dispatch(
+        updateOverUnders({ ...overUnders, selectedUser: newSelectedUser }),
+      );
   };

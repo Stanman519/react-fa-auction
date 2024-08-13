@@ -1,16 +1,26 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Avatar, Box, Paper, Typography, useTheme } from "@mui/material";
-import Owner from "../../../redux/reducers/OwnerReducer";
+import Owner, { PoolUser } from "../../../redux/reducers/OwnerReducer";
 import Icon from "@mdi/react";
 import { mdiCashRemove } from "@mdi/js";
+import { seePicksForUser } from "../../../redux/actions/OverUnderActions";
 
-export const StandingsRow = ({ user }: { user: Owner }): JSX.Element => {
+export const StandingsRow = ({
+  user,
+  currentPool,
+}: {
+  user: PoolUser;
+  currentPool?: number;
+}): JSX.Element => {
   const dispatch = useDispatch();
 
   return (
     <Paper elevation={3} sx={{ marginBottom: 0.5, cursor: "pointer" }}>
       <Box
+        onClick={() => {
+          dispatch(seePicksForUser(user.id));
+        }}
         sx={{
           mr: 2,
           display: "flex",
@@ -22,7 +32,7 @@ export const StandingsRow = ({ user }: { user: Owner }): JSX.Element => {
         }}
       >
         <img
-          src={user.avatar}
+          src={user.owner.avatar}
           referrerPolicy="no-referrer"
           style={{ height: 0, width: 0 }}
         />
@@ -30,10 +40,10 @@ export const StandingsRow = ({ user }: { user: Owner }): JSX.Element => {
           <Avatar
             style={{ marginRight: 8, cursor: "pointer" }}
             sx={{ height: 50, width: 50 }}
-            alt={user.ownername}
-            src={user.avatar}
+            alt={user.owner.ownername}
+            src={user.owner.avatar}
           />
-          <Typography>{user.displayName}</Typography>
+          <Typography>{user.owner.displayName}</Typography>
           <Icon path={mdiCashRemove} size={1} color="red" />
         </div>
         <Typography>0</Typography>
