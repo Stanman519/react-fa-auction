@@ -519,7 +519,9 @@ export function MenuBar({
           open={openDrawer === "Chat"}
           onClose={() => closeDrawer()}
         >
-          <FAChatWindow leagueId={currentLeague?.league.leagueId.toString()} />
+          <FAChatWindow
+            screen={barOptions.includes("rules") ? "games" : "league"}
+          />
 
           {/* </Box> */}
         </Drawer>
