@@ -8,11 +8,13 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   ToggleButtonProps,
+  ToggleButtonPropsColorOverrides,
   Typography,
   keyframes,
   useTheme,
 } from "@mui/material";
 import styled from "@emotion/styled";
+import { theme } from "antd";
 
 export const OverUnderRow = ({
   prop,
@@ -151,6 +153,7 @@ export const OverUnderRow = ({
           value={userPick.isOver ?? ""}
         >
           <MyToggleButton
+            themecolor="salmon"
             selected={userPick.isOver === false}
             disableTouchRipple={userPick.isOver === false}
             onMouseDown={(e) => mouseDown(e)}
@@ -163,14 +166,20 @@ export const OverUnderRow = ({
           </MyToggleButton>
           <ToggleButton
             style={{
+              padding: 8,
+              fontSize: 18,
+              fontWeight:
+                prop.userPick.lineAdjustment !== 0 ? "bolder" : undefined,
               backgroundColor:
                 prop.userPick.lineAdjustment !== 0 ? "gold" : undefined,
+              color: prop.userPick.lineAdjustment !== 0 ? "black" : undefined,
             }}
             value={""}
           >
             {prop.overUnder + prop.userPick.lineAdjustment}
           </ToggleButton>
           <MyToggleButton
+            themecolor="green"
             selected={userPick.isOver === true}
             disableTouchRipple={userPick.isOver === true}
             onMouseDown={(e) => mouseDown(e)}
@@ -186,14 +195,24 @@ export const OverUnderRow = ({
     </Paper>
   );
 };
-const ProgressBar = styled("div")(({ theme }) => ({
-  position: "absolute",
-  top: 0,
-  left: 0,
-  height: "100%",
-  backgroundColor: "rgba(0, 0, 255, 0.3)", // Progress bar color
-  transition: "width 0.1s linear",
-}));
+
+declare module "@mui/material/ToggleButton" {
+  interface ToggleButtonPropsColorOverrides {
+    green: true;
+    salmon: true;
+  }
+}
+const ProgressBar = styled("div")(
+  ({ themecolor }: { themecolor: "salmon" | "green" }) => ({
+    position: "absolute",
+    top: 0,
+    left: 0,
+    height: "100%",
+    backgroundColor:
+      themecolor === "salmon" ? "rgba(155, 0, 0, 0.3)" : "rgba(0, 155, 0, 0.3)", // Progress bar color
+    transition: "width 0.1s linear",
+  }),
+);
 
 const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
   position: "relative",
@@ -202,13 +221,14 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
 
 interface MyToggButtProps extends ToggleButtonProps {
   selected: boolean;
+  themecolor: "salmon" | "green";
 }
 
 const MyToggleButton = (props: MyToggButtProps): JSX.Element => {
   const [progress, setProgress] = useState(0);
   const intervalRef = useRef<number | null>(null);
   const timeoutRef = useRef<number | null>(null);
-
+  const theme = useTheme();
   const startProgress = () => {
     intervalRef.current = window.setInterval(() => {
       setProgress((prev) => Math.min(prev + 10, 100));
@@ -267,6 +287,7 @@ const MyToggleButton = (props: MyToggButtProps): JSX.Element => {
   return (
     <CustomToggleButton
       {...props}
+      color={props.themecolor}
       onMouseDown={handleMouseDown}
       onTouchStart={handleMouseDown}
       onTouchEnd={handleMouseUp}
@@ -274,7 +295,10 @@ const MyToggleButton = (props: MyToggButtProps): JSX.Element => {
       onMouseLeave={handleMouseUp} // To handle case when mouse leaves the button
     >
       {props.children}
-      <ProgressBar style={{ width: `${progress}%` }} />
+      <ProgressBar
+        themecolor={props.themecolor}
+        style={{ width: `${progress}%` }}
+      />
     </CustomToggleButton>
   );
 };

@@ -69,6 +69,18 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (
+      franchiseWinTotals.length > 0 &&
+      isPreseason &&
+      franchiseWinTotals
+        .map((f) => f.userPick)
+        .every((p) => p.isOver === null || p.isOver === undefined)
+    ) {
+      dispatch(updateUI({ modal: "confidence-rules" }));
+    }
+  }, [franchiseWinTotals.length]);
+
   const getRelevantUserPick = (lineId: number) => {
     const pick = userPicks.find(
       (p) => p.lineId === lineId && p.userId === selectedPoolUserId,
