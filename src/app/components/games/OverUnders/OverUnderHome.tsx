@@ -215,7 +215,7 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
             onClick={() => dispatch(submitOverUnderPicks())}
           >
             <SendIcon className="mr-2" />
-            Submit Picks
+            Save Picks
           </Fab>
         </Box>
       )}
