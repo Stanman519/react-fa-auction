@@ -18,6 +18,7 @@ export default interface Owner {
 export interface PoolUser {
   id: number;
   owner: Owner;
+  isPaid: boolean;
   picks: OverUnderPick[];
 }
 export interface Pool {

@@ -44,7 +44,7 @@ export const StandingsRow = ({
             src={user.owner.avatar}
           />
           <Typography>{user.owner.displayName}</Typography>
-          <Icon path={mdiCashRemove} size={1} color="red" />
+          {!user.isPaid && <Icon path={mdiCashRemove} size={1} color="red" />}
         </div>
         <Typography>0</Typography>
       </Box>
