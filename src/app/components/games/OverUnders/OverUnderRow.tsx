@@ -31,29 +31,11 @@ export const OverUnderRow = ({
       dispatch(handleOverUnderRowUpdate(prop.id, 0, undefined));
   };
 
-  const getBool = (str: string) => {
-    switch (str?.toLowerCase()?.trim()) {
-      case "true":
-        return true;
-      case "false":
-        return false;
-      default:
-        return undefined;
-    }
-  };
-
   const mouseDown = (
     e:
       | React.MouseEvent<HTMLButtonElement, MouseEvent>
       | React.TouchEvent<HTMLButtonElement>,
   ) => {
-    if (
-      //@ts-ignore
-      getBool(e.target.value) !== userPick.isOver ||
-      userPick.isOver === undefined
-    )
-      return;
-    if (userPick.isOver === null || userPick.isOver === undefined) return;
     setStartTime(Date.now());
   };
 
@@ -62,21 +44,27 @@ export const OverUnderRow = ({
       | React.MouseEvent<HTMLButtonElement, MouseEvent>
       | React.TouchEvent<HTMLButtonElement>,
   ) => {
-    const target = e.target as HTMLButtonElement;
+    let target = e.target as HTMLButtonElement;
+    if (!target.value && target.parentElement)
+      // when you hold down the target is now the progress bar
+      target = target.parentElement as HTMLButtonElement;
     const { isOver, lineAdjustment } = userPick;
+    // if current is undefined or tapping a different button than selected, dont worry about time
     if (isOver === undefined || isOver.toString() !== target.value) {
+      setStartTime(undefined);
       dispatch(handleOverUnderRowUpdate(prop.id, 0, target.value === "true"));
       return;
     }
-    if (startTime === undefined) return;
-    if (
-      Date.now() - (startTime ?? 0) < 80 &&
-      ((target.value === "true" && isOver) ||
-        (target.value === "false" && isOver === false))
-    ) {
-      setStartTime(undefined);
-      dispatch(handleOverUnderRowUpdate(prop.id, 0, undefined));
-      return;
+    if (Date.now() - (startTime ?? 0) < 200) {
+      // Regular tap of non-middle button
+      if (
+        (target.value === "true" && isOver) || //tapping same button as selected
+        (target.value === "false" && isOver === false)
+      ) {
+        setStartTime(undefined);
+        dispatch(handleOverUnderRowUpdate(prop.id, 0, undefined));
+        return;
+      }
     }
     if (Date.now() - (startTime ?? 0) < 1000) {
       setStartTime(undefined);
