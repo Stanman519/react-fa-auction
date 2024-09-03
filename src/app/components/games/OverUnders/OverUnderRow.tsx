@@ -38,16 +38,58 @@ export const OverUnderRow = ({
   ) => {
     setStartTime(Date.now());
   };
+  const [isTouchEvent, setIsTouchEvent] = useState(false);
 
+  const handleMouseDown = (
+    e:
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+      | React.TouchEvent<HTMLButtonElement>,
+  ) => {
+    if (isTouchEvent) return; // Ignore mouse events if triggered by a touch
+    mouseDown(e);
+  };
+
+  const handleTouchStart = (
+    e:
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+      | React.TouchEvent<HTMLButtonElement>,
+  ) => {
+    setIsTouchEvent(true); // Set flag when a touch event is detected
+    e.preventDefault(); // Prevent subsequent mouse events from firing
+    mouseDown(e);
+  };
+
+  const handleMouseUp = (
+    e:
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+      | React.TouchEvent<HTMLButtonElement>,
+  ) => {
+    if (isTouchEvent) {
+      setIsTouchEvent(false); // Reset the flag after touch interaction ends
+      return;
+    }
+    mouseUp(e);
+  };
+
+  const handleTouchEnd = (
+    e:
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+      | React.TouchEvent<HTMLButtonElement>,
+  ) => {
+    e.preventDefault(); // Prevent subsequent mouse events from firing
+    mouseUp(e);
+  };
   const mouseUp = (
     e:
       | React.MouseEvent<HTMLButtonElement, MouseEvent>
       | React.TouchEvent<HTMLButtonElement>,
   ) => {
     let target = e.target as HTMLButtonElement;
-    if (!target.value && target.parentElement)
+    if (!target.value && target.parentElement) {
       // when you hold down the target is now the progress bar
       target = target.parentElement as HTMLButtonElement;
+    }
+
     const { isOver, lineAdjustment } = userPick;
     // if current is undefined or tapping a different button than selected, dont worry about time
     if (isOver === undefined || isOver.toString() !== target.value) {
@@ -139,10 +181,10 @@ export const OverUnderRow = ({
             themecolor="salmon"
             selected={userPick.isOver === false}
             disableTouchRipple={userPick.isOver === false}
-            onMouseDown={(e) => mouseDown(e)}
-            onTouchStart={(e) => mouseDown(e)}
-            onMouseUp={(e) => mouseUp(e)}
-            onTouchEnd={(e) => mouseUp(e)}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+            onMouseUp={handleMouseUp}
+            onTouchEnd={handleTouchEnd}
             value={false}
           >
             {userPick.lineAdjustment === -1 ? "Under -1" : "Under"}
@@ -165,10 +207,10 @@ export const OverUnderRow = ({
             themecolor="green"
             selected={userPick.isOver === true}
             disableTouchRipple={userPick.isOver === true}
-            onMouseDown={(e) => mouseDown(e)}
-            onTouchStart={(e) => mouseDown(e)}
-            onMouseUp={(e) => mouseUp(e)}
-            onTouchEnd={(e) => mouseUp(e)}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+            onMouseUp={handleMouseUp}
+            onTouchEnd={handleTouchEnd}
             value={true}
           >
             {userPick.lineAdjustment === 1 ? "Over +1" : "Over"}
