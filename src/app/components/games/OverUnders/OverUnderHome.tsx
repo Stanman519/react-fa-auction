@@ -127,7 +127,7 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
                 Picks: <span className="font-bold">{totalPicks}</span>
               </Typography>
               <Typography variant="caption" className="text-gray-600">
-                Required: 24
+                {totalPicks > 24 ? "Max" : "Required"}: 24
               </Typography>
             </div>
             <div
@@ -139,7 +139,8 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
                 Double Downs: <span className="font-bold">{totalDoubles}</span>
               </Typography>
               <Typography variant="caption" className="text-gray-600">
-                Required: 2 (Hold down on selection)
+                {totalDoubles > 2 ? "Max" : "Required"}: 2 (Hold down on
+                selection)
               </Typography>
             </div>
           </div>

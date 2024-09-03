@@ -15,6 +15,7 @@ import { loadDashboardData } from "../redux/actions/TransactionActions";
 import WaiverExtensions from "./nonAuction/WaiverExtensions";
 import { updateUI } from "../redux/actions/UiActions";
 import { OverUnderRow } from "./games/OverUnders/OverUnderRow";
+import AdvancedContractTrades from "./nonAuction/AdvancedContractTrades";
 
 interface Tab {
   label: string;
@@ -40,6 +41,7 @@ const HomeBase = () => {
   var draftTabs: Tab[] = [
     leagueTab,
     { label: "FREE TAXI CUTS", value: "taxi" },
+    // { label: "TRADES", value: "trades" },
   ];
   if (currentLeague?.league.isBuyoutSzn)
     draftTabs.push({ label: "AMNESTY BUYOUTS", value: "buyouts" });
@@ -61,7 +63,7 @@ const HomeBase = () => {
   }, [currentLeague?.league?.leagueId]);
 
   useEffect(() => {
-    if (authSynchronized && !currentLeague) nav("/games");
+    if (!currentLeague) nav("/games");
   }, [authSynchronized]);
   return (
     <div>
@@ -109,13 +111,11 @@ const HomeBase = () => {
                 {currentTab === "taxi" && <TaxiSquadTile />}
                 {currentTab === "buyouts" && <BuyoutTile />}
                 {currentTab === "waiver" && <WaiverExtensions />}
+                {currentTab === "trades" && <AdvancedContractTrades />}
               </div>
             </div>
           ) : (
-            <div>
-              Your profile was not automatically linked to your MyFantasyLeague
-              Account. Please contact the admin.
-            </div>
+            <CircularProgress />
           )}
         </>
       )}

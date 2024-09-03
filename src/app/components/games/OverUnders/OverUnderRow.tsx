@@ -1,5 +1,5 @@
 import { handleOverUnderRowUpdate } from "../../../redux/actions/OverUnderActions";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { FranchiseWinTotal } from "../../../redux/reducers/OverUnderReducer";
 import {
@@ -8,13 +8,10 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   ToggleButtonProps,
-  ToggleButtonPropsColorOverrides,
   Typography,
-  keyframes,
   useTheme,
 } from "@mui/material";
 import styled from "@emotion/styled";
-import { theme } from "antd";
 
 export const OverUnderRow = ({
   prop,
@@ -30,27 +27,10 @@ export const OverUnderRow = ({
     e: React.MouseEvent<HTMLElement>,
     newValue: boolean | "",
   ) => {
-    if (newValue === userPick.isOver || newValue === null) return;
-    let newAdj = userPick.lineAdjustment;
-    if (userPick.lineAdjustment !== 0) newAdj = 0;
-    dispatch(
-      handleOverUnderRowUpdate(
-        prop.id,
-        newAdj,
-        newValue === "" ? undefined : newValue,
-      ),
-    );
+    if (newValue === "")
+      dispatch(handleOverUnderRowUpdate(prop.id, 0, undefined));
   };
 
-  //   const onDouble = () => {
-  //     if (userPick.isOver === null || userPick.isOver === undefined) return;
-  //     if (userPick.lineAdjustment !== 0) {
-  //       dispatch(handleOverUnderRowUpdate(prop.id, 0, userPick.isOver));
-  //       return;
-  //     }
-  //     const newAdj = userPick.isOver ? 1 : -1;
-  //     dispatch(handleOverUnderRowUpdate(prop.id, newAdj, userPick.isOver));
-  //   };
   const getBool = (str: string) => {
     switch (str?.toLowerCase()?.trim()) {
       case "true":
@@ -82,19 +62,34 @@ export const OverUnderRow = ({
       | React.MouseEvent<HTMLButtonElement, MouseEvent>
       | React.TouchEvent<HTMLButtonElement>,
   ) => {
+    const target = e.target as HTMLButtonElement;
+    const { isOver, lineAdjustment } = userPick;
+    if (isOver === undefined || isOver.toString() !== target.value) {
+      dispatch(handleOverUnderRowUpdate(prop.id, 0, target.value === "true"));
+      return;
+    }
     if (startTime === undefined) return;
+    if (
+      Date.now() - (startTime ?? 0) < 80 &&
+      ((target.value === "true" && isOver) ||
+        (target.value === "false" && isOver === false))
+    ) {
+      setStartTime(undefined);
+      dispatch(handleOverUnderRowUpdate(prop.id, 0, undefined));
+      return;
+    }
     if (Date.now() - (startTime ?? 0) < 1000) {
       setStartTime(undefined);
       return;
     }
-    if (userPick.lineAdjustment !== 0) {
-      dispatch(handleOverUnderRowUpdate(prop.id, 0, userPick.isOver));
+    if (lineAdjustment !== 0) {
+      dispatch(handleOverUnderRowUpdate(prop.id, 0, isOver));
       setStartTime(undefined);
       return;
     }
-    if (userPick.lineAdjustment == 0) {
+    if (lineAdjustment == 0) {
       const newAdj = userPick.isOver ? 1 : -1;
-      dispatch(handleOverUnderRowUpdate(prop.id, newAdj, userPick.isOver));
+      dispatch(handleOverUnderRowUpdate(prop.id, newAdj, isOver));
       setStartTime(undefined);
     }
   };
@@ -250,10 +245,6 @@ const MyToggleButton = (props: MyToggButtProps): JSX.Element => {
     if (props.selected) {
       startProgress();
     }
-    timeoutRef.current = window.setTimeout(() => {
-      console.log("Long press action triggered"); // Replace with your long press action
-    }, 1000);
-
     if (props.onMouseDown && event.type === "mousedown") {
       props.onMouseDown(event as React.MouseEvent<HTMLButtonElement>);
     }

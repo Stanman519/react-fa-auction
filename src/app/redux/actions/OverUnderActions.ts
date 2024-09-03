@@ -150,7 +150,6 @@ export const handleOverUnderRowUpdate =
     if (newPicks.length === 0) return;
     const foundIndex = newPicks.findIndex((p) => p.id == id);
     if (foundIndex < 0) return;
-
     const oldPick = newPicks[foundIndex].userPick;
     const updatedPick = {
       ...oldPick,
