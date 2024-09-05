@@ -47,13 +47,19 @@ export const Rules = (): JSX.Element => {
 
   const overUndersRulesText = `Select whether you think each team will win OVER or UNDER the amount of wins displayed on each card. 
     
-    You must make a selection for 24 teams, so you can pass on some teams you are unsure about.
+    You must make a selection for 24 teams, so you can pass on some teams that you are unsure about.
     
     Additionally, 2 of those selections must be a "double down".  In this case you will still pick over or under but you'll have to move the expected wins +1 or -1, respectively, to make it more difficult.  Do this by making your selection and then holding down on your choice a second time.
     
     1 point for every team that you guess correctly and 2 points for every correct double down.
     
     You can edit your picks in the preseason. Once the season starts, your picks will be locked in and you'll be able to view everyone else's picks.
+
+    Prizes: If you tie the winner without tiebreakers, you'll be given your money back at minimum.  2nd place will get $50. 1st place will get the remaining money.
+
+    Tie-breaker #1: Total correct picks
+
+    Tie-breaker #2: Total amount of people who picked the other side of your correct picks. (Teams where you went against the crowd are worth more)
     
     Good luck! Have fun!`;
 
