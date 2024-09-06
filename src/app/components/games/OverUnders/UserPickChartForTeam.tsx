@@ -141,7 +141,7 @@ export const UserPickChartForTeam = (): JSX.Element => {
                 fontWeight: "700",
                 top: "50%",
                 left: "50%",
-                transform: "translate(-50%, -50%)",
+                transform: "translate(-50%, -50%) rotate(-45deg)",
                 //backgroundColor: 'rgba(255, 255, 255, 0.2)',
                 padding: "0 8px",
                 whiteSpace: "nowrap",
