@@ -1,3 +1,4 @@
+import internal from "stream";
 import { PlayerDTO } from "../redux/reducers/FreeAgentReducer";
 
 export interface DashboardTradeLeagueDTO {
@@ -40,7 +41,31 @@ export interface MflFranchise {
   url?: string;
   assets: FranchiseAssets;
 }
-
+export interface PendingTradeResponse {
+  tradeRequests: TradeRequest[];
+}
+export interface TradeRequest {
+  senderId: number;
+  senderTeamName: string;
+  receiverTeamName: string;
+  receiverId: number;
+  sendingAssets: TradeOfferAsset[];
+  receivingAssets: TradeOfferAsset[];
+  leagueId: number;
+  expires: number;
+}
+export interface TradeOfferAsset {
+  mflId: string;
+  playerDetails: PlayerDTO;
+  capEats: CapEat[];
+}
+export interface CapEat {
+  eaterId: number;
+  receiverId: number;
+  amount: number;
+  year: number;
+  mflId: number;
+}
 export interface FranchiseAssets {
   id: string;
   players: PlayerDTO[];

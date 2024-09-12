@@ -16,6 +16,7 @@ import WaiverExtensions from "./nonAuction/WaiverExtensions";
 import { updateUI } from "../redux/actions/UiActions";
 import { OverUnderRow } from "./games/OverUnders/OverUnderRow";
 import AdvancedContractTrades from "./nonAuction/AdvancedContractTrades";
+import PendingTrades from "./nonAuction/PendingTrades";
 
 interface Tab {
   label: string;
@@ -41,7 +42,8 @@ const HomeBase = () => {
   var draftTabs: Tab[] = [
     leagueTab,
     { label: "FREE TAXI CUTS", value: "taxi" },
-    // { label: "TRADES", value: "trades" },
+    { label: "PROPOSE TRADE", value: "new-trades" },
+    { label: "PENDING TRADES", value: "pending-trades" },
   ];
   if (currentLeague?.league.isBuyoutSzn)
     draftTabs.push({ label: "AMNESTY BUYOUTS", value: "buyouts" });
@@ -58,9 +60,9 @@ const HomeBase = () => {
     }
   }, []);
 
-  useEffect(() => {
-    dispatch(loadDashboardData());
-  }, [currentLeague?.league?.leagueId]);
+  // useEffect(() => {  // i dont know this was causing looping
+  //   dispatch(loadDashboardData());
+  // }, [currentLeague?.league?.leagueId]);
 
   useEffect(() => {
     if (!currentLeague) nav("/games");
@@ -111,7 +113,8 @@ const HomeBase = () => {
                 {currentTab === "taxi" && <TaxiSquadTile />}
                 {currentTab === "buyouts" && <BuyoutTile />}
                 {currentTab === "waiver" && <WaiverExtensions />}
-                {currentTab === "trades" && <AdvancedContractTrades />}
+                {currentTab === "new-trades" && <AdvancedContractTrades />}
+                {currentTab === "pending-trades" && <PendingTrades />}
               </div>
             </div>
           ) : (
