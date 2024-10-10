@@ -9,6 +9,7 @@ import { User } from "@auth0/auth0-react";
 import { LeagueLoginInfo } from "../reducers/OwnerReducer";
 import { PlayerDTO } from "../reducers/FreeAgentReducer";
 import { useNavigate } from "react-router-dom";
+import { TradeRequest } from "../../models/MflModels";
 
 export interface TransactionAction extends Action {
   payload: Transaction[];
@@ -230,6 +231,26 @@ export const submitBuyout =
     }
   };
 
+export const submitPendingTrade =
+  (
+    leagueId: number,
+    player: PlayerDTO,
+    mflFranchiseId: number,
+    rebate: number,
+  ) =>
+  async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    const { profile } = getState();
+    const requestBody = { leagueId, player, mflFranchiseId, rebate }; //(Math.round(5.01 * 10) / 10).toFixed(1)
+    if (!profile.currentLeague) return;
+    try {
+      const res = await GeneralApiSvc.postTaxiCut(requestBody);
+
+      dispatch(updateUI({ modal: "dashboard-success" }));
+    } catch (e: any) {
+      dispatch(updateUI({ modal: "error" }));
+    }
+  };
+
 export const submitTaxiCut =
   (
     leagueId: number,
@@ -255,5 +276,46 @@ export const submitTaxiCut =
       dispatch(updateUI({ modal: "dashboard-success" }));
     } catch (e: any) {
       dispatch(updateUI({ modal: "error" }));
+    }
+  };
+
+export const submitTradeRequest =
+  (tradeReq: TradeRequest) =>
+  async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    const { profile } = getState();
+    if (!profile.currentLeague) return;
+    try {
+      dispatch(updateUI({ isLoading: "button" }));
+      const res = await GeneralApiSvc.proposeTrade(tradeReq);
+      dispatch(
+        updateUI({ isLoading: undefined, modal: "trade-submit-success" }),
+      );
+    } catch (e: any) {
+      dispatch(updateUI({ modal: "error", isLoading: undefined }));
+    }
+  };
+
+export const replyToTrade =
+  (tradeId: number, answer: "reject" | "accept" | "revoke") =>
+  async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    const { profile } = getState();
+
+    if (!profile.currentLeague) return;
+    const leagueId = profile.currentLeague.league.leagueId;
+    const franchId = profile.currentLeague.mflfranchiseid;
+    try {
+      dispatch(updateUI({ isLoading: "button" }));
+
+      if (answer === "accept")
+        await GeneralApiSvc.acceptTrade(leagueId, tradeId, 0, franchId);
+      else if (answer === "reject")
+        await GeneralApiSvc.rejectTrade(leagueId, tradeId, 0, franchId);
+      else if (answer === "revoke")
+        await GeneralApiSvc.cancelTrade(leagueId, tradeId, 0, franchId);
+      dispatch(
+        updateUI({ isLoading: undefined, modal: "trade-response-success" }),
+      );
+    } catch (e: any) {
+      dispatch(updateUI({ modal: "error", isLoading: undefined }));
     }
   };

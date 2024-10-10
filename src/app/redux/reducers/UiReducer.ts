@@ -48,6 +48,8 @@ export type Modals =
   | "confidence-submit-success"
   | "ou-standings"
   | "error"
+  | "trade-submit-success"
+  | "trade-response-success"
   | "confidence-rules"
   | undefined;
 

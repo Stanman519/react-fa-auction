@@ -24,6 +24,7 @@ import {
   FranchiseWinTotal,
   OverUnderLoadResponse,
 } from "../redux/reducers/OverUnderReducer";
+import { TradeRequest } from "../models/MflModels";
 
 export interface LeagueCapInfo {
   leagueTransactions: Transaction[];
@@ -579,6 +580,91 @@ const getAllOverUnderUsersAndPicks = (poolId: number): Promise<PoolUser[]> => {
     });
 };
 
+const proposeTrade = (tradeReq: TradeRequest): Promise<Response> => {
+  return axios
+    .post(`${URL}/dashboard/propose-trade`, tradeReq, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((e) => {
+      console.log(e);
+      return undefined;
+    });
+};
+
+const acceptTrade = (
+  leagueId: number,
+  tradeId: number,
+  leagueOwnerId: number,
+  mflFranchiseId: number,
+): Promise<Response> => {
+  return axios
+    .get(
+      `${URL}/dashboard/league/${leagueId}/trades/${tradeId}/${leagueOwnerId}/mfl/${mflFranchiseId}/accept-trade`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    )
+    .then((res) => {
+      return res.data;
+    })
+    .catch((e) => {
+      console.log(e);
+      return undefined;
+    });
+};
+const rejectTrade = (
+  leagueId: number,
+  tradeId: number,
+  leagueOwnerId: number,
+  mflFranchiseId: number,
+): Promise<Response> => {
+  return axios
+    .get(
+      `${URL}/dashboard/league/${leagueId}/trades/${tradeId}/${leagueOwnerId}/mfl/${mflFranchiseId}/reject-trade/comments/sent from stanfan`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    )
+    .then((res) => {
+      return res.data;
+    })
+    .catch((e) => {
+      console.log(e);
+      return undefined;
+    });
+};
+const cancelTrade = (
+  leagueId: number,
+  tradeId: number,
+  leagueOwnerId: number,
+  mflFranchiseId: number,
+): Promise<Response> => {
+  return axios
+    .get(
+      `${URL}/dashboard/league/${leagueId}/trades/${tradeId}/${leagueOwnerId}/mfl/${mflFranchiseId}/revoke-trade/comments/sent from stanfan`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    )
+    .then((res) => {
+      return res.data;
+    })
+    .catch((e) => {
+      console.log(e);
+      return undefined;
+    });
+};
 // const getAllOverUnderUsers = (poolId: number): Promise<Owner[]> => {
 //   return axios
 //     .get(`${URL}/games/pools/${poolId}/ou-users`, {
@@ -622,4 +708,8 @@ export default {
   sendOverUnderPicks,
   getWinOverUndersForLeagueYear,
   getAllOverUnderUsersAndPicks,
+  proposeTrade,
+  cancelTrade,
+  acceptTrade,
+  rejectTrade,
 };

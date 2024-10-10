@@ -53,6 +53,7 @@ export interface TradeRequest {
   receivingAssets: TradeOfferAsset[];
   leagueId: number;
   expires: number;
+  tradeId: string;
 }
 export interface TradeOfferAsset {
   mflId: string;

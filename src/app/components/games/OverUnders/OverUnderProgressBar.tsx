@@ -66,7 +66,7 @@ export const OverUnderProgressBar: React.FC<ProgressSliderProps> = ({
   marker,
   isOver,
 }) => {
-  const emoji = isOnTrack === undefined ? "" : isOnTrack ? "😎" : "😬";
+  const emoji = isOnTrack === undefined ? "" : isOnTrack ? "😎" : "😞";
   const handleSliderClick = (event: React.MouseEvent<HTMLSpanElement>) => {
     event.preventDefault();
   };
