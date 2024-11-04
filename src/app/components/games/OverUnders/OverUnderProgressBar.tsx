@@ -66,10 +66,19 @@ export const OverUnderProgressBar: React.FC<ProgressSliderProps> = ({
   marker,
   isOver,
 }) => {
-  const emoji = isOnTrack === undefined ? "" : isOnTrack ? "😎" : "😞";
+  const emoji =
+    currentValue >= targetValue
+      ? "⭐"
+      : isOnTrack === undefined
+        ? ""
+        : isOnTrack
+          ? "😎"
+          : "😞";
   const handleSliderClick = (event: React.MouseEvent<HTMLSpanElement>) => {
     event.preventDefault();
   };
+
+  const correct = currentValue >= targetValue;
   return (
     <CustomSlider
       max={targetValue}
@@ -95,6 +104,11 @@ export const OverUnderProgressBar: React.FC<ProgressSliderProps> = ({
         },
         "& .MuiSlider-thumb:before": {
           content: `"${emoji}"`,
+          fontSize: 26,
+          textShadow: "0px 1px 8px #6E6E6E",
+        },
+        "& .MuiSlider-thumb": {
+          backgroundColor: emoji == "" ? "" : "transparent",
         },
       }}
     />

@@ -29,6 +29,8 @@ const PendingTrades = () => {
   const isPick = (asset: TradeOfferAsset) => {
     return asset.mflId.startsWith("DP_") || asset.mflId.startsWith("FP_");
   };
+
+  console.log("currl eag", currentLeague);
   useEffect(() => {
     const fetchPendingTrades = async () => {
       const response = axios

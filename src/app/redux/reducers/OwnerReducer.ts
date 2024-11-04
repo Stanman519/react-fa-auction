@@ -20,6 +20,7 @@ export interface PoolUser {
   owner: Owner;
   isPaid: boolean;
   picks: OverUnderPick[];
+  score?: number;
 }
 export interface Pool {
   id: number;

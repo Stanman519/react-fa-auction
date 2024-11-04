@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateUI } from "../../../redux/actions/UiActions";
 import { RootState } from "../../../redux/reducers/RootReducer";
 import StandingsRow from "./StandingsRow";
+import { PoolUser } from "../../../redux/reducers/OwnerReducer";
 
 export const OverUnderStandingsSlab = (): JSX.Element => {
   const users = useSelector((state: RootState) => state.overUnders.otherUsers);
@@ -12,6 +13,40 @@ export const OverUnderStandingsSlab = (): JSX.Element => {
   const openSlab = useSelector(
     (state: RootState) => state.ui.modal === "ou-standings",
   );
+  const { franchiseWinTotals } = useSelector(
+    (state: RootState) => state.overUnders,
+  );
+
+  const getPointsForUser = (user: PoolUser): number => {
+    const scoringLines = user.picks.filter((p) => {
+      const foundLine = franchiseWinTotals.find((f) => f.id == p.lineId);
+      return (
+        (p.isOver &&
+          (foundLine?.realWins ?? 0) >
+            (foundLine?.overUnder ?? 0 + p.lineAdjustment)) ||
+        (p.isOver === false &&
+          17 - ((foundLine?.gamesRemaining ?? 0) + (foundLine?.realWins ?? 0)) >
+            17.5 - ((foundLine?.overUnder ?? 0) + p.lineAdjustment))
+      );
+    });
+    {
+      return scoringLines.reduce(
+        (prev, curr) => prev + (curr.lineAdjustment === 0 ? 1 : 2),
+        0,
+      );
+    }
+  };
+
+  const scoredAndSorted = users
+    .map((u) => {
+      if (!u.score) u.score = getPointsForUser(u);
+      return u;
+    })
+    .sort(
+      (a, b) =>
+        (b?.score ?? 0) - (a?.score ?? 0) ||
+        a.owner.displayName.localeCompare(b.owner.displayName),
+    );
 
   return (
     <Drawer
@@ -26,8 +61,13 @@ export const OverUnderStandingsSlab = (): JSX.Element => {
         bgcolor={palette.background.default}
       >
         <List>
-          {users.map((o, index) => (
-            <StandingsRow key={o.id} user={o} currentPool={currentPool?.id} />
+          {scoredAndSorted.map((o, index) => (
+            <StandingsRow
+              key={o.id}
+              user={o}
+              currentPool={currentPool?.id}
+              score={o.score ?? 0}
+            />
           ))}
         </List>
       </Box>

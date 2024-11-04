@@ -16,6 +16,14 @@ export const InSeasonOUTeamRow = ({
 }): JSX.Element => {
   const dispatch = useDispatch();
   const [startTime, setStartTime] = useState<number | undefined>(undefined);
+  const targetVal = userPick.isOver
+    ? franchise.overUnder + userPick.lineAdjustment + 0.5
+    : 17.5 - (franchise.overUnder + userPick.lineAdjustment);
+
+  const currValue = userPick.isOver
+    ? franchise.realWins
+    : 17 - (franchise.gamesRemaining + franchise.realWins);
+  const sliderValue = currValue > targetVal ? targetVal : currValue;
 
   const getPace = () => {
     const ouWinPct = franchise.overUnder / 17;
@@ -44,6 +52,8 @@ export const InSeasonOUTeamRow = ({
       onClick={() => dispatch(selectALine(franchise.id))}
       elevation={3}
       sx={{
+        borderColor: sliderValue >= targetVal ? "darkgreen" : "transparent",
+        borderWidth: 3,
         cursor: "pointer",
         width: 360,
         height: 120, // Fixed height for consistency
@@ -107,7 +117,7 @@ export const InSeasonOUTeamRow = ({
               textAlign: "center",
               WebkitLineClamp: 2,
               WebkitBoxOrient: "vertical",
-
+              whiteSpace: "nowrap",
               overflow: "hidden",
             }}
           >
@@ -146,17 +156,9 @@ export const InSeasonOUTeamRow = ({
           </div>
           {userPick.isOver !== null && userPick.isOver !== undefined && (
             <OverUnderProgressBar
-              currentValue={
-                userPick.isOver
-                  ? franchise.realWins
-                  : 17 - (franchise.gamesRemaining + franchise.realWins)
-              }
+              currentValue={sliderValue}
               isOnTrack={getPace()}
-              targetValue={
-                userPick.isOver
-                  ? franchise.overUnder + userPick.lineAdjustment + 0.5
-                  : 17.5 - (franchise.overUnder + userPick.lineAdjustment)
-              }
+              targetValue={targetVal}
               isOver={userPick.isOver}
               marker={
                 userPick.isOver

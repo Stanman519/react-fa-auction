@@ -1,17 +1,21 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Avatar, Box, Paper, Typography, useTheme } from "@mui/material";
 import Owner, { PoolUser } from "../../../redux/reducers/OwnerReducer";
 import Icon from "@mdi/react";
 import { mdiCashRemove } from "@mdi/js";
 import { seePicksForUser } from "../../../redux/actions/OverUnderActions";
+import { stat } from "fs";
+import { RootState } from "../../../store";
 
 export const StandingsRow = ({
   user,
   currentPool,
+  score,
 }: {
   user: PoolUser;
   currentPool?: number;
+  score: number;
 }): JSX.Element => {
   const dispatch = useDispatch();
 
@@ -46,7 +50,7 @@ export const StandingsRow = ({
           <Typography>{user.owner.displayName}</Typography>
           {!user.isPaid && <Icon path={mdiCashRemove} size={1} color="red" />}
         </div>
-        <Typography>0</Typography>
+        <Typography>{score}</Typography>
       </Box>
     </Paper>
   );

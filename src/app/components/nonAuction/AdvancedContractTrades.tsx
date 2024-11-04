@@ -19,6 +19,8 @@ import {
   AccordionSummary,
   AccordionDetails,
   Slider,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -34,10 +36,11 @@ import React from "react";
 import { URL } from "../../services/AuctionApiSvc";
 import { TradeListItemHeader } from "./TradeListItemHeader";
 import { submitTradeRequest } from "../../redux/actions/TransactionActions";
+import { updateUI } from "../../redux/actions/UiActions";
 const AdvancedContractTrades = () => {
   const dispatch = useDispatch();
   const modal = useSelector(
-    (state: RootState) => state.ui.modal === "taxi-confirm",
+    (state: RootState) => state.ui.modal === "trade-submit-success",
   );
   const [mflLeagueRoot, setMflLeagueRoot] = useState<
     DashboardTradeLeagueDTO | undefined
@@ -315,6 +318,7 @@ const AdvancedContractTrades = () => {
           tradeId: "",
         }),
       );
+      dispatch(updateUI({ modal: "trade-submit-success" }));
       setActiveStep(0);
     } else {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -675,6 +679,18 @@ const AdvancedContractTrades = () => {
           )}
         </React.Fragment>
       )}
+      <Snackbar
+        open={modal}
+        autoHideDuration={8000}
+        onClose={() => dispatch(updateUI({ modal: undefined }))}
+      >
+        <Alert
+          severity="success"
+          onClose={() => dispatch(updateUI({ modal: undefined }))}
+        >
+          Submission Complete!
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
