@@ -1,4 +1,4 @@
-import { Box, Drawer, List, useTheme } from "@mui/material";
+import { Box, Drawer, List, Paper, Typography, useTheme } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUI } from "../../../redux/actions/UiActions";
 import { RootState } from "../../../redux/reducers/RootReducer";
@@ -60,6 +60,13 @@ export const OverUnderStandingsSlab = (): JSX.Element => {
         onClick={() => dispatch(updateUI({ modal: undefined }))}
         bgcolor={palette.background.default}
       >
+        {/* <Paper>
+          <Box className="flex flex-row justify-end">
+            <Typography>Pts</Typography>
+            <Typography>Misses</Typography>
+          </Box>
+        </Paper> */}
+
         <List>
           {scoredAndSorted.map((o, index) => (
             <StandingsRow

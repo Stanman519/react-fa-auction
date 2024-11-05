@@ -24,7 +24,15 @@ export const InSeasonOUTeamRow = ({
     ? franchise.realWins
     : 17 - (franchise.gamesRemaining + franchise.realWins);
   const sliderValue = currValue > targetVal ? targetVal : currValue;
-
+  const hasFailed =
+    (userPick.isOver == false &&
+      17 -
+        franchise.gamesRemaining -
+        franchise.realWins +
+        franchise.gamesRemaining <=
+        targetVal) ||
+    (userPick.isOver &&
+      franchise.realWins + franchise.gamesRemaining <= targetVal);
   const getPace = () => {
     const ouWinPct = franchise.overUnder / 17;
     const realWinPct = franchise.realWins / (17 - franchise.gamesRemaining);
@@ -52,7 +60,11 @@ export const InSeasonOUTeamRow = ({
       onClick={() => dispatch(selectALine(franchise.id))}
       elevation={3}
       sx={{
-        borderColor: sliderValue >= targetVal ? "darkgreen" : "transparent",
+        borderColor: hasFailed
+          ? "crimson"
+          : sliderValue >= targetVal
+            ? "darkgreen"
+            : "transparent",
         borderWidth: 3,
         cursor: "pointer",
         width: 360,
@@ -156,6 +168,8 @@ export const InSeasonOUTeamRow = ({
           </div>
           {userPick.isOver !== null && userPick.isOver !== undefined && (
             <OverUnderProgressBar
+              hasFailed={hasFailed ?? false}
+              //losses + gamesremaining <= targetVal || wins + games remaining <= target
               currentValue={sliderValue}
               isOnTrack={getPace()}
               targetValue={targetVal}

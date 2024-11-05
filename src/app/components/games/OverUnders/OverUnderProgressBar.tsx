@@ -53,6 +53,7 @@ const CustomSlider = styled(Slider)(({ theme }) => ({
 
 interface ProgressSliderProps {
   currentValue: number;
+  hasFailed: boolean;
   isOnTrack?: boolean;
   targetValue: number;
   marker: number;
@@ -60,14 +61,16 @@ interface ProgressSliderProps {
 }
 
 export const OverUnderProgressBar: React.FC<ProgressSliderProps> = ({
+  hasFailed,
   currentValue,
   targetValue,
   isOnTrack,
   marker,
   isOver,
 }) => {
-  const emoji =
-    currentValue >= targetValue
+  const emoji = hasFailed
+    ? "🚫"
+    : currentValue >= targetValue
       ? "⭐"
       : isOnTrack === undefined
         ? ""
