@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store";
+
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Card,
@@ -37,11 +37,11 @@ import { URL } from "../../services/AuctionApiSvc";
 import { TradeListItemHeader } from "./TradeListItemHeader";
 import { submitTradeRequest } from "../../redux/actions/TransactionActions";
 import { updateUI } from "../../redux/actions/UiActions";
+import { RootState } from "../../redux/reducers/RootReducer";
 const AdvancedContractTrades = () => {
   const dispatch = useDispatch();
-  const modal = useSelector(
-    (state: RootState) => state.ui.modal === "trade-submit-success",
-  );
+  const { modal } = useSelector((state: RootState) => state.ui);
+  console.log("modal", modal);
   const [mflLeagueRoot, setMflLeagueRoot] = useState<
     DashboardTradeLeagueDTO | undefined
   >(undefined);
@@ -318,7 +318,6 @@ const AdvancedContractTrades = () => {
           tradeId: "",
         }),
       );
-      dispatch(updateUI({ modal: "trade-submit-success" }));
       setActiveStep(0);
     } else {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -356,7 +355,15 @@ const AdvancedContractTrades = () => {
           Back
         </Button>
         <Box sx={{ flex: "1 1 auto" }} />
-        <Button onClick={handleNext}>
+        <Button
+          onClick={handleNext}
+          disabled={
+            (activeStep == 0 && !tradeTeamId) ||
+            (activeStep == 1 &&
+              mySelectedAssets.length === 0 &&
+              otherSelectedAssets.length === 0)
+          }
+        >
           {activeStep === steps.length - 1 ? "Submit" : "Next"}
         </Button>
       </Box>
@@ -420,7 +427,13 @@ const AdvancedContractTrades = () => {
                           />
                         }
                         label={
-                          <Box sx={{ flexDirection: "row", display: "flex" }}>
+                          <Box
+                            sx={{
+                              flexDirection: "row",
+                              display: "flex",
+                              flexWrap: "wrap",
+                            }}
+                          >
                             <Typography sx={{ marginRight: 1 }}>
                               {mp.fullName}{" "}
                             </Typography>
@@ -492,7 +505,13 @@ const AdvancedContractTrades = () => {
                             />
                           }
                           label={
-                            <Box sx={{ flexDirection: "row", display: "flex" }}>
+                            <Box
+                              sx={{
+                                flexDirection: "row",
+                                display: "flex",
+                                flexWrap: "wrap",
+                              }}
+                            >
                               <Typography sx={{ marginRight: 1 }}>
                                 {mp.fullName}{" "}
                               </Typography>
@@ -550,57 +569,70 @@ const AdvancedContractTrades = () => {
                 </Typography>
                 {mySelectedAssets.map((my, assetIndex) => {
                   // Handle filtering inside the map while preserving the index
-                  if (
-                    my.mflId.startsWith("DP_") ||
-                    my.mflId.startsWith("FP_")
-                  ) {
-                    return null;
-                  }
+                  // if (
+                  //   my.mflId.startsWith("DP_") ||
+                  //   my.mflId.startsWith("FP_")
+                  // ) {
+                  //   return null;
+
                   return (
                     <Accordion elevation={3} key={my.mflId}>
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <AccordionSummary
+                        expandIcon={
+                          my.mflId.startsWith("DP_") ||
+                          my.mflId.startsWith("FP_") ? (
+                            <></>
+                          ) : (
+                            <ExpandMoreIcon />
+                          )
+                        }
+                      >
                         <TradeListItemHeader
                           mflId={my.mflId}
                           playerDetails={my.playerDetails}
                         />
                       </AccordionSummary>
-                      {my.capEats.length > 0 && (
-                        <Typography>
-                          Salary Retained By {currentLeague?.teamName}
-                        </Typography>
-                      )}
-                      {my.capEats.map((ce, capEatIndex) => {
-                        const marks = [
-                          { value: 0, label: "$0" },
-                          {
-                            value: my.playerDetails.salary ?? 0,
-                            label: `$${my.playerDetails.salary ?? 0}`,
-                          },
-                        ];
-                        return (
-                          <AccordionDetails
-                            style={{ display: "flex", flexDirection: "row" }}
-                          >
-                            <Typography style={{ marginRight: 16 }}>
-                              {ce.year}
-                            </Typography>
-                            <Slider
-                              valueLabelDisplay="on"
-                              marks={marks}
-                              value={ce.amount}
-                              valueLabelFormat={(v) => `$${v}`}
-                              max={my.playerDetails.salary}
-                              onChange={(_, newValue) =>
-                                handleMySliderChange(
-                                  assetIndex,
-                                  capEatIndex,
-                                  newValue as number,
-                                )
-                              }
-                            />
-                          </AccordionDetails>
-                        );
-                      })}
+                      {!my.mflId.startsWith("DP_") &&
+                        !my.mflId.startsWith("FP_") &&
+                        my.capEats.length > 0 && (
+                          <Typography>
+                            Salary Retained By {currentLeague?.teamName}
+                          </Typography>
+                        )}
+                      {!my.mflId.startsWith("DP_") &&
+                        !my.mflId.startsWith("FP_") &&
+                        my.capEats.map((ce, capEatIndex) => {
+                          const marks = [
+                            { value: 0, label: "$0" },
+                            {
+                              value: my.playerDetails.salary ?? 0,
+                              label: `$${my.playerDetails.salary ?? 0}`,
+                            },
+                          ];
+                          return (
+                            <AccordionDetails
+                              style={{ display: "flex", flexDirection: "row" }}
+                            >
+                              <Typography style={{ marginRight: 16 }}>
+                                {ce.year}
+                              </Typography>
+                              <Slider
+                                valueLabelDisplay="on"
+                                marks={marks}
+                                value={ce.amount}
+                                valueLabelFormat={(v) => `$${v}`}
+                                max={my.playerDetails.salary}
+                                onChange={(_, newValue) =>
+                                  handleMySliderChange(
+                                    assetIndex,
+                                    capEatIndex,
+                                    newValue as number,
+                                  )
+                                }
+                              />
+                            </AccordionDetails>
+                          );
+                        })}
                     </Accordion>
                   );
                 })}
@@ -618,59 +650,72 @@ const AdvancedContractTrades = () => {
                   {franchises.find((f) => f.id == tradeTeamId)?.name} sends:
                 </Typography>
                 {otherSelectedAssets.map((my, assetIndex) => {
-                  // Handle filtering inside the map while preserving the index
-                  if (
-                    my.mflId.startsWith("DP_") ||
-                    my.mflId.startsWith("FP_")
-                  ) {
-                    return null;
-                  }
+                  // // Handle filtering inside the map while preserving the index
+                  // if (
+                  //   my.mflId.startsWith("DP_") ||
+                  //   my.mflId.startsWith("FP_")
+                  // ) {
+                  //   return null;
+                  // }
                   return (
                     <Accordion elevation={3} key={my.mflId}>
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <AccordionSummary
+                        expandIcon={
+                          my.mflId.startsWith("DP_") ||
+                          my.mflId.startsWith("FP_") ? (
+                            <></>
+                          ) : (
+                            <ExpandMoreIcon />
+                          )
+                        }
+                      >
                         <TradeListItemHeader
                           mflId={my.mflId}
                           playerDetails={my.playerDetails}
                         />
                       </AccordionSummary>
-                      {my.capEats.length > 0 && (
-                        <Typography>
-                          Salary Retained By{" "}
-                          {franchises.find((f) => f.id == tradeTeamId)?.name}
-                        </Typography>
-                      )}
-                      {my.capEats.map((ce, capEatIndex) => {
-                        const marks = [
-                          { value: 0, label: "$0" },
-                          {
-                            value: my.playerDetails.salary ?? 0,
-                            label: `$${my.playerDetails.salary ?? 0}`,
-                          },
-                        ];
-                        return (
-                          <AccordionDetails
-                            style={{ display: "flex", flexDirection: "row" }}
-                          >
-                            <Typography style={{ marginRight: 16 }}>
-                              {ce.year}
-                            </Typography>
-                            <Slider
-                              valueLabelDisplay="on"
-                              marks={marks}
-                              value={ce.amount}
-                              valueLabelFormat={(v) => `$${v}`}
-                              max={my.playerDetails.salary}
-                              onChange={(_, newValue) =>
-                                handleOtherSliderChange(
-                                  assetIndex,
-                                  capEatIndex,
-                                  newValue as number,
-                                )
-                              }
-                            />
-                          </AccordionDetails>
-                        );
-                      })}
+                      {!my.mflId.startsWith("DP_") &&
+                        !my.mflId.startsWith("FP_") &&
+                        my.capEats.length > 0 && (
+                          <Typography>
+                            Salary Retained By{" "}
+                            {franchises.find((f) => f.id == tradeTeamId)?.name}
+                          </Typography>
+                        )}
+                      {!my.mflId.startsWith("DP_") &&
+                        !my.mflId.startsWith("FP_") &&
+                        my.capEats.map((ce, capEatIndex) => {
+                          const marks = [
+                            { value: 0, label: "$0" },
+                            {
+                              value: my.playerDetails.salary ?? 0,
+                              label: `$${my.playerDetails.salary ?? 0}`,
+                            },
+                          ];
+                          return (
+                            <AccordionDetails
+                              style={{ display: "flex", flexDirection: "row" }}
+                            >
+                              <Typography style={{ marginRight: 16 }}>
+                                {ce.year}
+                              </Typography>
+                              <Slider
+                                valueLabelDisplay="on"
+                                marks={marks}
+                                value={ce.amount}
+                                valueLabelFormat={(v) => `$${v}`}
+                                max={my.playerDetails.salary}
+                                onChange={(_, newValue) =>
+                                  handleOtherSliderChange(
+                                    assetIndex,
+                                    capEatIndex,
+                                    newValue as number,
+                                  )
+                                }
+                              />
+                            </AccordionDetails>
+                          );
+                        })}
                     </Accordion>
                   );
                 })}
@@ -679,16 +724,19 @@ const AdvancedContractTrades = () => {
           )}
         </React.Fragment>
       )}
+
       <Snackbar
-        open={modal}
+        open={modal === "trade-submit-success" || modal === "error"}
         autoHideDuration={8000}
         onClose={() => dispatch(updateUI({ modal: undefined }))}
       >
         <Alert
-          severity="success"
+          severity={modal === "trade-submit-success" ? "success" : "error"}
           onClose={() => dispatch(updateUI({ modal: undefined }))}
         >
-          Submission Complete!
+          {modal === "trade-submit-success"
+            ? "Submission Complete!"
+            : "Submission failed."}
         </Alert>
       </Snackbar>
     </Box>

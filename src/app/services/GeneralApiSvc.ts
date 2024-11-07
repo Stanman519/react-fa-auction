@@ -591,8 +591,7 @@ const proposeTrade = (tradeReq: TradeRequest): Promise<Response> => {
       return res.data;
     })
     .catch((e) => {
-      console.log(e);
-      return undefined;
+      throw e;
     });
 };
 

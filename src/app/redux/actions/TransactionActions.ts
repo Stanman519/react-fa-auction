@@ -287,6 +287,7 @@ export const submitTradeRequest =
     try {
       dispatch(updateUI({ isLoading: "button" }));
       const res = await GeneralApiSvc.proposeTrade(tradeReq);
+
       dispatch(
         updateUI({ isLoading: undefined, modal: "trade-submit-success" }),
       );
