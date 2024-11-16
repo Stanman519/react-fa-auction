@@ -173,7 +173,7 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
         </>
       )}
       <div
-        style={{ marginTop: isPreseason ? "100px" : 150, width: "100%" }}
+        style={{ marginTop: isPreseason ? "100px" : 175, width: "100%" }}
       ></div>
       {selectedUser && !isPreseason && (
         <Typography variant="h3">

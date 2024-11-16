@@ -41,7 +41,7 @@ import { RootState } from "../../redux/reducers/RootReducer";
 const AdvancedContractTrades = () => {
   const dispatch = useDispatch();
   const { modal } = useSelector((state: RootState) => state.ui);
-  console.log("modal", modal);
+
   const [mflLeagueRoot, setMflLeagueRoot] = useState<
     DashboardTradeLeagueDTO | undefined
   >(undefined);
@@ -58,7 +58,7 @@ const AdvancedContractTrades = () => {
   const [otherSelectedAssets, setOtherSelectedAssets] = useState<
     TradeOfferAsset[]
   >([]);
-  console.log("myassets", mySelectedAssets);
+
   // Function to handle asset selection for "My Assets"
   const handleMyAssetChange = (assetId: string, isChecked: boolean) => {
     if (isChecked && currentLeague?.mflfranchiseid) {
@@ -67,7 +67,7 @@ const AdvancedContractTrades = () => {
       )?.assets;
       const now = new Date();
       const year = now.getFullYear();
-      console.log("assets", franchises);
+
       if (assetId.startsWith("DP_") || assetId.startsWith("FP_")) {
         const np = assets?.currentYearDraftPicks
           .concat(assets.futureYearDraftPicks)
@@ -199,8 +199,6 @@ const AdvancedContractTrades = () => {
           },
         )
         .then((res) => {
-          console.log("other", res.data);
-
           const data = res.data as PendingTradeResponse;
           setPendingTrades(data.tradeRequests);
           // newTeam.assets.players.forEach((a) => {
@@ -240,9 +238,7 @@ const AdvancedContractTrades = () => {
         }
 
         const data = (await response.json()) as DashboardTradeLeagueDTO;
-        console.log("data", data); // You can replace this with your state update logic
         setMflLeagueRoot(data);
-        console.log(currentLeague?.mflfranchiseid ?? 0);
         setFranchises(data.franchises);
       } catch (error) {
         //@ts-ignore
@@ -262,7 +258,6 @@ const AdvancedContractTrades = () => {
       (!newTeam?.assets.players ||
         newTeam.assets.players.some((p) => !p.fullName))
     ) {
-      console.log("runnin");
       const playerIds = newTeam.assets.players.map((p) => p.mflId).join(",");
       const now = new Date();
       const year = now.getFullYear();
@@ -276,7 +271,6 @@ const AdvancedContractTrades = () => {
           },
         )
         .then((res) => {
-          console.log("player result, ", res.data);
           const data = res.data as PlayerDTO[];
           newTeam.assets.players.forEach((a) => {
             const foundPlayer = data.find((d) => d.mflId == a.mflId);
@@ -418,7 +412,6 @@ const AdvancedContractTrades = () => {
                               ),
                             )}
                             onChange={(e) => {
-                              console.log("e", e);
                               handleMyAssetChange(
                                 mp.mflId.toString(),
                                 e.target.checked,
@@ -486,7 +479,6 @@ const AdvancedContractTrades = () => {
                       return positionA.localeCompare(positionB);
                     })
                     .map((mp) => {
-                      console.log("mp", mp);
                       return (
                         <FormControlLabel
                           control={

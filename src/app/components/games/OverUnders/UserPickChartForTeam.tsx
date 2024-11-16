@@ -13,41 +13,26 @@ import { seePicksForUser } from "../../../redux/actions/OverUnderActions";
 
 export const UserPickChartForTeam = (): JSX.Element => {
   const isMobile = useMediaQuery("(max-width:600px)");
+  const dispatch = useDispatch();
   const { userPicks, selectedLine, franchiseWinTotals, otherUsers } =
     useSelector((state: RootState) => state.overUnders);
+
   const teamLine = franchiseWinTotals.find((f) => f.id === selectedLine);
   const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [pickSum, setPickSum] = useState<number>(0);
-  const [popoverEl, setPopoverEl] = useState<HTMLDivElement | null>(null);
   const [groupedPicks, setGroupedPicks] = useState<
     Map<string, OverUnderPick[]>
   >(new Map());
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const handleClickOutside = (event: Event) => {
-      if (!popoverEl?.contains(event.target as Node)) {
-        handlePopoverClose();
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [popoverEl]);
 
   useEffect(() => {
     const handleScroll = () => {
       setAnchorEl(null);
-      setPopoverEl(null);
+      setHoveredId(null);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
@@ -58,24 +43,26 @@ export const UserPickChartForTeam = (): JSX.Element => {
           if (pick.isOver === false) return 0;
           if (pick.isOver == null) return 1;
           if (pick.isOver === true) return 2;
-          else return 0;
+          return 0;
         };
         const isOverComparison = priority(a) - priority(b);
-        if (isOverComparison !== 0) {
-          return isOverComparison;
-        }
-        return a.lineAdjustment - b.lineAdjustment;
+        return isOverComparison !== 0
+          ? isOverComparison
+          : a.lineAdjustment - b.lineAdjustment;
       });
+
     const grouped = new Map<string, OverUnderPick[]>();
     setPickSum(sorted.length);
+
     sorted.forEach((p) => {
-      if (teamLine !== undefined) {
+      if (teamLine) {
         const key =
           p.isOver === true
-            ? `O ${teamLine?.overUnder + p.lineAdjustment}`
+            ? `O ${teamLine.overUnder + p.lineAdjustment}`
             : p.isOver === false
-              ? `U ${teamLine?.overUnder + p.lineAdjustment}`
+              ? `U ${teamLine.overUnder + p.lineAdjustment}`
               : "PASS";
+
         if (!grouped.has(key)) {
           grouped.set(key, []);
         }
@@ -84,158 +71,144 @@ export const UserPickChartForTeam = (): JSX.Element => {
     });
 
     setGroupedPicks(grouped);
-  }, [userPicks, selectedLine]);
+  }, [userPicks, selectedLine, teamLine]);
 
-  const handlePopoverOpen = (
-    event: MouseEvent<HTMLElement>,
-    pickId: number,
-  ): void => {
-    setAnchorEl(event.currentTarget);
-    setHoveredId(pickId);
-  };
+  const handlePopoverOpen = useCallback(
+    (event: MouseEvent<HTMLElement>, pickId: number) => {
+      setHoveredId(pickId);
+      setAnchorEl(event.currentTarget);
+    },
+    [],
+  );
 
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
+  const handlePopoverClose = useCallback(() => {
     setHoveredId(null);
-  };
-
-  const popoverRef = useCallback((node: HTMLDivElement) => {
-    if (node !== null) {
-      setPopoverEl(node);
-    }
+    setAnchorEl(null);
   }, []);
 
-  const getBgColor = (lineAdjustment: number, isOver?: boolean) => {
+  const getBgColor = useCallback((lineAdjustment: number, isOver?: boolean) => {
     if (isOver !== true && isOver !== false) return "lightgray";
     if (!isOver) {
       return lineAdjustment === 0 ? "#ffcccb" : "#e57373";
     }
-    if (isOver) {
-      return lineAdjustment === 0 ? "#c8e6c9" : "#81c784";
-    }
-  };
+    return lineAdjustment === 0 ? "#c8e6c9" : "#81c784";
+  }, []);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-      }}
-    >
-      {Array.from(groupedPicks.entries()).map(([key, picks], i) => {
-        return (
+    <div className="flex flex-col items-center">
+      <div className="flex flex-row justify-center w-full">
+        {Array.from(groupedPicks.entries()).map(([key, picks]) => (
           <div
             key={key}
+            className="mb-4 border-gray-400"
             style={{
-              marginBottom: 16,
               width: `${(picks.length / pickSum) * 100}%`,
-              position: "relative",
+              borderWidth: 1,
             }}
           >
             <Typography
-              variant="h6"
+              className="font-bold whitespace-nowrap  pointer-events-none"
               style={{
-                pointerEvents: "none",
-                position: "absolute",
-                fontWeight: "700",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%) rotate(-45deg)",
-                //backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                textAlign: "center",
+                width: "100%",
                 padding: "0 8px",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                zIndex: 1,
               }}
             >
               {key}
             </Typography>
-            <div style={{ display: "flex", flexDirection: "row" }}>
-              {picks.map((p) => {
-                const user = otherUsers.find((u) => u.id === p.userId);
+
+            <div className="flex flex-row">
+              {picks.map((pick) => {
+                const user = otherUsers.find((u) => u.id === pick.userId);
                 return (
                   <div
-                    onMouseEnter={(e) => handlePopoverOpen(e, p.id ?? 0)}
-                    onClick={
-                      isMobile
-                        ? (e) => handlePopoverOpen(e, p.id ?? 0)
+                    key={pick.id}
+                    onMouseEnter={
+                      !isMobile
+                        ? (e) => handlePopoverOpen(e, pick.id ?? 0)
                         : undefined
                     }
-                    key={p.id}
+                    onMouseLeave={!isMobile ? handlePopoverClose : undefined}
+                    onClick={
+                      isMobile
+                        ? (e) => handlePopoverOpen(e, pick.id ?? 0)
+                        : undefined
+                    }
+                    className="relative border border-gray-400 box-border"
                     style={{
-                      borderStyle: "solid",
-                      borderColor: "darkgray",
-                      boxSizing: "border-box",
-                      borderWidth: 1,
-                      backgroundColor: getBgColor(p.lineAdjustment, p.isOver),
-                      position: "relative",
+                      backgroundColor: getBgColor(
+                        pick.lineAdjustment,
+                        pick.isOver,
+                      ),
                       height: 60,
-                      width: `${(1 / picks.length) * 100}%`, // Uniform width for all rectangles
+                      width: `${(1 / picks.length) * 100}%`,
                     }}
                   >
-                    <div id={`${p.id}`}></div>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: "24px",
+                        height: "24px",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      <Avatar
+                        src={user?.owner.avatar}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                        }}
+                      />
+                    </div>
 
-                    {anchorEl && (
-                      <Popover
-                        sx={{
-                          pointerEvents: "none",
-                          zIndex: 500,
-                          overflow: "visible",
-                        }}
-                        ref={popoverRef}
-                        id={`mouse-over-popover-${p.id}`}
-                        open={hoveredId === p.id}
-                        anchorEl={anchorEl}
-                        //@ts-ignore
-                        container={anchorEl}
-                        anchorOrigin={{
-                          vertical: "top",
-                          horizontal: "center",
-                        }}
-                        transformOrigin={{
-                          vertical: "bottom",
-                          horizontal: "center",
-                        }}
-                        onClose={(e, r) => {
+                    <Popover
+                      open={hoveredId === pick.id}
+                      anchorEl={anchorEl}
+                      anchorOrigin={{
+                        vertical: "top",
+                        horizontal: "center",
+                      }}
+                      transformOrigin={{
+                        vertical: "bottom",
+                        horizontal: "center",
+                      }}
+                      onClose={handlePopoverClose}
+                      disableRestoreFocus
+                      disableScrollLock={true}
+                      keepMounted
+                      sx={{
+                        pointerEvents: "none",
+                        "& .MuiPopover-paper": {
+                          pointerEvents: "auto",
+                          marginTop: "-8px",
+                        },
+                      }}
+                    >
+                      <Button
+                        onClick={() => {
+                          dispatch(seePicksForUser(user?.id));
                           handlePopoverClose();
                         }}
-                        transitionDuration={0} // Disable animation
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          padding: "8px 16px",
+                        }}
+                        tabIndex={-1}
                       >
-                        <div
-                          style={{
-                            pointerEvents: "all",
-                            display: "flex",
-                            flexDirection: "row",
-                          }}
-                        >
-                          <img
-                            src={user?.owner.avatar}
-                            referrerPolicy="no-referrer"
-                            style={{ height: 0, width: 0 }}
-                          />
-                          <Button
-                            onClick={() => {
-                              dispatch(seePicksForUser(user?.id));
-                            }}
-                          >
-                            {" "}
-                            <Avatar
-                              src={user?.owner.avatar}
-                              style={{ marginRight: 4 }}
-                            />{" "}
-                            {user?.owner.displayName}'s picks
-                          </Button>
-                        </div>
-                      </Popover>
-                    )}
+                        <span>{user?.owner.displayName}'s picks</span>
+                      </Button>
+                    </Popover>
                   </div>
                 );
               })}
             </div>
           </div>
-        );
-      })}
+        ))}
+      </div>
     </div>
   );
 };

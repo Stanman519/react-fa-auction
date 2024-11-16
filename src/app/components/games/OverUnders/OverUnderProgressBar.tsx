@@ -87,18 +87,25 @@ export const OverUnderProgressBar: React.FC<ProgressSliderProps> = ({
       max={targetValue}
       valueLabelDisplay="auto"
       marks={[
+        {
+          value: 0,
+          label: `${isOver ? "Win" : "Loss"} Progress`,
+        },
         // { value: currentValue, label: currentValue },
         {
           value: marker,
-          label: isOver ? ` ` : `losses needed: ${targetValue}`,
+          label: `target: ${targetValue}`,
         },
       ]}
       onClick={handleSliderClick}
       value={currentValue}
       sx={{
-        "& .MuiSlider-markLabel": {
-          transform: "translateX(-90%)translateY(-15%)",
-          marginTop: 0,
+        "& .MuiSlider-markLabel.MuiSlider-markLabelActive": {
+          transform: "translateX(0%)",
+        },
+        // Second mark label (target value)
+        "& .MuiSlider-markLabel:not(.MuiSlider-markLabelActive)": {
+          transform: "translateX(-75%)",
         },
         "& .MuiSlider-mark": {
           color: "black",

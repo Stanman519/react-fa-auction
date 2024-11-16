@@ -30,7 +30,6 @@ const PendingTrades = () => {
     return asset.mflId.startsWith("DP_") || asset.mflId.startsWith("FP_");
   };
 
-  console.log("currl eag", currentLeague);
   useEffect(() => {
     const fetchPendingTrades = async () => {
       const response = axios
@@ -43,8 +42,6 @@ const PendingTrades = () => {
           },
         )
         .then((res) => {
-          console.log("other", res.data);
-
           const data = res.data as PendingTradeResponse;
           setPendingTrades(data.tradeRequests);
         })

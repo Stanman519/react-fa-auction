@@ -176,6 +176,7 @@ export const seePicksForUser =
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { overUnders } = getState();
     const currentPoolId = overUnders.currentPool?.id;
+    console.log("in the dispatch");
     if (currentPoolId === undefined || userId === undefined) return;
     const newSelectedUser = overUnders.otherUsers.find((u) => u.id === userId);
     if (newSelectedUser)
