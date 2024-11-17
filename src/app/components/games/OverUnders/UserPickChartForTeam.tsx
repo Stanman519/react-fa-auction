@@ -86,6 +86,15 @@ export const UserPickChartForTeam = (): JSX.Element => {
     setAnchorEl(null);
   }, []);
 
+  const getHeaderBgColor = useCallback((pick: OverUnderPick) => {
+    if (pick.isOver === null) return "lightgray";
+    if (pick.isOver === true) {
+      return pick.lineAdjustment === 0 ? "#c8e6c9" : "#81c784";
+    } else {
+      return pick.lineAdjustment === 0 ? "#ffcccb" : "#e57373";
+    }
+  }, []);
+
   const getBgColor = useCallback((lineAdjustment: number, isOver?: boolean) => {
     if (isOver !== true && isOver !== false) return "lightgray";
     if (!isOver) {
@@ -93,7 +102,6 @@ export const UserPickChartForTeam = (): JSX.Element => {
     }
     return lineAdjustment === 0 ? "#c8e6c9" : "#81c784";
   }, []);
-
   return (
     <div className="flex flex-col items-center">
       <div className="flex flex-row justify-center w-full">
@@ -109,6 +117,8 @@ export const UserPickChartForTeam = (): JSX.Element => {
             <Typography
               className="font-bold whitespace-nowrap  pointer-events-none"
               style={{
+                backgroundColor:
+                  picks.length > 0 ? getHeaderBgColor(picks[0]) : "transparent",
                 textAlign: "center",
                 width: "100%",
                 padding: "0 8px",
@@ -144,7 +154,7 @@ export const UserPickChartForTeam = (): JSX.Element => {
                       width: `${(1 / picks.length) * 100}%`,
                     }}
                   >
-                    <div
+                    {/* <div
                       style={{
                         position: "absolute",
                         top: "50%",
@@ -154,15 +164,17 @@ export const UserPickChartForTeam = (): JSX.Element => {
                         height: "24px",
                         pointerEvents: "none",
                       }}
-                    >
-                      <Avatar
-                        src={user?.owner.avatar}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                        }}
-                      />
-                    </div>
+                    > */}
+                    <Avatar
+                      variant="square"
+                      src={user?.owner.avatar}
+                      style={{
+                        opacity: hoveredId === pick.id ? "100%" : "60%",
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    />
+                    {/* </div> */}
 
                     <Popover
                       open={hoveredId === pick.id}
