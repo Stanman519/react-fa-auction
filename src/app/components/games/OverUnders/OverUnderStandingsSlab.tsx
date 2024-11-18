@@ -20,12 +20,18 @@ export const OverUnderStandingsSlab = (): JSX.Element => {
   const getPointsForUser = (user: PoolUser): number => {
     const scoringLines = user.picks.filter((p) => {
       const foundLine = franchiseWinTotals.find((f) => f.id == p.lineId);
+      // console.log(
+      //   `franchise: ${foundLine?.franchise.name} ${user.owner.displayName} pick: ${p.isOver} ${p.lineAdjustment}`,
+      // );
       return (
         (p.isOver &&
           (foundLine?.realWins ?? 0) >
             (foundLine?.overUnder ?? 0 + p.lineAdjustment)) ||
+        //  const sliderValue = currValue > targetVal ? targetVal : currValue;
+        //  const currValue =  17 - (franchise.gamesRemaining + franchise.realWins);
         (p.isOver === false &&
-          17 - ((foundLine?.gamesRemaining ?? 0) + (foundLine?.realWins ?? 0)) >
+          17 -
+            ((foundLine?.gamesRemaining ?? 0) + (foundLine?.realWins ?? 0)) >=
             17.5 - ((foundLine?.overUnder ?? 0) + p.lineAdjustment))
       );
     });

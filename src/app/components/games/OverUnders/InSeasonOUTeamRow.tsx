@@ -62,9 +62,11 @@ export const InSeasonOUTeamRow = ({
       sx={{
         borderColor: hasFailed
           ? "crimson"
-          : sliderValue >= targetVal
-            ? "darkgreen"
-            : "transparent",
+          : userPick.isOver === null
+            ? "transparent"
+            : sliderValue >= targetVal
+              ? "darkgreen"
+              : "transparent",
         borderWidth: 3,
         cursor: "pointer",
         width: 360,
