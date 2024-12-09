@@ -101,12 +101,17 @@ export const OverUnderProgressBar: React.FC<ProgressSliderProps> = ({
       value={currentValue}
       sx={{
         "& .MuiSlider-markLabel.MuiSlider-markLabelActive": {
-          transform: "translateX(0%)",
+          "&[data-index='0']": {
+            transform: "translateX(0%)",
+          },
+          "&[data-index='1']": {
+            transform: correct ? "translateX(-75%)" : "translateX(0%)",
+          },
         },
-        // Second mark label (target value)
         "& .MuiSlider-markLabel:not(.MuiSlider-markLabelActive)": {
           transform: "translateX(-75%)",
         },
+
         "& .MuiSlider-mark": {
           color: "black",
           width: "3%",
@@ -118,6 +123,7 @@ export const OverUnderProgressBar: React.FC<ProgressSliderProps> = ({
           textShadow: "0px 1px 8px #6E6E6E",
         },
         "& .MuiSlider-thumb": {
+          //transform: correct ? "translateX(-7%)" : "translateX(0%)",
           backgroundColor: emoji == "" ? "" : "transparent",
         },
       }}

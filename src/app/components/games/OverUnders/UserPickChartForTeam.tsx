@@ -166,9 +166,14 @@ export const UserPickChartForTeam = (): JSX.Element => {
                       }}
                     > */}
                     <Avatar
+                      onClick={() => {
+                        dispatch(seePicksForUser(user?.id));
+                        handlePopoverClose();
+                      }}
                       variant="square"
                       src={user?.owner.avatar}
                       style={{
+                        cursor: "pointer",
                         opacity: hoveredId === pick.id ? "100%" : "60%",
                         width: "100%",
                         height: "100%",

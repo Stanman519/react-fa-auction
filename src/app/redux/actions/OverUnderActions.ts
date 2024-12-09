@@ -53,8 +53,10 @@ export const fetchUserPicks =
     const res = await GeneralApiSvc.getAllOverUnderUsersAndPicks(id);
     const { overUnders } = getState();
     const allPicks = res.flatMap((u) => u.picks);
+
     const allUsers = res.map((u) => u);
-    const me = allUsers.find((u) => u.owner.ownerId);
+
+    const me = allUsers.find((u) => u.owner.ownerId == ownerId);
 
     dispatch(
       updateOverUnders({
