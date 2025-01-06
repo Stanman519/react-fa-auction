@@ -14,8 +14,8 @@ import { RootState } from "../../../redux/reducers/RootReducer";
 import { useAuth0 } from "@auth0/auth0-react";
 
 export interface NewMatchup {
-  left: string;
-  right: string;
+  left: number;
+  right: number;
   index: number;
 }
 
@@ -42,21 +42,17 @@ export const AddMatchups = (): JSX.Element => {
   useEffect(() => {
     if (nflTeams && nflTeams?.length > 0) {
       setTeams(nflTeams);
-      setNewMatchups([{ index: 0, left: "", right: "" }]);
+      setNewMatchups([{ index: 0, left: 0, right: 0 }]);
     }
   }, [nflTeams]);
 
-  const draftChanges = (
-    index: number,
-    tricode: string,
-    side: "left" | "right",
-  ) => {
+  const draftChanges = (index: number, id: number, side: "left" | "right") => {
     let draft = [...newMatchups];
     const editIndex = draft.findIndex((d) => d.index == index);
     if (editIndex < 0) return;
     side === "left"
-      ? (draft[editIndex].left = tricode)
-      : (draft[editIndex].right = tricode);
+      ? (draft[editIndex].left = id)
+      : (draft[editIndex].right = id);
     setNewMatchups(draft);
   };
 
@@ -68,8 +64,8 @@ export const AddMatchups = (): JSX.Element => {
           <AddMatchupTeamSelector
             key={index}
             teams={teams}
-            setLeft={(ind, tricode) => draftChanges(ind, tricode, "left")}
-            setRight={(ind, tricode) => draftChanges(ind, tricode, "right")}
+            setLeft={(ind, id) => draftChanges(ind, id, "left")}
+            setRight={(ind, id) => draftChanges(ind, id, "right")}
             left={nm.left}
             right={nm.right}
             index={index}
@@ -80,7 +76,7 @@ export const AddMatchups = (): JSX.Element => {
         onClick={() => {
           setNewMatchups([
             ...newMatchups,
-            { index: newMatchups.length, left: "", right: "" },
+            { index: newMatchups.length, left: 0, right: 0 },
           ]);
         }}
       >

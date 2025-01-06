@@ -127,7 +127,7 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
         barOptions={["confidence", "chat"]}
       />
       <Rules />
-      <Button onClick={() => navigate(`/over-unders`)}>OVER UNDERS</Button>
+
       <TabContext value={value}>
         <div className="flex flex-row w-full justify-center ">
           <TabList

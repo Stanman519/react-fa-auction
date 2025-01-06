@@ -18,8 +18,8 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
     },
     {
       altTitle: "Playoff Confidence Game",
-      disabled: true,
-      onClick: () => {},
+      disabled: false,
+      onClick: () => navigate(`/confidence`),
       tooltip:
         "Available in the playoffs. Make your playoff picks and earn points based on your confidence.",
       imgFile: process.env.PUBLIC_URL + "/playoff_confidence_logo.png",

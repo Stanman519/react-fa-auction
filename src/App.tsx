@@ -22,6 +22,7 @@ import { Auth0Provider, useAuth0 } from "@auth0/auth0-react";
 import { useDispatch, useSelector } from "react-redux";
 import { synchronizeAuth0WithDbLogin } from "./app/redux/actions/LoginActions";
 import { RootState } from "./app/redux/reducers/RootReducer";
+import ConfidenceHome from "./app/components/confidence/ConfidenceHome";
 
 function App() {
   const theme = useTheme();
@@ -54,6 +55,10 @@ function App() {
               <Route
                 path="/auction"
                 element={<PrivateRoute element={<AuctionHome />} />}
+              />
+              <Route
+                path="/confidence"
+                element={<PrivateRoute element={<ConfidenceHome />} />}
               />
               <Route
                 path="/games"
