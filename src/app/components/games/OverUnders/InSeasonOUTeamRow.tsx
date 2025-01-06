@@ -17,7 +17,7 @@ export const InSeasonOUTeamRow = ({
   const dispatch = useDispatch();
   const [startTime, setStartTime] = useState<number | undefined>(undefined);
   const targetVal = userPick.isOver
-    ? franchise.overUnder + userPick.lineAdjustment + 0.5
+    ? franchise.overUnder + userPick.lineAdjustment
     : 17.5 - (franchise.overUnder + userPick.lineAdjustment);
 
   const currValue = userPick.isOver
