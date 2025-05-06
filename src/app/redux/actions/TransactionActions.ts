@@ -80,6 +80,7 @@ export const getLeagueCapInfo =
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     dispatch(updateUI({ isLoading: "full-screen" }));
     const { currentLeague } = getState().profile;
+    console.log("current league in getLeaguecap", currentLeague);
     const dashboard = await GeneralApiSvc.getDeadCapAndTransactions(
       currentLeague?.league.leagueId,
     );

@@ -7,7 +7,7 @@ import { updateUI } from "./UiActions";
 import { Route } from "../../services/Routing";
 import { getInitialAuctionData } from "./FreeAgentActions";
 import GeneralApiSvc from "../../services/GeneralApiSvc";
-import { getLeagueCapInfo } from "./TransactionActions";
+import { getLeagueCapInfo, loadDashboardData } from "./TransactionActions";
 import { updateOverUnders } from "./OverUnderActions";
 import { useNavigate } from "react-router-dom";
 
@@ -48,9 +48,10 @@ export const updateCurrentLeague =
     const newCurrentLeague = newProfile.owner.leagues.find(
       (l) => l.league.leagueId === leagueId,
     );
+    console.log("new curr league", newCurrentLeague);
     dispatch(
       updateLoginInfo({ ...newProfile, currentLeague: newCurrentLeague }),
     );
     if (currentRoute == "/auction") dispatch(getInitialAuctionData(user.sub));
-    if (currentRoute == "/home") dispatch(getLeagueCapInfo());
+    if (currentRoute == "/") dispatch(loadDashboardData());
   };
