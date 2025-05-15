@@ -19,7 +19,8 @@ export default function DashboardTabNav({
   return (
     <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
       <Tabs
-        variant="fullWidth"
+        visibleScrollbar
+        variant="scrollable"
         value={value}
         onChange={handleChange}
         textColor="primary"
