@@ -2,6 +2,7 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  LinearProgress,
   Table,
   TableBody,
   TableCell,
@@ -103,42 +104,52 @@ export default function TriTable() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {standings.map((row) => (
-                      <TableRow className="horizontal" key={row.franchiseId}>
-                        <TableCell className="team-text">
-                          {
-                            ownerList.find(
-                              (o) => o.franchiseId === row.franchiseId,
-                            )?.team
-                          }
-                          <div className="text-rose-800">
-                            {row.teamStandings
-                              .reduce(
-                                (sum, ts) =>
-                                  sum + ts.pointsFor + ts.h2hWins * 10,
-                                0,
-                              )
-                              .toFixed(1)}{" "}
-                            Pts
-                          </div>
-                        </TableCell>
-                        {row.teamStandings.map((tm, i) => {
-                          return (
-                            <React.Fragment key={i}>
-                              <TableCell className="tritable-text">
-                                {tm.h2hWins ?? 0}
-                              </TableCell>
-                              <TableCell className="tritable-text">
-                                {tm.pointsFor ?? 0}
-                              </TableCell>
-                              <TableCell className="vertical tritable-text">
-                                {tm.h2hWins * 10 + tm.pointsFor}
-                              </TableCell>
-                            </React.Fragment>
-                          );
-                        })}
-                      </TableRow>
-                    ))}
+                    {standings.map((row) => {
+                      let totalTytPts = row.teamStandings.reduce(
+                        (sum, ts) => sum + ts.pointsFor + ts.h2hWins * 10,
+                        0,
+                      );
+                      const highestOfColumn = Math.max(
+                        ...standings.map((row) =>
+                          row.teamStandings.reduce(
+                            (sum, ts) => sum + ts.pointsFor + ts.h2hWins * 10,
+                            0,
+                          ),
+                        ),
+                      );
+                      return (
+                        <TableRow className="horizontal" key={row.franchiseId}>
+                          <TableCell className="team-text">
+                            {
+                              ownerList.find(
+                                (o) => o.franchiseId === row.franchiseId,
+                              )?.team
+                            }
+                            <div>{totalTytPts.toFixed(1)} Pts</div>
+                            <LinearProgress
+                              color="secondary"
+                              variant="determinate"
+                              value={(totalTytPts / highestOfColumn) * 100}
+                            />
+                          </TableCell>
+                          {row.teamStandings.map((tm, i) => {
+                            return (
+                              <React.Fragment key={i}>
+                                <TableCell className="tritable-text">
+                                  {tm.h2hWins ?? 0}
+                                </TableCell>
+                                <TableCell className="tritable-text">
+                                  {tm.pointsFor ?? 0}
+                                </TableCell>
+                                <TableCell className="vertical tritable-text">
+                                  {tm.h2hWins * 10 + tm.pointsFor}
+                                </TableCell>
+                              </React.Fragment>
+                            );
+                          })}
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </TableContainer>
