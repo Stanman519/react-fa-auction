@@ -49,6 +49,7 @@ export const getInitialAuctionData =
       if (initData.profile) {
         dispatch(
           updateLoginInfo({
+            redirected: "",
             owner: initData.profile,
             currentLeague: currentLeague ?? initData.profile.leagues[0],
             authSynchronized: true,

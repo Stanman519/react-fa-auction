@@ -4,7 +4,7 @@ import { RootState } from "../store";
 import DeadCapParentCard from "./nonAuction/DeadCapParentCard";
 import DashboardMenu from "./nonAuction/DashboardMenu";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardTabNav from "./nonAuction/DashboardTabNav";
 import BuyoutTile from "./nonAuction/BuyoutTile";
@@ -17,6 +17,7 @@ import { updateUI } from "../redux/actions/UiActions";
 import { OverUnderRow } from "./games/OverUnders/OverUnderRow";
 import AdvancedContractTrades from "./nonAuction/AdvancedContractTrades";
 import PendingTrades from "./nonAuction/PendingTrades";
+import { redirectToAuction } from "../redux/actions/LoginActions";
 
 interface Tab {
   label: string;
@@ -24,7 +25,7 @@ interface Tab {
 }
 
 const HomeBase = () => {
-  const { currentLeague, authSynchronized } = useSelector(
+  const { currentLeague, authSynchronized, redirected } = useSelector(
     (state: RootState) => state.profile,
   );
   const { franchiseWinTotals } = useSelector(
@@ -53,20 +54,28 @@ const HomeBase = () => {
     draftTabs.push({ label: "WAIVER EXTENSION", value: "waiver" });
   const [tabs, setTabs] = useState<Tab[]>(draftTabs);
   const { deadCap } = useSelector((state: RootState) => state.deadCap);
+  const hasRedirectedToAuction = useRef(false);
 
   useEffect(() => {
-    if (!deadCap || deadCap.length === 0) {
+    console.log("getting dead cap");
+    if (authSynchronized && (!deadCap || deadCap.length === 0)) {
+      console.log("loading dead cap");
       dispatch(loadDashboardData());
     }
-  }, []);
+  }, [authSynchronized, deadCap]);
 
   // useEffect(() => {  // i dont know this was causing looping
   //   dispatch(loadDashboardData());
   // }, [currentLeague?.league?.leagueId]);
 
   useEffect(() => {
-    if (!currentLeague) nav("/games");
-  }, [authSynchronized]);
+    console.log("redir", redirected);
+    if (currentLeague?.league.isAuctioning && redirected != "auction") {
+      dispatch(redirectToAuction());
+      nav("/auction");
+    }
+    if (authSynchronized && !currentLeague) nav("/games");
+  }, [authSynchronized, currentLeague, nav]);
   return (
     <div>
       <DashboardMenu />

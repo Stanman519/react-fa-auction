@@ -7,6 +7,7 @@ export interface LoginState {
   currentLeague?: LeagueLoginInfo;
   authUser?: User;
   authSynchronized: boolean;
+  redirected: string;
 }
 
 const defaultState: LoginState = {
@@ -24,6 +25,7 @@ const defaultState: LoginState = {
     //tipsUsed: []
   },
   authSynchronized: false,
+  redirected: "",
   currentLeague: undefined,
   authUser: undefined,
 };

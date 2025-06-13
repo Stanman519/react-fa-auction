@@ -39,6 +39,13 @@ function App() {
       authorizationParams={{
         redirect_uri: window.location.origin,
       }}
+      onRedirectCallback={(appState) => {
+        window.history.replaceState(
+          {},
+          document.title,
+          appState?.returnTo || "/", // <-- change this to your desired route
+        );
+      }}
     >
       <BrowserRouter>
         <AuthProviderWrapper>

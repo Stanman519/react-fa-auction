@@ -349,7 +349,7 @@ export function MenuBar({
                         navigate("/");
                       }}
                     >
-                      {currentLeague?.league.name}
+                      League Info
                     </Button>
                   )}
                   {barOptions.includes("league-home") && (
@@ -359,7 +359,7 @@ export function MenuBar({
                         navigate("/");
                       }}
                     >
-                      {currentLeague?.league.name}
+                      League Info
                     </Button>
                   )}
                   {!isDemo && barOptions.includes("confidence") && (

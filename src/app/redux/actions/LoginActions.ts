@@ -55,3 +55,11 @@ export const updateCurrentLeague =
     if (currentRoute == "/auction") dispatch(getInitialAuctionData(user.sub));
     if (currentRoute == "/") dispatch(loadDashboardData());
   };
+
+export const redirectToAuction =
+  () => async (dispatch: Function, getState: () => RootState) => {
+    const { profile } = getState();
+    const newProfile = { ...profile };
+    profile.redirected = "auction";
+    dispatch(updateLoginInfo(newProfile));
+  };

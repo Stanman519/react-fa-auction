@@ -82,7 +82,7 @@ function AuctionHome() {
     >
       <div className="menu-container">
         <MenuBar
-          barOptions={["chat", "fa-auction", "salary-league", "confidence"]}
+          barOptions={["chat", "fa-auction", "salary-league"]}
           chatChannel={"messaging"}
         />
       </div>

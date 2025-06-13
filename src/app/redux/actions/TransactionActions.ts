@@ -55,6 +55,7 @@ export const loadDashboardData =
             currentLeague.mflfranchiseid,
           ),
         ]);
+      console.log("dead cap", deadCap);
       newLeague.tagCandidates = tagCandidates;
       newLeague.cutCandidates = buyouts;
       newLeague.taxiPlayers = taxiSquad;
