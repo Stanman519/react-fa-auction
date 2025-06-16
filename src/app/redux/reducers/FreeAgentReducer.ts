@@ -10,6 +10,7 @@ export interface PlayerDTO {
   position: string;
   team: string;
   age?: number;
+  adp?: number;
   height?: number;
   weight?: number;
   headshot?: string;

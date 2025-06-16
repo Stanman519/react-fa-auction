@@ -25,6 +25,7 @@ export const getInitialAuctionData =
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     try {
       const { currentLeague } = getState().profile;
+      const { profile } = getState();
       dispatch(updateUI({ isLoading: "full-screen" }));
       const leagueId = currentLeague?.league?.leagueId ?? 0;
       const initData = await AuctionApiSvc.pageLoad(userSub, leagueId);
@@ -49,7 +50,7 @@ export const getInitialAuctionData =
       if (initData.profile) {
         dispatch(
           updateLoginInfo({
-            redirected: "",
+            redirected: profile.redirected,
             owner: initData.profile,
             currentLeague: currentLeague ?? initData.profile.leagues[0],
             authSynchronized: true,

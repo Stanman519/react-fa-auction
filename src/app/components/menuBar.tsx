@@ -17,11 +17,12 @@ import { turnOnNominationModeForThisOwnersLot } from "../redux/actions/LotAction
 import { updateUI } from "../redux/actions/UiActions";
 import { FAChatWindow } from "./chat";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useNavigate } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 import { clearConfidenceStateBeforeNav } from "../redux/actions/ConfidenceActions";
 import { AuctionTeamSalaryCapsSlab } from "./AuctionTeamSalaryCapsSlab";
 import LeagueSwitchMenu from "./menu/LeagueSwitchMenu";
 import { OverUnderStandingsSlab } from "./games/OverUnders/OverUnderStandingsSlab";
+import { redirectToAuction } from "../redux/actions/LoginActions";
 
 type DrawerType = "Salaries" | "Chat" | "pfp-click" | undefined;
 
@@ -241,6 +242,7 @@ export function MenuBar({
                     {barOptions.includes("salary-league") && (
                       <MenuItem
                         onClick={() => {
+                          dispatch(redirectToAuction());
                           navigate("/");
                         }}
                       >
@@ -346,6 +348,7 @@ export function MenuBar({
                     <Button
                       color="inherit"
                       onClick={() => {
+                        dispatch(redirectToAuction());
                         navigate("/");
                       }}
                     >
@@ -356,6 +359,7 @@ export function MenuBar({
                     <Button
                       color="inherit"
                       onClick={() => {
+                        dispatch(redirectToAuction());
                         navigate("/");
                       }}
                     >

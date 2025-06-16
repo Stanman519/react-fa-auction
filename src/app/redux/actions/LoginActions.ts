@@ -60,6 +60,7 @@ export const redirectToAuction =
   () => async (dispatch: Function, getState: () => RootState) => {
     const { profile } = getState();
     const newProfile = { ...profile };
-    profile.redirected = "auction";
+    newProfile.redirected = "auction";
+    console.log("redirecting to auction", newProfile);
     dispatch(updateLoginInfo(newProfile));
   };

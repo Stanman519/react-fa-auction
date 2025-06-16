@@ -57,7 +57,6 @@ const HomeBase = () => {
   const hasRedirectedToAuction = useRef(false);
 
   useEffect(() => {
-    console.log("getting dead cap");
     if (authSynchronized && (!deadCap || deadCap.length === 0)) {
       console.log("loading dead cap");
       dispatch(loadDashboardData());
@@ -70,7 +69,9 @@ const HomeBase = () => {
 
   useEffect(() => {
     console.log("redir", redirected);
+    console.log("current league", currentLeague);
     if (currentLeague?.league.isAuctioning && redirected != "auction") {
+      console.log("redirecting to auction");
       dispatch(redirectToAuction());
       nav("/auction");
     }
