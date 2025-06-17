@@ -46,13 +46,36 @@ export const getInitialAuctionData =
 
       dispatch(updateLots(initData.lots));
       dispatch(updateOwners(initData.owners));
-
       if (initData.profile) {
         dispatch(
           updateLoginInfo({
-            redirected: profile.redirected,
+            ...getState().profile,
             owner: initData.profile,
-            currentLeague: currentLeague ?? initData.profile.leagues[0],
+            currentLeague: {
+              ...getState().profile.currentLeague, // preserve existing fields
+              ...(() => {
+                const foundLeague = initData.profile.leagues.find(
+                  (l) =>
+                    l.league.leagueId ===
+                    (currentLeague?.league?.leagueId ?? 0),
+                );
+                // Ensure required fields are not undefined
+                return {
+                  ...foundLeague,
+                  capRoom: foundLeague?.capRoom ?? 0,
+                  yearsLeft: foundLeague?.yearsLeft ?? 0,
+                  mflfranchiseid: foundLeague?.mflfranchiseid ?? 0,
+                  leagueownerid: foundLeague?.leagueownerid ?? 0,
+                  teamName: foundLeague?.teamName ?? "",
+                  league: foundLeague?.league ?? (currentLeague?.league as any), // fallback to existing league, ensure not undefined
+                  tagCandidates: foundLeague?.tagCandidates ?? [],
+                  taxiPlayers: foundLeague?.taxiPlayers ?? [],
+                  cutCandidates: foundLeague?.cutCandidates ?? [],
+                  waiverExtensionPlayers:
+                    foundLeague?.waiverExtensionPlayers ?? [],
+                };
+              })(),
+            },
             authSynchronized: true,
           }),
         );

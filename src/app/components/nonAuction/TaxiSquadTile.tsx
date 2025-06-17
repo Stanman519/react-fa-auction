@@ -17,28 +17,32 @@ const TaxiSquadTile = () => {
   const [selectedPlayerIndex, setSelectedPlayerIndex] = useState<
     number | undefined
   >(undefined);
-  const taxiPlayers = currentLeague?.taxiPlayers ?? [];
+
+  console.log("taxi in the component", currentLeague?.taxiPlayers);
 
   return (
     <div className="m-4 flex justify-center">
       {modal &&
         selectedPlayerIndex !== undefined &&
         selectedPlayerIndex >= 0 &&
-        taxiPlayers[selectedPlayerIndex!].salary && (
+        currentLeague?.taxiPlayers[selectedPlayerIndex!].salary && (
           <ConfirmModal
             isOpen={modal}
             actionButtonLabel={"SUBMIT"}
-            mainText={`Are you sure you want to cut ${taxiPlayers[selectedPlayerIndex ?? 0].fullName}?`}
+            mainText={`Are you sure you want to cut ${currentLeague?.taxiPlayers[selectedPlayerIndex ?? 0].fullName}?`}
             onAction={() =>
               dispatch(
                 submitTaxiCut(
                   currentLeague?.league?.leagueId ?? 0,
-                  taxiPlayers[selectedPlayerIndex!],
+                  currentLeague?.taxiPlayers[selectedPlayerIndex!],
                   currentLeague?.mflfranchiseid ?? 0,
                   Number(
                     (
                       Math.round(
-                        taxiPlayers[selectedPlayerIndex!].salary! * 0.4 * 10,
+                        currentLeague?.taxiPlayers[selectedPlayerIndex!]
+                          .salary! *
+                          0.4 *
+                          10,
                       ) / 10
                     ).toFixed(1),
                   ),
@@ -47,7 +51,7 @@ const TaxiSquadTile = () => {
             }
           />
         )}
-      {taxiPlayers.length > 0 ? (
+      {currentLeague?.taxiPlayers && currentLeague?.taxiPlayers.length > 0 ? (
         <Card className="max-w-4xl flex-1">
           <div>
             <div className="flex flex-row ml-2 mr-3 flex-1 ">
@@ -61,7 +65,7 @@ const TaxiSquadTile = () => {
                 </div>
               </div>
             </div>
-            {taxiPlayers.map((p, index) => {
+            {currentLeague?.taxiPlayers.map((p, index) => {
               return (
                 <TogglePlayerCardButton
                   key={p.mflId}

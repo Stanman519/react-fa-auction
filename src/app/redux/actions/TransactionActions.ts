@@ -56,6 +56,7 @@ export const loadDashboardData =
           ),
         ]);
       console.log("dead cap", deadCap);
+      console.log("tax candidates", taxiSquad);
       newLeague.tagCandidates = tagCandidates;
       newLeague.cutCandidates = buyouts;
       newLeague.taxiPlayers = taxiSquad;

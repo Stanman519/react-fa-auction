@@ -53,9 +53,7 @@ export function MenuBar({
   );
 
   const lots = useSelector((state: RootState) =>
-    state.lots.filter(
-      (l) => l.leagueId === currentLeague?.league.leagueId ?? 0,
-    ),
+    state.lots.filter((l) => l.leagueId === currentLeague?.league.leagueId),
   );
   const { modal } = useSelector((state: RootState) => state.ui);
   const [openDrawer, setOpenDrawer] = useState<DrawerType>(undefined);
@@ -141,50 +139,54 @@ export function MenuBar({
                       }
                     }
                   >
-                    {barOptions.includes("fa-auction") && (
-                      <>
-                        <MenuItem onClick={() => navigate("/rosters")}>
-                          Rosters
-                        </MenuItem>
+                    {barOptions.includes("fa-auction") && [
+                      <MenuItem
+                        key="rosters"
+                        onClick={() => navigate("/rosters")}
+                      >
+                        Rosters
+                      </MenuItem>,
+                      <MenuItem
+                        key="salary-caps"
+                        onClick={() => {
+                          dispatch(updateUI({ modal: "team-caps-slab" }));
+                          setAnchorEl(null);
+                        }}
+                      >
+                        Salary Caps
+                      </MenuItem>,
+                      owner.ownername &&
+                      lots.filter((l) => !l.bid).length > 0 &&
+                      lots.filter(
+                        (l) => l.nominatedBy === currentLeague?.leagueownerid,
+                      ).length < 3 ? (
                         <MenuItem
+                          key="nominate-player"
                           onClick={() => {
-                            dispatch(updateUI({ modal: "team-caps-slab" }));
+                            addNominationCard();
                             setAnchorEl(null);
                           }}
                         >
-                          Salary Caps
+                          Nominate a Player
                         </MenuItem>
-                        {owner.ownername &&
-                        lots.filter((l) => !l.bid).length > 0 &&
-                        lots.filter(
-                          (l) => l.nominatedBy === currentLeague?.leagueownerid,
-                        ).length < 3 ? (
-                          <MenuItem
-                            onClick={() => {
-                              addNominationCard();
+                      ) : (
+                        <MenuItem
+                          key="free-agents"
+                          onClick={() => {
+                            if (modal === "free-agent-grid") {
+                              dispatch(updateUI({ modal: undefined }));
                               setAnchorEl(null);
-                            }}
-                          >
-                            Nominate a Player
-                          </MenuItem>
-                        ) : (
-                          <MenuItem
-                            onClick={() => {
-                              if (modal === "free-agent-grid") {
-                                dispatch(updateUI({ modal: undefined }));
-                                setAnchorEl(null);
-                              } else {
-                                seeFreeAgents();
-                                setAnchorEl(null);
-                              }
-                            }}
-                          >
-                            {modal === "free-agent-grid" ? "Close " : ""}Free
-                            Agents
-                          </MenuItem>
-                        )}
-                      </>
-                    )}
+                            } else {
+                              seeFreeAgents();
+                              setAnchorEl(null);
+                            }
+                          }}
+                        >
+                          {modal === "free-agent-grid" ? "Close " : ""}Free
+                          Agents
+                        </MenuItem>
+                      ),
+                    ]}
 
                     {barOptions.includes("rules") && (
                       <MenuItem
