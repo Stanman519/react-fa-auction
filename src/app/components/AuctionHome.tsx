@@ -44,6 +44,7 @@ function AuctionHome() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user?.sub && authSynchronized) {
+      console.log("User authenticated, fetching auction data");
       dispatch(getInitialAuctionData(user.sub));
       dispatch(signalR());
     }

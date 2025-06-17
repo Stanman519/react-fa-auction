@@ -48,10 +48,14 @@ export function MenuBar({
 }) {
   const { user, isAuthenticated, loginWithRedirect, isLoading, logout } =
     useAuth0();
-  const { owner, currentLeague } = useSelector(
+  const { owner, currentLeagueId } = useSelector(
     (state: RootState) => state.profile,
   );
-
+  const currentLeague = useSelector((state: RootState) =>
+    state.profile.owner.leagues.find(
+      (l) => l.league.leagueId === currentLeagueId,
+    ),
+  );
   const lots = useSelector((state: RootState) =>
     state.lots.filter((l) => l.leagueId === currentLeague?.league.leagueId),
   );

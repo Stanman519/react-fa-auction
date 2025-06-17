@@ -13,12 +13,16 @@ const TaxiSquadTile = () => {
   const modal = useSelector(
     (state: RootState) => state.ui.modal === "taxi-confirm",
   );
-  const { currentLeague } = useSelector((state: RootState) => state.profile);
+  const { currentLeagueId } = useSelector((state: RootState) => state.profile);
   const [selectedPlayerIndex, setSelectedPlayerIndex] = useState<
     number | undefined
   >(undefined);
 
-  console.log("taxi in the component", currentLeague?.taxiPlayers);
+  const currentLeague = useSelector((state: RootState) =>
+    state.profile.owner.leagues.find(
+      (l) => l.league.leagueId === currentLeagueId,
+    ),
+  );
 
   return (
     <div className="m-4 flex justify-center">

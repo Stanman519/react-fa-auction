@@ -1,15 +1,11 @@
-import { User, useAuth0 } from "@auth0/auth0-react";
+import { User } from "@auth0/auth0-react";
 import { Action } from "@reduxjs/toolkit";
-import AuctionApiSvc from "../../services/AuctionApiSvc";
 import { LoginState } from "../reducers/LoginReducer";
 import { RootState } from "../reducers/RootReducer";
-import { updateUI } from "./UiActions";
-import { Route } from "../../services/Routing";
 import { getInitialAuctionData } from "./FreeAgentActions";
 import GeneralApiSvc from "../../services/GeneralApiSvc";
-import { getLeagueCapInfo, loadDashboardData } from "./TransactionActions";
+import { loadDashboardData } from "./TransactionActions";
 import { updateOverUnders } from "./OverUnderActions";
-import { useNavigate } from "react-router-dom";
 
 export const UPDATE_LOGIN = "UPDATE_LOGIN";
 
@@ -28,16 +24,31 @@ export const synchronizeAuth0WithDbLogin =
   (user: User) => async (dispatch: Function, getState: () => RootState) => {
     const { profile } = getState();
     const { overUnders } = getState();
+
     const dbUser = await GeneralApiSvc.synchronizeAuth(user);
-    var newProfile = { ...profile };
-    newProfile.owner = dbUser;
-    newProfile.currentLeague =
-      dbUser.leagues.length > 0 ? dbUser.leagues[0] : undefined;
-    newProfile.authSynchronized = true;
-    newProfile.owner.leagues = dbUser.leagues;
+
     var pool = dbUser.pools.length > 0 ? dbUser.pools[0] : undefined;
     dispatch(updateOverUnders({ ...overUnders, currentPool: pool }));
-    dispatch(updateLoginInfo(newProfile));
+    dispatch(
+      updateLoginInfo({
+        ...profile,
+        owner: {
+          ...profile.owner,
+          leagues:
+            !profile.owner.leagues || profile.owner.leagues.length == 0
+              ? dbUser.leagues
+              : profile.owner.leagues,
+        },
+
+        currentLeagueId:
+          dbUser.leagues.length > 0
+            ? dbUser.leagues[0].league.leagueId
+            : undefined,
+        authSynchronized: true,
+        authUser: user,
+        redirected: "",
+      }),
+    );
   };
 
 export const updateCurrentLeague =
@@ -45,13 +56,17 @@ export const updateCurrentLeague =
   async (dispatch: Function, getState: () => RootState) => {
     const { profile } = getState();
     const newProfile = { ...profile };
+    console.log("updating current league to", leagueId);
     const newCurrentLeague = newProfile.owner.leagues.find(
       (l) => l.league.leagueId === leagueId,
     );
-    console.log("new curr league", newCurrentLeague);
     dispatch(
-      updateLoginInfo({ ...newProfile, currentLeague: newCurrentLeague }),
+      updateLoginInfo({
+        ...newProfile,
+        currentLeagueId: newCurrentLeague?.league.leagueId,
+      }),
     );
+    console.log("updateCurrentLeague checking route", currentRoute);
     if (currentRoute == "/auction") dispatch(getInitialAuctionData(user.sub));
     if (currentRoute == "/") dispatch(loadDashboardData());
   };
@@ -59,8 +74,5 @@ export const updateCurrentLeague =
 export const redirectToAuction =
   () => async (dispatch: Function, getState: () => RootState) => {
     const { profile } = getState();
-    const newProfile = { ...profile };
-    newProfile.redirected = "auction";
-    console.log("redirecting to auction", newProfile);
-    dispatch(updateLoginInfo(newProfile));
+    dispatch(updateLoginInfo({ ...profile, redirected: "auction" }));
   };

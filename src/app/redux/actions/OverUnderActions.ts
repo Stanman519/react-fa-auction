@@ -67,16 +67,7 @@ export const fetchUserPicks =
       }),
     );
   };
-// export const fetchAllUsers =
-//   () =>
-//   async (dispatch: Function, getState: () => RootState): Promise<any> => {
-//     const pool = getState().overUnders.currentPool;
-//     if (!pool) return;
-//     const res = await GeneralApiSvc.getAllOverUnderUsers(pool.id);
-//     console.log("res", res);
-//     const { overUnders } = getState();
-//     dispatch(updateOverUnders({ ...overUnders, otherUsers: res }));
-//   };
+
 export const submitOverUnderPicks =
   () =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
@@ -178,7 +169,6 @@ export const seePicksForUser =
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { overUnders } = getState();
     const currentPoolId = overUnders.currentPool?.id;
-    console.log("in the dispatch");
     if (currentPoolId === undefined || userId === undefined) return;
     const newSelectedUser = overUnders.otherUsers.find((u) => u.id === userId);
     if (newSelectedUser)

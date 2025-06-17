@@ -46,8 +46,13 @@ export const FAChatWindow = ({
 }: {
   screen: "league" | "games";
 }): JSX.Element | null => {
-  const { owner, currentLeague } = useSelector(
+  const { owner, currentLeagueId } = useSelector(
     (state: RootState) => state.profile,
+  );
+  const currentLeague = useSelector((state: RootState) =>
+    state.profile.owner.leagues.find(
+      (l) => l.league.leagueId === currentLeagueId,
+    ),
   );
   const { currentPool } = useSelector((state: RootState) => state.overUnders);
   const { profile } = useSelector((state: RootState) => state);

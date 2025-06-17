@@ -23,7 +23,12 @@ import { Typography } from "antd";
 import { replyToTrade } from "../../redux/actions/TransactionActions";
 const PendingTrades = () => {
   const [pendingTrades, setPendingTrades] = useState<TradeRequest[]>([]);
-  const { currentLeague } = useSelector((state: RootState) => state.profile);
+  const { currentLeagueId } = useSelector((state: RootState) => state.profile);
+  const currentLeague = useSelector((state: RootState) =>
+    state.profile.owner.leagues.find(
+      (l) => l.league.leagueId === currentLeagueId,
+    ),
+  );
   const { deadCap } = useSelector((state: RootState) => state);
   const dispatch = useDispatch();
   const isPick = (asset: TradeOfferAsset) => {

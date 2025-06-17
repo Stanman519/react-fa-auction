@@ -21,8 +21,13 @@ import { current } from "@reduxjs/toolkit";
 const settings = ["logout"];
 
 function ResponsiveAppBar() {
-  const { owner, currentLeague } = useSelector(
+  const { owner, currentLeagueId } = useSelector(
     (state: RootState) => state.profile,
+  );
+  const currentLeague = useSelector((state: RootState) =>
+    state.profile.owner.leagues.find(
+      (l) => l.league.leagueId === currentLeagueId,
+    ),
   );
   const pages = [{ label: "Games", route: "/games" }];
   if (currentLeague?.league.isAuctioning)

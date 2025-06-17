@@ -49,9 +49,13 @@ const AdvancedContractTrades = () => {
   const [pendingTrades, setPendingTrades] = useState<TradeRequest[]>([]);
   const [tradeTeamId, setTradeTeamId] = useState<string>("");
   const [activeStep, setActiveStep] = useState(0);
-  const { currentLeague } = useSelector((state: RootState) => state.profile);
+  const { currentLeagueId } = useSelector((state: RootState) => state.profile);
   const steps = ["Pick Team", "Choose Assets", "Eat Salary Cap"];
-
+  const currentLeague = useSelector((state: RootState) =>
+    state.profile.owner.leagues.find(
+      (l) => l.league.leagueId === currentLeagueId,
+    ),
+  );
   const [mySelectedAssets, setMySelectedAssets] = useState<TradeOfferAsset[]>(
     [],
   );

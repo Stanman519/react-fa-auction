@@ -25,7 +25,7 @@ interface Tab {
 }
 
 const HomeBase = () => {
-  const { currentLeague, authSynchronized, redirected } = useSelector(
+  const { currentLeagueId, authSynchronized, redirected } = useSelector(
     (state: RootState) => state.profile,
   );
   const { franchiseWinTotals } = useSelector(
@@ -40,6 +40,11 @@ const HomeBase = () => {
   const nav = useNavigate();
   const [currentTab, setCurrentTab] = useState("league");
   const leagueTab: Tab = { label: "LEAGUE INFO", value: "league" };
+  const currentLeague = useSelector((state: RootState) =>
+    state.profile.owner.leagues.find(
+      (l) => l.league.leagueId === currentLeagueId,
+    ),
+  );
   var draftTabs: Tab[] = [
     leagueTab,
     { label: "FREE TAXI CUTS", value: "taxi" },
@@ -58,7 +63,6 @@ const HomeBase = () => {
 
   useEffect(() => {
     if (authSynchronized && (!deadCap || deadCap.length === 0)) {
-      console.log("loading dead cap");
       dispatch(loadDashboardData());
     }
   }, [authSynchronized, deadCap]);
@@ -68,10 +72,7 @@ const HomeBase = () => {
   // }, [currentLeague?.league?.leagueId]);
 
   useEffect(() => {
-    console.log("redir", redirected);
-    console.log("current league", currentLeague);
     if (currentLeague?.league.isAuctioning && redirected != "auction") {
-      console.log("redirecting to auction");
       dispatch(redirectToAuction());
       nav("/auction");
     }

@@ -23,7 +23,7 @@ import { lastYear } from "../../services/Common";
 export default function TriTable() {
   const ownerList = useSelector((state: RootState) => state.deadCap.deadCap);
   const leagueId = useSelector(
-    (state: RootState) => state.profile.currentLeague?.league?.leagueId,
+    (state: RootState) => state.profile.currentLeagueId,
   );
   const [standings, setStandings] = useState<FranchiseStandings[]>([]);
   const [isLoading, setIsLoading] = useState(true);

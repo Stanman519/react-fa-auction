@@ -25,9 +25,12 @@ export const loadDashboardData =
   () =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { profile } = getState();
-    const { currentLeague } = getState().profile;
-    if (!currentLeague) return;
-    const newLeague: LeagueLoginInfo = { ...currentLeague };
+    const { currentLeagueId } = getState().profile;
+    const leagues = [...profile.owner.leagues];
+    const idx = leagues.findIndex((l) => l.league.leagueId === currentLeagueId);
+    if (idx === -1) return;
+
+    const currentLeague = leagues[idx];
     try {
       var [deadCap, tagCandidates, taxiSquad, buyouts, waiverExtensions] =
         await Promise.all([
@@ -55,12 +58,24 @@ export const loadDashboardData =
             currentLeague.mflfranchiseid,
           ),
         ]);
-      console.log("dead cap", deadCap);
-      console.log("tax candidates", taxiSquad);
-      newLeague.tagCandidates = tagCandidates;
-      newLeague.cutCandidates = buyouts;
-      newLeague.taxiPlayers = taxiSquad;
-      newLeague.waiverExtensionPlayers = waiverExtensions;
+      console.log("load dashboard taxiSquad", taxiSquad);
+      leagues[idx] = {
+        ...leagues[idx],
+        tagCandidates: tagCandidates,
+        taxiPlayers: taxiSquad,
+        waiverExtensionPlayers: waiverExtensions,
+        cutCandidates: buyouts,
+      };
+
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: {
+            ...profile.owner,
+            leagues,
+          },
+        }),
+      );
       dispatch(loadTransactions(deadCap.leagueTransactions));
       dispatch(
         updateDeadCapInfo({
@@ -71,7 +86,6 @@ export const loadDashboardData =
               : undefined,
         }),
       );
-      dispatch(updateLoginInfo({ ...profile, currentLeague: newLeague }));
     } catch (e: any) {
       console.log("ERROR: ", e);
     }
@@ -81,8 +95,10 @@ export const getLeagueCapInfo =
   () =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     dispatch(updateUI({ isLoading: "full-screen" }));
-    const { currentLeague } = getState().profile;
-    console.log("current league in getLeaguecap", currentLeague);
+    const { currentLeagueId } = getState().profile;
+    const currentLeague = getState().profile.owner.leagues.find(
+      (l) => l.league.leagueId === currentLeagueId,
+    );
     const dashboard = await GeneralApiSvc.getDeadCapAndTransactions(
       currentLeague?.league.leagueId,
     );
@@ -106,48 +122,94 @@ export const getFranchiseTagCandidates =
   () =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { profile } = getState();
-    if (!profile.currentLeague) return;
+    const leagues = [...profile.owner.leagues];
+    const idx = leagues.findIndex(
+      (l) => l.league.leagueId === profile.currentLeagueId,
+    );
+    if (idx === -1) return;
+
     try {
       const res = await GeneralApiSvc.getFranchiseTagCandidates(
-        profile.currentLeague.league.leagueId,
-        profile.currentLeague.leagueownerid,
-        profile.currentLeague.mflfranchiseid,
+        leagues[idx].league.leagueId,
+        leagues[idx].leagueownerid,
+        leagues[idx].mflfranchiseid,
       );
-      const newLeague: LeagueLoginInfo = { ...profile.currentLeague };
-      newLeague.tagCandidates = res;
-      dispatch(updateLoginInfo({ ...profile, currentLeague: newLeague }));
+      leagues[idx] = {
+        ...leagues[idx],
+        tagCandidates: res,
+      };
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: {
+            ...profile.owner,
+            leagues,
+          },
+        }),
+      );
     } catch (e: any) {}
   };
+
 export const getTaxiSquadPlayers =
   () =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { profile } = getState();
-    if (!profile.currentLeague) return;
+    const leagues = [...profile.owner.leagues];
+    const idx = leagues.findIndex(
+      (l) => l.league.leagueId === profile.currentLeagueId,
+    );
+    if (idx === -1) return;
     try {
       const res = await GeneralApiSvc.getTaxiSquadPlayers(
-        profile.currentLeague.league.leagueId,
-        profile.currentLeague.leagueownerid,
-        profile.currentLeague.mflfranchiseid,
+        leagues[idx].league.leagueId,
+        leagues[idx].leagueownerid,
+        leagues[idx].mflfranchiseid,
       );
-      const newLeague: LeagueLoginInfo = { ...profile.currentLeague };
-      newLeague.taxiPlayers = res;
-      dispatch(updateLoginInfo({ ...profile, currentLeague: newLeague }));
+      leagues[idx] = {
+        ...leagues[idx],
+        taxiPlayers: res,
+      };
+      console.log("getTaxiSquadPlayers", res);
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: {
+            ...profile.owner,
+            leagues,
+          },
+        }),
+      );
     } catch (e: any) {}
   };
 export const getBuyoutCandidates =
   () =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { profile } = getState();
-    if (!profile.currentLeague) return;
+    const leagues = [...profile.owner.leagues];
+    const idx = leagues.findIndex(
+      (l) => l.league.leagueId === profile.currentLeagueId,
+    );
+    if (idx === -1) return;
+
     try {
       const res = await GeneralApiSvc.getBuyoutCandidates(
-        profile.currentLeague.league.leagueId,
-        profile.currentLeague.leagueownerid,
-        profile.currentLeague.mflfranchiseid,
+        leagues[idx].league.leagueId,
+        leagues[idx].leagueownerid,
+        leagues[idx].mflfranchiseid,
       );
-      const newLeague: LeagueLoginInfo = { ...profile.currentLeague };
-      newLeague.cutCandidates = res;
-      dispatch(updateLoginInfo({ ...profile, currentLeague: newLeague }));
+      leagues[idx] = {
+        ...leagues[idx],
+        cutCandidates: res,
+      };
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: {
+            ...profile.owner,
+            leagues,
+          },
+        }),
+      );
     } catch (e: any) {}
   };
 
@@ -160,21 +222,40 @@ export const submitFranchiseTag =
   ) =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { profile } = getState();
-    if (!profile.currentLeague) return;
+    if (!profile.currentLeagueId) return;
     var requestBody = {
       leagueId,
       mflFranchiseId,
       mflPlayerId,
       tagSalary,
     } as FranchiseTagBody;
-    requestBody.leagueOwnerId = profile.currentLeague.leagueownerid;
+    // Find and update the league in the leagues array
+    const leagues = [...profile.owner.leagues];
+    const idx = leagues.findIndex(
+      (l) => l.league.leagueId === profile.currentLeagueId,
+    );
+    if (idx === -1) return;
+    requestBody.leagueOwnerId = leagues[idx].leagueownerid;
+    leagues[idx] = {
+      ...leagues[idx],
+    };
+
     try {
       const res = await GeneralApiSvc.postFranchiseTagPlayer(requestBody);
-      //const newTags = profile.currentLeague?.tagCandidates.filter(t => t.player.mflId !== mflPlayerId) ?? []
-      const newLeague: LeagueLoginInfo = { ...profile.currentLeague };
-      if (!newLeague) return;
-      newLeague.tagCandidates = [];
-      dispatch(updateLoginInfo({ ...profile, currentLeague: newLeague }));
+      leagues[idx] = {
+        ...leagues[idx],
+        tagCandidates: [],
+      };
+
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: {
+            ...profile.owner,
+            leagues,
+          },
+        }),
+      );
       dispatch(updateUI({ modal: "dashboard-success" }));
     } catch (e: any) {
       dispatch(updateUI({ modal: "error" }));
@@ -190,21 +271,35 @@ export const submitWaiverExtension =
   ) =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { profile } = getState();
-    if (!profile.currentLeague) return;
+    const leagues = [...profile.owner.leagues];
+    const idx = leagues.findIndex(
+      (l) => l.league.leagueId === profile.currentLeagueId,
+    );
+    if (idx === -1) return;
+
     var requestBody = {
       leagueId,
       mflFranchiseId,
       mflPlayerId,
       tagSalary,
     } as FranchiseTagBody;
-    requestBody.leagueOwnerId = profile.currentLeague.leagueownerid;
+
+    requestBody.leagueOwnerId = leagues[idx].leagueownerid;
     try {
       const res = await GeneralApiSvc.postWaiverExtension(requestBody);
-      //const newTags = profile.currentLeague?.tagCandidates.filter(t => t.player.mflId !== mflPlayerId) ?? []
-      const newLeague: LeagueLoginInfo = { ...profile.currentLeague };
-      if (!newLeague) return;
-      newLeague.tagCandidates = [];
-      dispatch(updateLoginInfo({ ...profile, currentLeague: newLeague }));
+      leagues[idx] = {
+        ...leagues[idx],
+        waiverExtensionPlayers: [],
+      };
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: {
+            ...profile.owner,
+            leagues,
+          },
+        }),
+      );
       dispatch(updateUI({ modal: "dashboard-success" }));
     } catch (e: any) {
       dispatch(updateUI({ modal: "error" }));
@@ -221,13 +316,29 @@ export const submitBuyout =
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { profile } = getState();
     const requestBody = { leagueId, player, mflFranchiseId, rebate };
-    if (!profile.currentLeague) return;
+    if (!profile.currentLeagueId) return;
     try {
       await GeneralApiSvc.postBuyoutPlayer(requestBody);
-      const newLeague: LeagueLoginInfo = { ...profile.currentLeague };
-      if (!newLeague) return;
-      newLeague.cutCandidates = [];
-      dispatch(updateLoginInfo({ ...profile, currentLeague: newLeague }));
+      // Find and update the league in the leagues array
+      const leagues = [...profile.owner.leagues];
+      const idx = leagues.findIndex(
+        (l) => l.league.leagueId === profile.currentLeagueId,
+      );
+      if (idx === -1) return;
+      leagues[idx] = {
+        ...leagues[idx],
+        cutCandidates: [],
+      };
+
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: {
+            ...profile.owner,
+            leagues,
+          },
+        }),
+      );
       dispatch(updateUI({ modal: "dashboard-success" }));
     } catch (e: any) {
       dispatch(updateUI({ modal: "error" }));
@@ -244,7 +355,7 @@ export const submitPendingTrade =
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { profile } = getState();
     const requestBody = { leagueId, player, mflFranchiseId, rebate }; //(Math.round(5.01 * 10) / 10).toFixed(1)
-    if (!profile.currentLeague) return;
+    if (!profile.currentLeagueId) return;
     try {
       const res = await GeneralApiSvc.postTaxiCut(requestBody);
 
@@ -263,19 +374,34 @@ export const submitTaxiCut =
   ) =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { profile } = getState();
-    const requestBody = { leagueId, player, mflFranchiseId, rebate }; //(Math.round(5.01 * 10) / 10).toFixed(1)
-    if (!profile.currentLeague) return;
+    const requestBody = { leagueId, player, mflFranchiseId, rebate };
+    if (!profile.currentLeagueId) return;
     try {
       const res = await GeneralApiSvc.postTaxiCut(requestBody);
       dispatch(updateUI({ modal: undefined }));
-      const newTaxi =
-        profile.currentLeague?.taxiPlayers.filter(
-          (t) => t.mflId !== player.mflId,
-        ) ?? [];
-      const newLeague: LeagueLoginInfo = { ...profile.currentLeague };
-      if (!newLeague) return;
-      newLeague.taxiPlayers = newTaxi;
-      dispatch(updateLoginInfo({ ...profile, currentLeague: newLeague }));
+
+      // Update taxiPlayers in the correct league
+      const leagues = [...profile.owner.leagues];
+      const idx = leagues.findIndex(
+        (l) => l.league.leagueId === profile.currentLeagueId,
+      );
+      if (idx === -1) return;
+      leagues[idx] = {
+        ...leagues[idx],
+        taxiPlayers:
+          leagues[idx].taxiPlayers?.filter((t) => t.mflId !== player.mflId) ??
+          [],
+      };
+
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: {
+            ...profile.owner,
+            leagues,
+          },
+        }),
+      );
       dispatch(updateUI({ modal: "dashboard-success" }));
     } catch (e: any) {
       dispatch(updateUI({ modal: "error" }));
@@ -286,7 +412,7 @@ export const submitTradeRequest =
   (tradeReq: TradeRequest) =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { profile } = getState();
-    if (!profile.currentLeague) return;
+    if (!profile.currentLeagueId) return;
     try {
       dispatch(updateUI({ isLoading: "button" }));
       const res = await GeneralApiSvc.proposeTrade(tradeReq);
@@ -304,9 +430,15 @@ export const replyToTrade =
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { profile } = getState();
 
-    if (!profile.currentLeague) return;
-    const leagueId = profile.currentLeague.league.leagueId;
-    const franchId = profile.currentLeague.mflfranchiseid;
+    if (!profile.currentLeagueId) return;
+    const leagueId = profile.currentLeagueId;
+    // Update taxiPlayers in the correct league
+    const leagues = [...profile.owner.leagues];
+    const idx = leagues.findIndex(
+      (l) => l.league.leagueId === profile.currentLeagueId,
+    );
+    if (idx === -1) return;
+    const franchId = profile.owner.leagues[idx].mflfranchiseid;
     try {
       dispatch(updateUI({ isLoading: "button" }));
 

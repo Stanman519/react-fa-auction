@@ -24,12 +24,14 @@ export const getInitialAuctionData =
   (userSub: string = "") =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     try {
-      const { currentLeague } = getState().profile;
-      const { profile } = getState();
+      const { currentLeagueId, owner } = getState().profile;
       dispatch(updateUI({ isLoading: "full-screen" }));
-      const leagueId = currentLeague?.league?.leagueId ?? 0;
+      const leagueId = currentLeagueId ?? 0;
+      console.log(
+        "profile before fetch init auction data",
+        getState().profile.owner.leagues[0],
+      );
       const initData = await AuctionApiSvc.pageLoad(userSub, leagueId);
-      //const user = await GeneralApiSvc.
 
       initData.lots.forEach((l) => {
         if (
@@ -43,39 +45,39 @@ export const getInitialAuctionData =
       });
 
       dispatch(updateFreeAgents(initData.freeAgents));
-
       dispatch(updateLots(initData.lots));
       dispatch(updateOwners(initData.owners));
+      console.log("initData", initData);
+
       if (initData.profile) {
+        // Find the league to update
+        const leagues = [...getState().profile.owner.leagues];
+
+        const newLeagueInfo = initData.profile.leagues.find(
+          (l) => l.league.leagueId === leagueId,
+        );
+
+        const idx = leagues.findIndex((l) => l.league.leagueId === leagueId);
+        if (idx !== -1 && newLeagueInfo) {
+          leagues[idx] = {
+            ...leagues[idx],
+            capRoom: newLeagueInfo.capRoom ?? 0,
+            yearsLeft: newLeagueInfo.yearsLeft ?? 0,
+            mflfranchiseid: newLeagueInfo.mflfranchiseid ?? 0,
+            leagueownerid: newLeagueInfo.leagueownerid ?? 0,
+            teamName: newLeagueInfo.teamName ?? "",
+            league: newLeagueInfo.league,
+          };
+        }
+
         dispatch(
           updateLoginInfo({
             ...getState().profile,
-            owner: initData.profile,
-            currentLeague: {
-              ...getState().profile.currentLeague, // preserve existing fields
-              ...(() => {
-                const foundLeague = initData.profile.leagues.find(
-                  (l) =>
-                    l.league.leagueId ===
-                    (currentLeague?.league?.leagueId ?? 0),
-                );
-                // Ensure required fields are not undefined
-                return {
-                  ...foundLeague,
-                  capRoom: foundLeague?.capRoom ?? 0,
-                  yearsLeft: foundLeague?.yearsLeft ?? 0,
-                  mflfranchiseid: foundLeague?.mflfranchiseid ?? 0,
-                  leagueownerid: foundLeague?.leagueownerid ?? 0,
-                  teamName: foundLeague?.teamName ?? "",
-                  league: foundLeague?.league ?? (currentLeague?.league as any), // fallback to existing league, ensure not undefined
-                  tagCandidates: foundLeague?.tagCandidates ?? [],
-                  taxiPlayers: foundLeague?.taxiPlayers ?? [],
-                  cutCandidates: foundLeague?.cutCandidates ?? [],
-                  waiverExtensionPlayers:
-                    foundLeague?.waiverExtensionPlayers ?? [],
-                };
-              })(),
+            owner: {
+              ...initData.profile,
+              leagues,
             },
+            currentLeagueId: leagueId,
             authSynchronized: true,
           }),
         );

@@ -4,7 +4,7 @@ import Owner, { LeagueLoginInfo } from "./OwnerReducer";
 
 export interface LoginState {
   owner: Owner;
-  currentLeague?: LeagueLoginInfo;
+  currentLeagueId?: number;
   authUser?: User;
   authSynchronized: boolean;
   redirected: string;
@@ -26,7 +26,7 @@ const defaultState: LoginState = {
   },
   authSynchronized: false,
   redirected: "",
-  currentLeague: undefined,
+  currentLeagueId: undefined,
   authUser: undefined,
 };
 

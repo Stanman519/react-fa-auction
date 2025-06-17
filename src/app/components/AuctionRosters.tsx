@@ -18,7 +18,12 @@ import AuctionApiSvc, { RosterOwner } from "../services/AuctionApiSvc";
 import { OpposingFranchiseDTO } from "../redux/reducers/OwnerReducer";
 
 function AuctionRosters() {
-  const { currentLeague } = useSelector((state: RootState) => state.profile);
+  const { currentLeagueId } = useSelector((state: RootState) => state.profile);
+  const currentLeague = useSelector((state: RootState) =>
+    state.profile.owner.leagues.find(
+      (l) => l.league.leagueId === currentLeagueId,
+    ),
+  );
   const dispatch = useDispatch();
   const [rosters, setRosters] = useState<RosterOwner[]>([]);
   const [selection, setSelection] = useState<RosterOwner | undefined>(
@@ -59,7 +64,7 @@ function AuctionRosters() {
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={`${selection?.mflfranchiseid}` ?? ""}
+          value={`${selection?.mflfranchiseid}`}
           label="Choose Team"
           onChange={handleChange}
         >
