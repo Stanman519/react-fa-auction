@@ -59,6 +59,8 @@ export const getInitialAuctionData =
 
         const idx = leagues.findIndex((l) => l.league.leagueId === leagueId);
         if (idx !== -1 && newLeagueInfo) {
+          console.log("idx", idx);
+          console.log("league", leagueId);
           leagues[idx] = {
             ...leagues[idx],
             capRoom: newLeagueInfo.capRoom ?? 0,

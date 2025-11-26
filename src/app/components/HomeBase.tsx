@@ -4,7 +4,7 @@ import { RootState } from "../store";
 import DeadCapParentCard from "./nonAuction/DeadCapParentCard";
 import DashboardMenu from "./nonAuction/DashboardMenu";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardTabNav from "./nonAuction/DashboardTabNav";
 import BuyoutTile from "./nonAuction/BuyoutTile";
@@ -17,7 +17,7 @@ import { updateUI } from "../redux/actions/UiActions";
 import { OverUnderRow } from "./games/OverUnders/OverUnderRow";
 import AdvancedContractTrades from "./nonAuction/AdvancedContractTrades";
 import PendingTrades from "./nonAuction/PendingTrades";
-import { redirectToAuction } from "../redux/actions/LoginActions";
+import { updateLoginInfo } from "../redux/actions/LoginActions";
 
 interface Tab {
   label: string;
@@ -25,9 +25,8 @@ interface Tab {
 }
 
 const HomeBase = () => {
-  const { currentLeagueId, authSynchronized, redirected } = useSelector(
-    (state: RootState) => state.profile,
-  );
+  const profileState = useSelector((state: RootState) => state.profile);
+  const { currentLeagueId, authSynchronized, owner } = profileState;
   const { franchiseWinTotals } = useSelector(
     (state: RootState) => state.overUnders,
   );
@@ -59,25 +58,49 @@ const HomeBase = () => {
     draftTabs.push({ label: "WAIVER EXTENSION", value: "waiver" });
   const [tabs, setTabs] = useState<Tab[]>(draftTabs);
   const { deadCap } = useSelector((state: RootState) => state.deadCap);
-  const hasRedirectedToAuction = useRef(false);
 
+  // Load dashboard data when auth is synchronized
   useEffect(() => {
     if (authSynchronized && (!deadCap || deadCap.length === 0)) {
       dispatch(loadDashboardData());
     }
-  }, [authSynchronized, deadCap]);
+  }, [authSynchronized, deadCap, dispatch]);
 
-  // useEffect(() => {  // i dont know this was causing looping
-  //   dispatch(loadDashboardData());
-  // }, [currentLeague?.league?.leagueId]);
-
+  // Handle one-time redirect to auction (but only if not already redirected for this league)
+  // This redirect happens after AuthCallback has routed here, so if we're here and
+  // league.redirected is null, we can safely redirect once and set the flag.
   useEffect(() => {
-    if (currentLeague?.league.isAuctioning && redirected != "auction") {
-      dispatch(redirectToAuction());
-      nav("/auction");
+    if (!currentLeague) return;
+
+    const alreadyRedirected = currentLeague.redirected === "auction";
+    if (currentLeague.league.isAuctioning && !alreadyRedirected) {
+      // Set the redirected flag on the league to prevent future redirects
+      const leagues = [...(owner?.leagues ?? [])];
+      const idx = leagues.findIndex(
+        (l) => l.league.leagueId === currentLeagueId,
+      );
+      if (idx !== -1) {
+        leagues[idx] = { ...leagues[idx], redirected: "auction" };
+        dispatch(
+          updateLoginInfo({
+            ...profileState,
+            owner: { ...owner, leagues },
+          }),
+        );
+        // Navigate AFTER dispatch completes
+        setTimeout(() => {
+          nav("/auction", { replace: true });
+        }, 0);
+      }
     }
-    if (authSynchronized && !currentLeague) nav("/games");
-  }, [authSynchronized, currentLeague, nav]);
+  }, [
+    currentLeague?.redirected,
+    currentLeague?.league.isAuctioning,
+    currentLeagueId,
+    owner?.ownerId,
+    dispatch,
+    nav,
+  ]);
   return (
     <div>
       <DashboardMenu />

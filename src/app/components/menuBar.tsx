@@ -22,7 +22,7 @@ import { clearConfidenceStateBeforeNav } from "../redux/actions/ConfidenceAction
 import { AuctionTeamSalaryCapsSlab } from "./AuctionTeamSalaryCapsSlab";
 import LeagueSwitchMenu from "./menu/LeagueSwitchMenu";
 import { OverUnderStandingsSlab } from "./games/OverUnders/OverUnderStandingsSlab";
-import { redirectToAuction } from "../redux/actions/LoginActions";
+import { useIsMobile } from "../hooks";
 
 type DrawerType = "Salaries" | "Chat" | "pfp-click" | undefined;
 
@@ -65,6 +65,7 @@ export function MenuBar({
   const [picAnchorEl, setPicAnchorEl] = useState<null | HTMLElement>(null);
   const avatar = user?.picture;
   const logo = process.env.PUBLIC_URL + "/stanfan-logo-white.png";
+  const isMobile = useIsMobile(720);
 
   const open = Boolean(anchorEl);
   const pfpMenuOpen = Boolean(picAnchorEl);
@@ -120,7 +121,7 @@ export function MenuBar({
                 paddingRight: 50,
               }}
             >
-              {window.innerWidth < 720 ? (
+              {isMobile ? (
                 <>
                   <IconButton
                     size="large"
@@ -248,7 +249,6 @@ export function MenuBar({
                     {barOptions.includes("salary-league") && (
                       <MenuItem
                         onClick={() => {
-                          dispatch(redirectToAuction());
                           navigate("/");
                         }}
                       >
@@ -354,7 +354,6 @@ export function MenuBar({
                     <Button
                       color="inherit"
                       onClick={() => {
-                        dispatch(redirectToAuction());
                         navigate("/");
                       }}
                     >
@@ -365,7 +364,6 @@ export function MenuBar({
                     <Button
                       color="inherit"
                       onClick={() => {
-                        dispatch(redirectToAuction());
                         navigate("/");
                       }}
                     >

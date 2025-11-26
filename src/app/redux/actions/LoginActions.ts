@@ -39,16 +39,16 @@ export const synchronizeAuth0WithDbLogin =
               ? dbUser.leagues
               : profile.owner.leagues,
         },
-
         currentLeagueId:
           dbUser.leagues.length > 0
             ? dbUser.leagues[0].league.leagueId
             : undefined,
         authSynchronized: true,
         authUser: user,
-        redirected: "",
+        // Note: we do NOT set redirected here. Per-league redirect flags are managed in HomeBase.
       }),
     );
+    console.log("synchronizeAuth0WithDbLogin profile", profile);
   };
 
 export const updateCurrentLeague =
@@ -69,10 +69,4 @@ export const updateCurrentLeague =
     console.log("updateCurrentLeague checking route", currentRoute);
     if (currentRoute == "/auction") dispatch(getInitialAuctionData(user.sub));
     if (currentRoute == "/") dispatch(loadDashboardData());
-  };
-
-export const redirectToAuction =
-  () => async (dispatch: Function, getState: () => RootState) => {
-    const { profile } = getState();
-    dispatch(updateLoginInfo({ ...profile, redirected: "auction" }));
   };

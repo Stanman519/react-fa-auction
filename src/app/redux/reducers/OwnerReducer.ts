@@ -54,6 +54,7 @@ export interface LeagueLoginInfo {
   taxiPlayers: PlayerDTO[];
   cutCandidates: PlayerDTO[];
   waiverExtensionPlayers: PlayerDTO[];
+  redirected?: string | null; // track if already redirected to auction/games for this league
 }
 
 export interface LeagueInfo {

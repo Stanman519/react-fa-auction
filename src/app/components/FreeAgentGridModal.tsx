@@ -15,6 +15,7 @@ import { updateUI } from "../redux/actions/UiActions";
 import { RootState } from "../store";
 import { Table, TableColumnsType, TableProps } from "antd";
 import { PlayerDTO } from "../redux/reducers/FreeAgentReducer";
+import { useIsMobile } from "../hooks";
 
 export const FreeAgentGridModal = ({
   isOpen = false,
@@ -41,14 +42,7 @@ export const FreeAgentGridModal = ({
     console.log("params", pagination, filters, sorter, extra);
   };
 
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 600);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  const isMobile = useIsMobile(600);
 
   const columns: TableColumnsType<PlayerDTO> = [
     {

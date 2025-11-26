@@ -17,6 +17,8 @@ import { RootState } from "../../redux/reducers/RootReducer";
 import LeagueSwitchMenu from "../menu/LeagueSwitchMenu";
 import { useSelector } from "react-redux";
 import { current } from "@reduxjs/toolkit";
+import Divider from "@mui/material/Divider";
+import { LeagueSwitchMenuItems } from "../menu/LeagueSwitchMenu";
 
 const settings = ["logout"];
 
@@ -33,11 +35,14 @@ function ResponsiveAppBar() {
   if (currentLeague?.league.isAuctioning)
     pages.push({ label: "Auction", route: "/auction" });
   const navigate = useNavigate();
-  const { user } = useAuth0();
+  const { user, logout } = useAuth0();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null,
   );
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
+    null,
+  );
+  const [picAnchorEl, setPicAnchorEl] = React.useState<null | HTMLElement>(
     null,
   );
   const logo = process.env.PUBLIC_URL + "/stanfan-logo-white.png";
@@ -46,6 +51,9 @@ function ResponsiveAppBar() {
   };
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
+  };
+  const pfpMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setPicAnchorEl(event.currentTarget);
   };
 
   React.useEffect(() => {}, [user]);
@@ -100,7 +108,15 @@ function ResponsiveAppBar() {
                 display: { xs: "block", md: "none" },
               }}
             >
-              {owner.leagues.length > 1 && <LeagueSwitchMenu />}
+              {owner.leagues.length > 1 && (
+                <>
+                  <Typography sx={{ px: 2, py: 1, fontWeight: "bold" }}>
+                    Change League
+                  </Typography>
+                  <LeagueSwitchMenuItems />
+                  <Divider />
+                </>
+              )}
               {pages.map((page) => (
                 <MenuItem key={page.label} onClick={() => navigate(page.route)}>
                   <Typography textAlign="center">{page.label}</Typography>
@@ -128,7 +144,87 @@ function ResponsiveAppBar() {
 
           {
             <Box sx={{ flexGrow: 0 }}>
-              <Avatar alt={user?.displayName} src={user?.picture} />
+              <Avatar
+                alt={user?.displayName}
+                src={user?.picture}
+                onClick={pfpMenuClick}
+                sx={{ cursor: "pointer" }}
+              />
+              <Menu
+                id="profile-menu"
+                anchorEl={picAnchorEl}
+                sx={{ alignItems: "flex-end" }}
+                open={Boolean(picAnchorEl)}
+                PaperProps={{
+                  elevation: 10,
+                  sx: {
+                    overflow: "visible",
+                    filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                    mt: 1.5,
+                    "& .MuiAvatar-root": {
+                      width: 32,
+                      height: 32,
+                      ml: -0.5,
+                      mr: 1,
+                    },
+                    "&::before": {
+                      content: '""',
+                      display: "block",
+                      position: "absolute",
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: "background.paper",
+                      transform: "translateY(-50%) rotate(45deg)",
+                      zIndex: 0,
+                    },
+                  },
+                }}
+                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                onClose={() => setPicAnchorEl(null)}
+              >
+                <MenuItem
+                  color="inherit"
+                  style={{
+                    textAlign: "right",
+                    width: "100%",
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                  }}
+                  onClick={() => {
+                    setPicAnchorEl(null);
+                    logout();
+                  }}
+                >
+                  Log out
+                </MenuItem>
+                {user?.sub?.includes("118311468702754688467") && (
+                  <MenuItem
+                    sx={{ justifyContent: "flex-end" }}
+                    onClick={() => navigate("/admin")}
+                  >
+                    Admin
+                  </MenuItem>
+                )}
+                <MenuItem
+                  sx={{ width: 150, justifyContent: "flex-end" }}
+                  onClick={() => {}}
+                >
+                  <a
+                    href="https://www.buymeacoffee.com/ryanstanley"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <img
+                      src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+                      alt="Buy Me A Coffee"
+                      style={{ height: 34, width: 122 }}
+                    />
+                  </a>
+                </MenuItem>
+              </Menu>
             </Box>
           }
         </Toolbar>

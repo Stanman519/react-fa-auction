@@ -1,24 +1,38 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './app/styles/index.css';
-import App from './App';
-import { store } from './app/store';
-import { Provider } from 'react-redux';
-import * as serviceWorker from './serviceWorker';
-import { myTheme } from './theme';
-import { ThemeProvider } from '@mui/material/styles';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./app/styles/index.css";
+import App from "./App";
+import { store } from "./app/store";
+import { Provider } from "react-redux";
+import * as serviceWorker from "./serviceWorker";
+import { myTheme } from "./theme";
+import { ThemeProvider } from "@mui/material/styles";
 
+// Clear corrupted IndexedDB if it exists (common issue during development)
+const clearCorruptedDB = async () => {
+  try {
+    const dbs = await (window.indexedDB.databases?.() || Promise.resolve([]));
+    for (const db of dbs) {
+      if (db.name) {
+        window.indexedDB.deleteDatabase(db.name);
+      }
+    }
+  } catch (e) {
+    console.warn("Could not clear IndexedDB:", e);
+  }
+};
 
+clearCorruptedDB();
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <ThemeProvider theme={myTheme} >
+      <ThemeProvider theme={myTheme}>
         <App />
       </ThemeProvider>
     </Provider>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root"),
 );
 
 // If you want your app to work offline and load faster, you can change
