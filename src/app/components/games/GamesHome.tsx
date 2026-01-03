@@ -30,9 +30,7 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
       className="flex flex-col justify-start items-center "
       style={{ overflowX: "hidden", overflowY: "hidden", minHeight: "100vh" }}
     >
-      <MenuBar
-        barOptions={profile.owner.leagues.length > 0 ? ["league-home"] : []}
-      />
+      <MenuBar />
       <div className="flex flex-col lg:flex-row w-full items-center justify-center">
         {THA_GAMES.map((g, i) => {
           return <GamesTile key={i} {...g} />;

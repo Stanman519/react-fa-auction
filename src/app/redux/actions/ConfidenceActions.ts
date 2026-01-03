@@ -223,9 +223,9 @@ export const makePropChoice =
   };
 
 export const adminAddNewMatchup =
-  (teams: NflTeam[], matchups: NewMatchup[], week: number, year: number) =>
+  (teams: NflTeam[], matchups: NewMatchup[], week: number, year: number, userSub: string) =>
   async (): Promise<any> => {
-    if (teams.length === 0 || matchups.length === 0 || week < 0 || year < 0)
+    if (teams.length === 0 || matchups.length === 0 || week <= 0 || !userSub)
       return;
 
     let postBody: NflMatchup[] = matchups.map((m) => {
@@ -238,18 +238,19 @@ export const adminAddNewMatchup =
         pickable: true,
       } as NflMatchup;
     });
-    await GeneralApiSvc.postNewMatchups(postBody);
+    await GeneralApiSvc.postNewMatchups(postBody, userSub);
   };
 
 export const submitMyPicks =
-  (locMatchups: NflMatchup[], points: number[], localProps: Prop[]) =>
+  (locMatchups: NflMatchup[], points: number[], localProps: Prop[], userSub: string) =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     const { owner } = getState().profile;
     const { confidence } = getState();
     if (
       locMatchups.some((m) => !m.chosenTeamLocal) ||
       !owner ||
-      localProps.some((p) => !p.localChoice)
+      localProps.some((p) => !p.localChoice) ||
+      !userSub
     )
       return;
     dispatch(updateUI({ button: "conf-pick-submit" }));
@@ -272,7 +273,7 @@ export const submitMyPicks =
       picks: submitPicks,
       props: propPicks,
     };
-    const response = await GeneralApiSvc.submitPicks(body);
+    const response = await GeneralApiSvc.submitPicks(body, userSub);
 
     if (response.success) {
       dispatch(
@@ -298,22 +299,24 @@ export const submitMyPicks =
         }),
       );
     } else {
+      dispatch(updateUI({ button: undefined }));
       dispatch(
         updateUI({
           modal: "error",
           errorText:
-            typeof response.data === "string"
+            response.errorMsg ||
+            (typeof response.data === "string"
               ? response.data
-              : "There was a problem submitting your picks.",
+              : "There was a problem submitting your picks."),
         }),
       );
     }
   };
 
 export const makeMatchupsUnpickable =
-  (year?: number) =>
+  (userSub: string, year?: number) =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
-    await GeneralApiSvc.lockAllMatchups(year);
+    await GeneralApiSvc.lockAllMatchups(userSub, year);
   };
 
 export const setupAdminScreen =

@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
+// Re-export RootState for convenience
+export type { RootState, AppDispatch };
+
 /**
  * Hook to detect mobile breakpoint (default 720px).
  * Returns true if viewport width is less than breakpoint.

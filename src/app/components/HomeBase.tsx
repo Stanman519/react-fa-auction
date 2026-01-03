@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import TriTable from "./nonAuction/TriTable";
 import { RootState } from "../store";
 import DeadCapParentCard from "./nonAuction/DeadCapParentCard";
-import DashboardMenu from "./nonAuction/DashboardMenu";
+import { MenuBar } from "./menuBar";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -103,7 +103,7 @@ const HomeBase = () => {
   ]);
   return (
     <div>
-      <DashboardMenu />
+      <MenuBar />
       {isLoading ? (
         <div className="flex-1 flex justify-center">
           <CircularProgress />

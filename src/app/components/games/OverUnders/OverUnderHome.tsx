@@ -100,11 +100,7 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
       className="flex flex-col justify-start items-center"
       style={{ overflowX: "hidden", overflowY: "hidden", minHeight: "100vh" }}
     >
-      <MenuBar
-        isDemo={isDemo}
-        chatChannel={"overunder"}
-        barOptions={["games", "chat", "ou-standings", "rules"]}
-      />
+      <MenuBar />
       <Rules />
 
       {isPreseason ? (

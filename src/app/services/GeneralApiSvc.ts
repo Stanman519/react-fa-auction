@@ -26,6 +26,15 @@ import {
 } from "../redux/reducers/OverUnderReducer";
 import { TradeRequest } from "../models/MflModels";
 
+/**
+ * Helper function to safely encode Auth0 user sub for URL parameters
+ * @param userSub - Auth0 sub (e.g., "auth0|507f1f77bcf86cd799439011")
+ * @returns URL-encoded user sub
+ */
+const encodeUserSub = (userSub: string): string => {
+  return encodeURIComponent(userSub);
+};
+
 export interface LeagueCapInfo {
   leagueTransactions: Transaction[];
   teamDeadCapData: DeadCapInfo[];
@@ -71,8 +80,24 @@ function determineSuccessOrErrorMsg<Type>(
     // Handle the case where the response is an AxiosError
     if (res.response) {
       const response = res.response as AxiosResponse;
+      
+      // Handle authentication/authorization errors
+      if (response.status === 401) {
+        return { 
+          success: false, 
+          errorMsg: "Please log in to perform this action." 
+        };
+      }
+      if (response.status === 403) {
+        return { 
+          success: false, 
+          errorMsg: "You are not authorized to perform this action." 
+        };
+      }
+      
       const errorMsg =
         response.data?.friendlyMessage ||
+        response.data?.Message ||
         "There was an error with the request.";
       return { success: false, errorMsg: errorMsg };
     } else {
@@ -327,9 +352,9 @@ const getWaiverExtensionCandidates = (
       return undefined;
     });
 };
-const setOwnersToPaid = (body: number[]): Promise<Response> => {
+const setOwnersToPaid = (body: number[], userSub: string): Promise<Response> => {
   return axios
-    .post(`${URL}/confidence/admin/mark-paid`, body, {
+    .post(`${URL}/confidence/admin/mark-paid?user=${encodeUserSub(userSub)}`, body, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -401,9 +426,9 @@ const postTaxiCut = (body: CutRequestBody): Promise<Response> => {
     });
 };
 
-const postNewMatchups = (matchups: NflMatchup[]): Promise<Response> => {
+const postNewMatchups = (matchups: NflMatchup[], userSub: string): Promise<Response> => {
   return axios
-    .post(`${URL}/confidence/admin/new-matchups`, matchups, {
+    .post(`${URL}/confidence/admin/new-matchups?user=${encodeUserSub(userSub)}`, matchups, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -418,9 +443,10 @@ const postNewMatchups = (matchups: NflMatchup[]): Promise<Response> => {
 };
 const submitPicks = (
   picks: NflPickSubmissionBody,
+  userSub: string,
 ): Promise<GenericResponse<string | Type>> => {
   return axios
-    .post(`${URL}/confidence/picks`, picks, {
+    .post(`${URL}/confidence/picks?user=${encodeUserSub(userSub)}`, picks, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -434,9 +460,9 @@ const submitPicks = (
     });
 };
 
-const submitProp = (props: Prop[]): Promise<Response> => {
+const submitProp = (props: Prop[], userSub: string): Promise<Response> => {
   return axios
-    .post(`${URL}/confidence/admin/new-props`, props, {
+    .post(`${URL}/confidence/admin/new-props?user=${encodeUserSub(userSub)}`, props, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -450,16 +476,11 @@ const submitProp = (props: Prop[]): Promise<Response> => {
     });
 };
 
-const lockAllMatchups = (year?: number): Promise<Response> => {
+const lockAllMatchups = (userSub: string, year?: number): Promise<Response> => {
   return axios
     .post(
-      `${URL}/confidence/lock-matchups`,
+      `${URL}/confidence/lock-matchups${year ? `?year=${year}&` : '?'}user=${encodeUserSub(userSub)}`,
       {},
-      year
-        ? {
-            params: { year },
-          }
-        : {},
     )
     .then((res) => {
       return res.data;
@@ -473,10 +494,11 @@ const lockAllMatchups = (year?: number): Promise<Response> => {
 const setWinnerForMatchup = (
   matchupId: number,
   winningTricode: string,
+  userSub: string,
 ): Promise<Response> => {
   return axios
     .post(
-      `${URL}/confidence/admin/matchups/${matchupId}/results/${winningTricode}`,
+      `${URL}/confidence/admin/matchups/${matchupId}/results/${winningTricode}?user=${encodeUserSub(userSub)}`,
       {},
       {
         headers: {
@@ -496,10 +518,11 @@ const setWinnerForMatchup = (
 const setWinningProp = (
   propId: number,
   winningSide: string,
+  userSub: string,
 ): Promise<Response> => {
   return axios
     .post(
-      `${URL}/confidence/admin/props/${propId}/results/${winningSide}`,
+      `${URL}/confidence/admin/props/${propId}/results/${winningSide}?user=${encodeUserSub(userSub)}`,
       {},
       {
         headers: {

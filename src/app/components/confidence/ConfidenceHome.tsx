@@ -5,7 +5,7 @@ import { DragableMatchups } from "../confidence/DragableMatchups";
 import { ConfidenceResultsAccordian } from "../confidence/ConfidenceResultsAccordian";
 import { MenuBar } from "../menuBar";
 import { Rules } from "../confidence/Rules";
-import { Alert, Button, Snackbar, Tab, Tabs, useTheme } from "@mui/material";
+import { Alert, Box, Button, Snackbar, Tab, Tabs, useTheme } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Boarding } from "boarding.js";
 import "boarding.js/styles/main.css";
@@ -31,7 +31,7 @@ function a11yProps(index: number) {
 function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
   const dispatch = useDispatch();
   const { user, isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
-  const { matchups } = useSelector((state: RootState) => state.confidence);
+  const { matchups, results } = useSelector((state: RootState) => state.confidence);
   const { modal, errorText } = useSelector((state: RootState) => state.ui);
   const theme = useTheme();
   const [value, setValue] = useState("1");
@@ -111,6 +111,16 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
   }, [isDemo]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    // If clicking on Rules tab, open modal and stay on current tab
+    if (newValue === "3") {
+      dispatch(updateUI({ modal: "confidence-rules" }));
+      return;
+    }
+    // If clicking on Demo tab, navigate to demo
+    if (newValue === "4") {
+      navigate("/demo");
+      return;
+    }
     setValue(newValue);
   };
 
@@ -121,11 +131,9 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
       className="flex flex-col justify-start items-center"
       style={{ overflowX: "hidden", overflowY: "hidden", minHeight: "100vh" }}
     >
-      <MenuBar
-        isDemo={isDemo}
-        chatChannel={"confidence"}
-        barOptions={["confidence", "chat"]}
-      />
+      <MenuBar />
+      
+      {/* Rules component handles its own modal via Redux */}
       <Rules />
 
       <TabContext value={value}>
@@ -138,6 +146,8 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
           >
             <Tab label="My Picks" value={"1"} />
             <Tab ref={testRef} label="Results" value={"2"} />
+            <Tab label="Rules" value={"3"} />
+            {!isDemo && <Tab label="See Demo" value={"4"} />}
           </TabList>
         </div>
         {isDemo && (
@@ -155,7 +165,51 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
             )}
           </div>
         )}
+{isDemo && (
+        <Box
+          sx={{
+            width: '100%',
+            // backgroundColor: '#ff9800',
+            color: 'white',
+            overflow: 'hidden',
+            position: 'relative',
+            height: '48px',
+            display: 'flex',
+            alignItems: 'center',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            // borderBottom: '3px solid #f57c00',
+          }}
+        >
+          <Box
+            sx={{
+              marginTop: '4px',
+              display: 'flex',
+              alignItems: 'center',
 
+              animation: 'scroll-left 60s linear infinite',
+              whiteSpace: 'nowrap',
+              '@keyframes scroll-left': {
+                '0%': {
+                  transform: 'translateX(20%)',
+                },
+                '100%': {
+                  transform: 'translateX(-100%)',
+                },
+              },
+            }}
+          >
+            {[...Array(10)].map((_, i) => (
+              <Box key={i} sx={{ display: 'flex', alignItems: 'center' }}>
+
+                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#ff9800' }}>
+                  DEMO MODE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      )}
         <TabPanel
           value={"1"}
           dir={theme.direction}
@@ -168,7 +222,18 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
           dir={theme.direction}
           className="w-full flex flex-row justify-center"
         >
-          <ConfidenceResultsAccordian isDemo={isDemo} />
+          {results && results.length > 0 ? (
+            <ConfidenceResultsAccordian isDemo={isDemo} />
+          ) : (
+            <div style={{ 
+              padding: '40px', 
+              textAlign: 'center',
+              color: theme.palette.text.secondary,
+              fontSize: '1.1rem'
+            }}>
+              Results will appear here when the games begin
+            </div>
+          )}
         </TabPanel>
       </TabContext>
       <Snackbar

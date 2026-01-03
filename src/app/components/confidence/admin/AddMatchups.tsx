@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
-import { Button, Input, TextField } from "@mui/material";
+import { Button, Input, TextField, Select, MenuItem, Box } from "@mui/material";
 import { NflMatchup, NflTeam } from "../../../models/ConfidenceDTOs";
 import GeneralApiSvc from "../../../services/GeneralApiSvc";
 import { AddMatchupTeamSelector } from "./AddMatchupTeamSelector";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   adminAddNewMatchup,
   getMatchups,
   makeMatchupsUnpickable,
   setupAdminScreen,
 } from "../../../redux/actions/ConfidenceActions";
-import { RootState } from "../../../redux/reducers/RootReducer";
+import { useAppSelector } from "../../../hooks";
 import { useAuth0 } from "@auth0/auth0-react";
 
 export interface NewMatchup {
@@ -23,11 +23,11 @@ export const AddMatchups = (): JSX.Element => {
   const [year, setYear] = React.useState<number>(0);
   const [week, setWeek] = React.useState<number>(0);
   const [teams, setTeams] = React.useState<NflTeam[]>([]);
-  const { owner, authSynchronized } = useSelector(
-    (state: RootState) => state.profile,
+  const { owner, authSynchronized } = useAppSelector(
+    (state) => state.profile,
   );
-  const { matchups, nflTeams } = useSelector(
-    (state: RootState) => state.confidence,
+  const { matchups, nflTeams } = useAppSelector(
+    (state) => state.confidence,
   );
   const [newMatchups, setNewMatchups] = React.useState<NewMatchup[]>([]);
   const dispatch = useDispatch();
@@ -54,6 +54,15 @@ export const AddMatchups = (): JSX.Element => {
       ? (draft[editIndex].left = id)
       : (draft[editIndex].right = id);
     setNewMatchups(draft);
+  };
+
+  const addMatchup = () => {
+    const newMatchup: NewMatchup = {
+      index: newMatchups.length,
+      left: 0,
+      right: 0,
+    };
+    setNewMatchups([...newMatchups, newMatchup]);
   };
 
   return (
@@ -110,8 +119,9 @@ export const AddMatchups = (): JSX.Element => {
       <Button
         variant="outlined"
         onClick={() =>
-          dispatch(adminAddNewMatchup(teams, newMatchups, week, year))
+          user?.sub && dispatch(adminAddNewMatchup(teams, newMatchups, week, year, user.sub))
         }
+        disabled={!user?.sub}
       >
         SAVE TO DB
       </Button>
@@ -123,7 +133,8 @@ export const AddMatchups = (): JSX.Element => {
       <Button
         color="error"
         sx={{ margin: 4 }}
-        onClick={() => dispatch(makeMatchupsUnpickable(year))}
+        onClick={() => user?.sub && dispatch(makeMatchupsUnpickable(user.sub, year))}
+        disabled={!user?.sub}
       >
         LOCK ALL MATCHUPS
       </Button>

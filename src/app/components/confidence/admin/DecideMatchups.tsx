@@ -3,9 +3,9 @@ import React, { useEffect, useRef } from "react";
 import { Button, Card, FormControlLabel, MenuItem, Radio, RadioGroup, Select, SelectChangeEvent } from "@mui/material";
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
 import { NflTeam } from "../../../models/ConfidenceDTOs";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/reducers/RootReducer";
+import { useAppSelector } from "../../../hooks";
 import GeneralApiSvc from "../../../services/GeneralApiSvc";
+import { useAuth0 } from "@auth0/auth0-react";
 
 interface stateRadio {
     id?: number,
@@ -13,8 +13,9 @@ interface stateRadio {
 }
 
 export const DecideMatchups = (): JSX.Element => {
-    const { matchups } = useSelector((state: RootState) => state.confidence)
+    const { matchups } = useAppSelector((state) => state.confidence)
     const [value, setValue] = React.useState<stateRadio[]>([]);
+    const { user } = useAuth0();
 
     useEffect(() => {
         setValue(matchups.map(m => {return {id: m.id, value: m.left.tricode}}))
@@ -23,9 +24,13 @@ export const DecideMatchups = (): JSX.Element => {
 
 
     const submitWinner = async (matchupId: number) => {
+        if (!user?.sub) {
+            alert('Please log in to submit results');
+            return;
+        }
         const winningTricode = value.find(m => m.id === matchupId)?.value
         if (!winningTricode) return
-        await GeneralApiSvc.setWinnerForMatchup(matchupId, winningTricode);
+        await GeneralApiSvc.setWinnerForMatchup(matchupId, winningTricode, user.sub);
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>, matchupId: number) => {

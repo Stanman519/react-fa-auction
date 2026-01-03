@@ -30,11 +30,15 @@ export const AddMatchupTeamSelector = ({
       <Select
         variant="standard"
         sx={{ flex: 1 }}
-        value={`${left}`}
+        value={`${left ?? ""}`}
         size="medium"
         onChange={handleLeft}
         label="select away team"
+        displayEmpty
       >
+        <MenuItem value="">
+          <em>Select Away Team</em>
+        </MenuItem>
         {teams
           .map((t) => {
             return {
@@ -43,7 +47,7 @@ export const AddMatchupTeamSelector = ({
             };
           })
           .map((m) => (
-            <MenuItem key={m.id} defaultValue={""} value={m.id}>
+            <MenuItem key={m.id} value={m.id}>
               {m.tricode}
             </MenuItem>
           ))}
@@ -51,16 +55,25 @@ export const AddMatchupTeamSelector = ({
       <Select
         variant="standard"
         sx={{ flex: 1 }}
-        value={`${right}`}
+        value={`${right ?? ""}`}
         size="medium"
         onChange={handleRight}
         label="select home team"
+        displayEmpty
       >
+        <MenuItem value="">
+          <em>Select Home Team</em>
+        </MenuItem>
         {teams
-          .map((t) => t.tricode)
+          .map((t) => {
+            return {
+              tricode: t.tricode,
+              id: t.id,
+            };
+          })
           .map((m) => (
-            <MenuItem key={m} value={m}>
-              {m}
+            <MenuItem key={m.id} value={m.id}>
+              {m.tricode}
             </MenuItem>
           ))}
       </Select>

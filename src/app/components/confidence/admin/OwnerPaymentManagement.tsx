@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Checkbox, FormControl, FormControlLabel } from "@mui/material";
 import GeneralApiSvc from "../../../services/GeneralApiSvc";
 import Owner from "../../../redux/reducers/OwnerReducer";
+import { useAuth0 } from "@auth0/auth0-react";
 
 
 
@@ -9,6 +10,8 @@ import Owner from "../../../redux/reducers/OwnerReducer";
 export const OwnerPaymentManagement = (): JSX.Element => {
     const [owners, setOwners] = useState<Owner[]>([])
     const [checked, setChecked] = useState<number[]>([])
+    const { user } = useAuth0();
+
     useEffect(() => {
         const onLoad = async () => {
             const unpaid = await GeneralApiSvc.getUnpaidOwners()
@@ -36,7 +39,11 @@ export const OwnerPaymentManagement = (): JSX.Element => {
                 ))}
             </FormControl>
             <Button onClick={async () => {
-                await GeneralApiSvc.setOwnersToPaid(checked)
+                if (!user?.sub) {
+                    alert('Please log in to mark owners as paid');
+                    return;
+                }
+                await GeneralApiSvc.setOwnersToPaid(checked, user.sub)
                 setOwners(owners.filter(o => !checked.includes(o.ownerId)))
                 setChecked([])
                 }}>SAVE</Button>
