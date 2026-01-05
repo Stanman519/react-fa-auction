@@ -308,15 +308,16 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
         <TabPanel
           value={"1"}
           dir={theme.direction}
-          className="w-full flex flex-row justify-center"
+          className="w-full flex flex-row justify-center "
         >
           <DragableMatchups user={user} isDemo={isDemo} />
         </TabPanel>
         <TabPanel
           value={"2"}
           dir={theme.direction}
-          className="w-full flex flex-col"
-          sx={{ p: 0, pt: 1 }}
+
+          className="w-full flex flex-col jusify-center"
+          sx={{ p: 0, pt: 1, alignItems: "center" }}
         >
           <PayoutStructure results={results} isDemo={isDemo} />
           <ConfidenceResultsAccordian isDemo={isDemo} />

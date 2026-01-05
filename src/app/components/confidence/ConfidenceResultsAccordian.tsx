@@ -55,7 +55,7 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
       }
     };
   return (
-    <div className="flex flex-col max-w-6xl w-full">
+    <div  style={{justifyContent:'center'}} className="flex flex-col max-w-6xl w-full">
       {multiLoader?.includes("con-results") ? (
         <div style={{ flex: 1 }}>
           <Skeleton variant="rectangular" style={{ flex: 1, margin: 10 }} />
@@ -70,7 +70,7 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
           //530
           <>
             {!isDemo && (
-              <div className="flex flex-row justify-between">
+              <div style={{alignItems: 'center'}} className="flex flex-row justify-between ">
                 {/* <Divider orientation="vertical" variant="middle" flexItem />
                 <div className="flex flex-col content-center">
                   <div style={{ textAlign: "center" }}>1st</div>
