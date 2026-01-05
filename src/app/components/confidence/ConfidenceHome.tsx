@@ -5,7 +5,7 @@ import { DragableMatchups } from "../confidence/DragableMatchups";
 import { ConfidenceResultsAccordian } from "../confidence/ConfidenceResultsAccordian";
 import { MenuBar } from "../menuBar";
 import { Rules } from "../confidence/Rules";
-import { Alert, Box, Button, Snackbar, Tab, Tabs, useTheme } from "@mui/material";
+import { Alert, Box, Button, Snackbar, Tab, Tabs, useTheme, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Boarding } from "boarding.js";
 import "boarding.js/styles/main.css";
@@ -14,6 +14,7 @@ import { RootState } from "../../redux/reducers/RootReducer";
 import { updateUI } from "../../redux/actions/UiActions";
 import { useNavigate } from "react-router-dom";
 import { getConfidenceResults } from "../../redux/actions/ConfidenceActions";
+import { ConfidencePlayerResult } from "../../models/ConfidenceDTOs";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -27,6 +28,85 @@ function a11yProps(index: number) {
     id: `full-width-tab-${index}`,
     "aria-controls": `full-width-tabpanel-${index}`,
   };
+}
+
+// Payout Structure Component
+function PayoutStructure({ results, isDemo }: { results: ConfidencePlayerResult[], isDemo: boolean }) {
+  const theme = useTheme();
+  
+  // Count paid entrants (isPaid = true)
+  const paidEntrants = results.filter(r => r.isPaid).length;
+  const entryFee = 10; // $10 per entry
+  const totalPot = paidEntrants * entryFee;
+  
+  // Determine number of winners and calculate payouts
+  let payouts: { place: string; amount: string }[] = [];
+  
+  if (paidEntrants >= 1 && paidEntrants <= 10) {
+    // 1 winner gets 100%
+    payouts = [
+      { place: "1st", amount: `$${totalPot}` }
+    ];
+  } else if (paidEntrants >= 11 && paidEntrants <= 20) {
+    // 2 winners: 70%/30%
+    payouts = [
+      { place: "1st", amount: `$${(totalPot * 0.70).toFixed(0)}` },
+      { place: "2nd", amount: `$${(totalPot * 0.30).toFixed(0)}` }
+    ];
+  } else if (paidEntrants >= 21 && paidEntrants <= 30) {
+    // 3 winners: 65%/25%/10%
+    payouts = [
+      { place: "1st", amount: `$${(totalPot * 0.65).toFixed(0)}` },
+      { place: "2nd", amount: `$${(totalPot * 0.25).toFixed(0)}` },
+      { place: "3rd", amount: `$${(totalPot * 0.10).toFixed(0)}` }
+    ];
+  } else if (paidEntrants >= 31 && paidEntrants <= 40) {
+    // 4 winners: 60%/25%/10%/5%
+    payouts = [
+      { place: "1st", amount: `$${(totalPot * 0.60).toFixed(0)}` },
+      { place: "2nd", amount: `$${(totalPot * 0.25).toFixed(0)}` },
+      { place: "3rd", amount: `$${(totalPot * 0.10).toFixed(0)}` },
+      { place: "4th", amount: `$${(totalPot * 0.05).toFixed(0)}` }
+    ];
+  } else if (paidEntrants >= 41) {
+    // 5+ winners: 5th gets entry back, rest split from remaining pot
+    const fifthPayout = entryFee;
+    const remainingPot = totalPot - fifthPayout;
+    payouts = [
+      { place: "1st", amount: `$${(remainingPot * 0.60).toFixed(0)}` },
+      { place: "2nd", amount: `$${(remainingPot * 0.25).toFixed(0)}` },
+      { place: "3rd", amount: `$${(remainingPot * 0.10).toFixed(0)}` },
+      { place: "4th", amount: `$${(remainingPot * 0.05).toFixed(0)}` },
+      { place: "5th", amount: `$${fifthPayout}` }
+    ];
+  }
+
+  if (payouts.length === 0) {
+    return null; // Don't show anything if no one has paid
+  }
+
+  return (
+    <Box sx={{ mb: 2, px: 2 }}>
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h6" sx={{ mb: 2, textAlign: 'center', fontWeight: 'bold' }}>
+          Paid Entrants: {paidEntrants}
+        </Typography>
+        
+        <Box sx={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: 2 }}>
+          {payouts.map((payout) => (
+            <Box key={payout.place} sx={{ textAlign: 'center', minWidth: '80px' }}>
+              <Typography variant="body2" sx={{ color: theme.palette.text.secondary, fontWeight: 'bold' }}>
+                {payout.place}
+              </Typography>
+              <Typography variant="h5" sx={{ color: theme.palette.primary.main, fontWeight: 'bold' }}>
+                {payout.amount}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </Paper>
+    </Box>
+  );
 }
 
 function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
@@ -130,6 +210,11 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
       navigate("/demo");
       return;
     }
+    // If clicking on EXIT tab (in demo), navigate back to confidence
+    if (newValue === "5") {
+      navigate("/confidence");
+      return;
+    }
     setValue(newValue);
   };
 
@@ -157,6 +242,7 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
             <Tab ref={testRef} label="Results" value={"2"} />
             <Tab label="Rules" value={"3"} />
             {!isDemo && <Tab label="See Demo" value={"4"} />}
+            {isDemo && <Tab label="EXIT" value={"5"} />}
           </TabList>
         </div>
         {isDemo && (
@@ -229,8 +315,10 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
         <TabPanel
           value={"2"}
           dir={theme.direction}
-          className="w-full flex flex-row justify-center"
+          className="w-full flex flex-col"
+          sx={{ p: 0, pt: 1 }}
         >
+          <PayoutStructure results={results} isDemo={isDemo} />
           <ConfidenceResultsAccordian isDemo={isDemo} />
         </TabPanel>
       </TabContext>

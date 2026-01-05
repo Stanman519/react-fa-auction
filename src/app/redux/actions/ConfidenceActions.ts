@@ -112,16 +112,15 @@ export const getConfidenceResults =
             week: 1,
             //@ts-ignore
             results: state.matchups.map((m, i) => {
+              const pickedTeam = [m.left, m.right].find((tm) => tm.id === m.pick?.choice);
               return {
                 ownerId: -1,
                 matchupId: m.id,
                 points: m.pick?.points,
-                pickTeam: {
-                  ...m.pick,
-
-                  name: [m.left, m.right].find((tm) => tm.id === m.pick?.choice)
-                    ?.name,
-                },
+                pickTeam: pickedTeam ? {
+                  id: pickedTeam.id,
+                  name: pickedTeam.name,
+                } : undefined,
                 correct: false,
                 id: i,
               };
@@ -130,22 +129,34 @@ export const getConfidenceResults =
         ],
       });
     }
-    if (year === -1 && state.picks?.demoPicks) {
+    // Calculate scores for all players in demo mode (both fake players and user)
+    if (year === -1) {
+      console.log("[getConfidenceResults] Calculating demo scores...");
       response.forEach((r) => {
+        console.log(`[getConfidenceResults] Processing player: ${r.displayName}`);
         var totalPoints = 0;
         r.weeklyResults.forEach((w) => {
           var pts = 0;
           w.results.forEach((gm) => {
             const mup = state.matchups.find((m) => m.id === gm.matchupId);
-            if (mup) {
+            if (mup && mup.winner) {
+              // If pickTeam doesn't have an id, find it by name from the matchup
+              if (!gm.pickTeam?.id && gm.pickTeam?.name) {
+                const teamWithId = [mup.left, mup.right].find(t => t.name === gm.pickTeam?.name);
+                if (teamWithId) {
+                  gm.pickTeam.id = teamWithId.id;
+                }
+              }
+              console.log(`  Matchup ${gm.matchupId}: picked=${gm.pickTeam?.id} (${gm.pickTeam?.name}), winner=${mup.winner?.id} (${mup.winner?.name})`);
               gm.correct = gm.pickTeam?.id === mup.winner?.id;
+              if (gm.correct) pts += gm.points;
             }
-            if (gm.correct) pts += gm.points;
           });
           w.totalPoints = pts;
           totalPoints = pts;
         });
         r.totalPoints = totalPoints;
+        console.log(`  Final score: ${totalPoints}`);
       });
     }
     if (year === -1) {
