@@ -13,6 +13,7 @@ import "boarding.js/styles/themes/basic.css";
 import { RootState } from "../../redux/reducers/RootReducer";
 import { updateUI } from "../../redux/actions/UiActions";
 import { useNavigate } from "react-router-dom";
+import { getConfidenceResults } from "../../redux/actions/ConfidenceActions";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -109,6 +110,14 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
   useEffect(() => {
     setValue("1");
   }, [isDemo]);
+
+  // Fetch results when switching to Results tab
+  useEffect(() => {
+    if (value === "2") {
+      console.log("[ConfidenceHome] Loading results for tab switch");
+      dispatch(getConfidenceResults(isDemo ? -1 : new Date().getFullYear()));
+    }
+  }, [value, isDemo, dispatch]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     // If clicking on Rules tab, open modal and stay on current tab
@@ -222,18 +231,7 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
           dir={theme.direction}
           className="w-full flex flex-row justify-center"
         >
-          {results && results.length > 0 ? (
-            <ConfidenceResultsAccordian isDemo={isDemo} />
-          ) : (
-            <div style={{ 
-              padding: '40px', 
-              textAlign: 'center',
-              color: theme.palette.text.secondary,
-              fontSize: '1.1rem'
-            }}>
-              Results will appear here when the games begin
-            </div>
-          )}
+          <ConfidenceResultsAccordian isDemo={isDemo} />
         </TabPanel>
       </TabContext>
       <Snackbar
