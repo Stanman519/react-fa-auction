@@ -156,7 +156,7 @@ const SmartHome: React.FC = () => {
 const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({
   element,
 }) => {
-  const { isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
   const { authSynchronized } = useAppSelector((state) => state.profile);
   const logo = "./stanfan-color-logo.png";
 
@@ -172,15 +172,25 @@ const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({
     return (
       <div className="flex flex-row justify-center items-center max-w-screen-sm min-h-screen ">
         <div className="flex-col justify-center items-center max-w-full p-4 m-4 ">
-          <img className="max-w-xs animate-pulse" src={logo} />
+          <img className="max-w-xs animate-pulse" src={logo} alt="StanFan Logo" />
         </div>
       </div>
     );
   }
 
   if (!isAuthenticated) {
-    console.log("[PrivateRoute] Not authenticated, redirecting to landing");
-    return <Navigate to="/landing" replace />;
+    console.log("[PrivateRoute] Not authenticated, redirecting to Auth0 login");
+    loginWithRedirect({
+      appState: { returnTo: window.location.pathname }
+    });
+    // Show loading while redirect happens
+    return (
+      <div className="flex flex-row justify-center items-center max-w-screen-sm min-h-screen ">
+        <div className="flex-col justify-center items-center max-w-full p-4 m-4 ">
+          <img className="max-w-xs animate-pulse" src={logo} alt="StanFan Logo" />
+        </div>
+      </div>
+    );
   }
 
   console.log("[PrivateRoute] Rendering protected element");

@@ -68,13 +68,13 @@ const AuthCallback: React.FC = () => {
       return;
     }
 
-    // If auction is live, route to /auction; otherwise route to league info (/)
+    // If auction is live, route to /auction; otherwise route to league info (/league-home)
     if (currentLeague.league?.isAuctioning) {
       console.log("[AuthCallback] Auction is live, routing to /auction");
       navigate("/auction", { replace: true });
     } else {
-      console.log("[AuthCallback] Auction not live, routing to /");
-      navigate("/", { replace: true });
+      console.log("[AuthCallback] Auction not live, routing to /league-home");
+      navigate("/league-home", { replace: true });
     }
   }, [authSynchronized, owner, currentLeagueId, navigate, returnTo]);
 
