@@ -25,30 +25,27 @@ export const synchronizeAuth0WithDbLogin =
     const { profile } = getState();
     const { overUnders } = getState();
 
+    console.log("[synchronizeAuth0WithDbLogin] Calling API...");
     const dbUser = await GeneralApiSvc.synchronizeAuth(user);
+    console.log("[synchronizeAuth0WithDbLogin] API returned dbUser:", dbUser);
 
     var pool = dbUser.pools.length > 0 ? dbUser.pools[0] : undefined;
     dispatch(updateOverUnders({ ...overUnders, currentPool: pool }));
-    dispatch(
-      updateLoginInfo({
-        ...profile,
-        owner: {
-          ...profile.owner,
-          leagues:
-            !profile.owner.leagues || profile.owner.leagues.length == 0
-              ? dbUser.leagues
-              : profile.owner.leagues,
-        },
-        currentLeagueId:
-          dbUser.leagues.length > 0
-            ? dbUser.leagues[0].league.leagueId
-            : undefined,
-        authSynchronized: true,
-        authUser: user,
-        // Note: we do NOT set redirected here. Per-league redirect flags are managed in HomeBase.
-      }),
-    );
-    console.log("synchronizeAuth0WithDbLogin profile", profile);
+    
+    const updatedProfile = {
+      ...profile,
+      owner: dbUser, // Replace entire owner object with data from API
+      currentLeagueId:
+        dbUser.leagues.length > 0
+          ? dbUser.leagues[0].league.leagueId
+          : undefined,
+      authSynchronized: true,
+      authUser: user,
+      // Note: we do NOT set redirected here. Per-league redirect flags are managed in HomeBase.
+    };
+    
+    console.log("[synchronizeAuth0WithDbLogin] Dispatching updated profile:", updatedProfile);
+    dispatch(updateLoginInfo(updatedProfile));
   };
 
 export const updateCurrentLeague =
