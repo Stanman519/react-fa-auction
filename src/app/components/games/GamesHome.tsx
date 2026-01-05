@@ -10,7 +10,7 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
   const THA_GAMES: GamesTileProps[] = [
     {
       altTitle: "Over/Unders Game",
-      disabled: false,
+      disabled: true,
       onClick: () => navigate(`/over-unders`),
       tooltip:
         "Available in the pre-season. Choose if teams will beat their expectations.",

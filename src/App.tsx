@@ -52,22 +52,15 @@ function AppRoutes() {
       authSynchronized,
     });
 
-    if (!isLoading && !isAuthenticated) {
-      console.log("[AppRoutes] Redirecting to Auth0 login...");
-      // Store the current path so we can return here after login
-      const returnTo = window.location.pathname + window.location.search;
-      loginWithRedirect({
-        appState: { returnTo }
-      });
-    }
-    if (isAuthenticated && user?.sub) {
+    // Only sync if authenticated and not yet synced
+    if (isAuthenticated && user?.sub && !authSynchronized) {
       console.log(
         "[AppRoutes] Dispatching synchronizeAuth0WithDbLogin for user:",
         user.sub,
       );
       dispatch(synchronizeAuth0WithDbLogin(user));
     }
-  }, [isLoading, isAuthenticated, loginWithRedirect, user, dispatch]);
+  }, [isLoading, isAuthenticated, user, authSynchronized, dispatch]);
 
   return (
     <div
@@ -122,19 +115,32 @@ export default App;
 // Smart Home component that redirects based on user's league status
 const SmartHome: React.FC = () => {
   const { owner, authSynchronized } = useAppSelector((state) => state.profile);
+  const { isLoading, isAuthenticated } = useAuth0();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (authSynchronized) {
-      // If user has a fantasy league, go to league home
-      if (owner?.leagues && owner.leagues.length > 0) {
-        navigate('/league-home', { replace: true });
-      } else {
-        // Otherwise go to games home
-        navigate('/games', { replace: true });
-      }
+    console.log("[SmartHome] State:", {
+      isLoading,
+      isAuthenticated,
+      authSynchronized,
+      hasLeagues: owner?.leagues?.length > 0,
+    });
+
+    // Wait for both auth loading to complete AND profile sync
+    if (isLoading || !authSynchronized) {
+      console.log("[SmartHome] Waiting for auth/sync...");
+      return;
     }
-  }, [authSynchronized, owner, navigate]);
+
+    // Now decide where to redirect
+    if (owner?.leagues && owner.leagues.length > 0) {
+      console.log("[SmartHome] Has leagues, navigating to /league-home");
+      navigate('/league-home', { replace: true });
+    } else {
+      console.log("[SmartHome] No leagues, navigating to /games");
+      navigate('/games', { replace: true });
+    }
+  }, [isLoading, authSynchronized, owner, navigate]);
 
   // Show loading while determining where to go
   const logo = "./stanfan-color-logo.png";
@@ -174,7 +180,7 @@ const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({
 
   if (!isAuthenticated) {
     console.log("[PrivateRoute] Not authenticated, redirecting to landing");
-    return <Navigate to="/landing" />;
+    return <Navigate to="/landing" replace />;
   }
 
   console.log("[PrivateRoute] Rendering protected element");
