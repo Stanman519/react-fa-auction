@@ -78,6 +78,7 @@ export interface ConfidencePlayerResult {
   rank: number;
   avatar: string;
   isPaid: boolean;
+  confidenceTitles?: number[];
 }
 export interface WeeklyConfidenceResult {
   extraPoints: number;

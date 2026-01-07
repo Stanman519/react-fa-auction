@@ -134,6 +134,19 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
                     <div className="flex flex-col justify-start mx-2">
                       <div className="flex text-sm sm:text-lg grow leading-tight items-center">
                         {r.displayName}
+                        {r.confidenceTitles &&
+                          r.confidenceTitles.length > 0 && (
+                            <div className="ml-2 flex gap-1">
+                              {r.confidenceTitles.map((year) => (
+                                <span
+                                  key={year}
+                                  className="text-xs sm:text-sm px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded"
+                                >
+                                  {year} champ
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         {!r.isPaid && (
                           <Tooltip
                             title="This player has not paid and will be disqualified once the games start"
