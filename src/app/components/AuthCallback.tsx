@@ -42,17 +42,17 @@ const AuthCallback: React.FC = () => {
 
     console.log("[AuthCallback] Auth synchronized, determining redirect...");
 
+    // If an explicit returnTo was provided by Auth0 and it's not root or auth-callback, honor it
+    if (returnTo && returnTo !== "/" && returnTo !== "/auth-callback") {
+      console.log("[AuthCallback] Honoring returnTo:", returnTo);
+      navigate(returnTo, { replace: true });
+      return;
+    }
+
     // User has no leagues -> route to games
     if (!owner || !owner.leagues || owner.leagues.length === 0) {
       console.log("[AuthCallback] No leagues found, routing to /games");
       navigate("/games", { replace: true });
-      return;
-    }
-
-    // If an explicit returnTo was provided by Auth0 and it's not root, honor it
-    if (returnTo && returnTo !== "/") {
-      console.log("[AuthCallback] Honoring returnTo:", returnTo);
-      navigate(returnTo, { replace: true });
       return;
     }
 
@@ -68,13 +68,13 @@ const AuthCallback: React.FC = () => {
       return;
     }
 
-    // If auction is live, route to /auction; otherwise route to league info (/)
+    // If auction is live, route to /auction; otherwise route to league info (/league-home)
     if (currentLeague.league?.isAuctioning) {
       console.log("[AuthCallback] Auction is live, routing to /auction");
       navigate("/auction", { replace: true });
     } else {
-      console.log("[AuthCallback] Auction not live, routing to /");
-      navigate("/", { replace: true });
+      console.log("[AuthCallback] Auction not live, routing to /league-home");
+      navigate("/league-home", { replace: true });
     }
   }, [authSynchronized, owner, currentLeagueId, navigate, returnTo]);
 

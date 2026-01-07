@@ -26,26 +26,7 @@ import { useIsMobile } from "../hooks";
 
 type DrawerType = "Salaries" | "Chat" | "pfp-click" | undefined;
 
-type BarOption =
-  | "fa-auction"
-  | "salary-league"
-  | "chat"
-  | "confidence"
-  | "rules"
-  | "games"
-  | "ou-standings"
-  | "league-home"
-  | "games";
-
-export function MenuBar({
-  chatChannel = "",
-  barOptions,
-  isDemo = false,
-}: {
-  chatChannel?: string;
-  barOptions: BarOption[];
-  isDemo?: boolean;
-}) {
+export function MenuBar() {
   const { user, isAuthenticated, loginWithRedirect, isLoading, logout } =
     useAuth0();
   const { owner, currentLeagueId } = useSelector(
@@ -66,6 +47,11 @@ export function MenuBar({
   const avatar = user?.picture;
   const logo = process.env.PUBLIC_URL + "/stanfan-logo-white.png";
   const isMobile = useIsMobile(720);
+  
+  // Determine what to show based on user's leagues
+  const hasFantasyLeague = owner?.leagues && owner.leagues.length > 0;
+  const isOnAuctionPage = window.location.pathname === '/auction';
+  const isOnLeaguePage = window.location.pathname === '/';
 
   const open = Boolean(anchorEl);
   const pfpMenuOpen = Boolean(picAnchorEl);
@@ -79,16 +65,10 @@ export function MenuBar({
     setAnchorEl(event.currentTarget);
   };
 
-  const clearDemoStateAndNav = (route: string) => {
-    setAnchorEl(null);
-    dispatch(clearConfidenceStateBeforeNav()).then(() => {
-      navigate(`/${route}`);
-    });
-  };
-
   const pfpMenuClick = (event: React.MouseEvent<HTMLImageElement>) => {
     setPicAnchorEl(event?.currentTarget);
   };
+  
   const handleAudio = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(updateUI({ audioOn: event.target.checked }));
   };
@@ -99,6 +79,14 @@ export function MenuBar({
 
   const seeFreeAgents = () => {
     dispatch(updateUI({ modal: "free-agent-grid" }));
+  };
+  
+  const goToSmartHome = () => {
+    if (hasFantasyLeague) {
+      navigate('/league-home');
+    } else {
+      navigate('/games');
+    }
   };
 
   return (
@@ -138,140 +126,72 @@ export function MenuBar({
                     anchorEl={anchorEl}
                     open={open}
                     onClose={() => setAnchorEl(null)}
-                    MenuListProps={
-                      {
-                        //'aria-labelledby': 'basic-button',
-                      }
-                    }
+                    MenuListProps={{}}
                   >
-                    {barOptions.includes("fa-auction") && [
-                      <MenuItem
-                        key="rosters"
-                        onClick={() => navigate("/rosters")}
-                      >
+                    {/* Always show Games Home */}
+                    <MenuItem onClick={() => { navigate("/games"); setAnchorEl(null); }}>
+                      Games Home
+                    </MenuItem>
+                    
+                    {/* Show League Home if user has a league */}
+                    {hasFantasyLeague && (
+                      <MenuItem onClick={() => { navigate("/league-home"); setAnchorEl(null); }}>
+                        {currentLeague?.league.name || "League Home"}
+                      </MenuItem>
+                    )}
+                    
+                    {/* Auction-specific options (only on auction page) */}
+                    {isOnAuctionPage && [
+                      <MenuItem key="rosters" onClick={() => { navigate("/rosters"); setAnchorEl(null); }}>
                         Rosters
                       </MenuItem>,
-                      <MenuItem
-                        key="salary-caps"
-                        onClick={() => {
-                          dispatch(updateUI({ modal: "team-caps-slab" }));
-                          setAnchorEl(null);
-                        }}
-                      >
+                      <MenuItem key="salary-caps" onClick={() => {
+                        dispatch(updateUI({ modal: "team-caps-slab" }));
+                        setAnchorEl(null);
+                      }}>
                         Salary Caps
                       </MenuItem>,
-                      owner.ownername &&
-                      lots.filter((l) => !l.bid).length > 0 &&
-                      lots.filter(
-                        (l) => l.nominatedBy === currentLeague?.leagueownerid,
-                      ).length < 3 ? (
-                        <MenuItem
-                          key="nominate-player"
-                          onClick={() => {
-                            addNominationCard();
-                            setAnchorEl(null);
-                          }}
-                        >
+                      owner.ownername && lots.filter((l) => !l.bid).length > 0 &&
+                      lots.filter((l) => l.nominatedBy === currentLeague?.leagueownerid).length < 3 ? (
+                        <MenuItem key="nominate-player" onClick={() => {
+                          addNominationCard();
+                          setAnchorEl(null);
+                        }}>
                           Nominate a Player
                         </MenuItem>
                       ) : (
-                        <MenuItem
-                          key="free-agents"
-                          onClick={() => {
-                            if (modal === "free-agent-grid") {
-                              dispatch(updateUI({ modal: undefined }));
-                              setAnchorEl(null);
-                            } else {
-                              seeFreeAgents();
-                              setAnchorEl(null);
-                            }
-                          }}
-                        >
-                          {modal === "free-agent-grid" ? "Close " : ""}Free
-                          Agents
+                        <MenuItem key="free-agents" onClick={() => {
+                          if (modal === "free-agent-grid") {
+                            dispatch(updateUI({ modal: undefined }));
+                          } else {
+                            seeFreeAgents();
+                          }
+                          setAnchorEl(null);
+                        }}>
+                          {modal === "free-agent-grid" ? "Close " : ""}Free Agents
                         </MenuItem>
                       ),
                     ]}
-
-                    {barOptions.includes("rules") && (
-                      <MenuItem
-                        color="inherit"
-                        onClick={() => {
-                          setAnchorEl(null);
-                          dispatch(updateUI({ modal: "confidence-rules" }));
-                        }}
-                      >
-                        Rules
-                      </MenuItem>
-                    )}
-                    {barOptions.includes("ou-standings") && (
-                      <MenuItem
-                        color="inherit"
-                        onClick={() => {
-                          setAnchorEl(null);
-                          dispatch(updateUI({ modal: "ou-standings" }));
-                        }}
-                      >
-                        Results
-                      </MenuItem>
-                    )}
-                    {barOptions.includes("games") && (
-                      <MenuItem
-                        color="inherit"
-                        onClick={() => {
-                          setAnchorEl(null);
-                          navigate("/games");
-                        }}
-                      >
-                        Games Home
-                      </MenuItem>
-                    )}
-                    {!isDemo && barOptions.includes("confidence") && (
-                      <MenuItem
-                        color="inherit"
-                        onClick={() => clearDemoStateAndNav("demo")}
-                      >
-                        See Demo
-                      </MenuItem>
-                    )}
-                    {barOptions.includes("chat") &&
-                      user?.sub &&
-                      isDemo !== true && (
-                        <MenuItem
-                          onClick={() => {
-                            setOpenDrawer("Chat");
-                            setAnchorEl(null);
-                          }}
-                        >
-                          {openDrawer === "Chat" ? "Close Chat" : "Open Chat"}
-                        </MenuItem>
-                      )}
-                    {barOptions.includes("salary-league") && (
-                      <MenuItem
-                        onClick={() => {
-                          navigate("/");
-                        }}
-                      >
-                        League Info
-                      </MenuItem>
-                    )}
-                    {barOptions.includes("league-home") && (
-                      <MenuItem
-                        onClick={() => {
-                          navigate("/");
-                        }}
-                      >
-                        {currentLeague?.league.name}
+                    
+                    {/* Chat option (except on demo pages) */}
+                    {user?.sub && (
+                      <MenuItem onClick={() => {
+                        setOpenDrawer("Chat");
+                        setAnchorEl(null);
+                      }}>
+                        {openDrawer === "Chat" ? "Close Chat" : "Open Chat"}
                       </MenuItem>
                     )}
                   </Menu>
 
                   <img
                     src={logo}
+                    onClick={goToSmartHome}
                     style={{
                       maxHeight: 20,
                       aspectRatio: "auto",
                       marginRight: 20,
+                      cursor: "pointer"
                     }}
                   />
                 </>
@@ -286,141 +206,74 @@ export function MenuBar({
                 >
                   <img
                     src={logo}
+                    onClick={goToSmartHome}
                     style={{
                       maxHeight: 20,
                       aspectRatio: "auto",
                       marginRight: 20,
+                      cursor: "pointer"
                     }}
                   />
 
+                  {/* Always show Games Home */}
                   <Button color="inherit" onClick={() => navigate("/games")}>
                     Games Home
                   </Button>
 
-                  {barOptions.includes("fa-auction") && (
-                    <Button
-                      color="inherit"
-                      onClick={() =>
-                        dispatch(updateUI({ modal: "team-caps-slab" }))
-                      }
-                    >
-                      Salary Caps
-                    </Button>
-                  )}
-                  {barOptions.includes("fa-auction") && (
-                    <Button
-                      color="inherit"
-                      onClick={() => navigate("/rosters")}
-                    >
-                      Rosters
-                    </Button>
-                  )}
-                  {barOptions.includes("rules") && (
-                    <Button
-                      color="inherit"
-                      onClick={() => {
-                        setAnchorEl(null);
-                        dispatch(updateUI({ modal: "confidence-rules" }));
-                      }}
-                    >
-                      Rules
-                    </Button>
-                  )}
-                  {barOptions.includes("ou-standings") && (
-                    <Button
-                      color="inherit"
-                      onClick={() => {
-                        setAnchorEl(null);
-                        dispatch(updateUI({ modal: "ou-standings" }));
-                      }}
-                    >
-                      Results
-                    </Button>
-                  )}
-                  {barOptions.includes("chat") &&
-                    user?.sub &&
-                    isDemo !== true && (
-                      <Button
-                        color="inherit"
-                        onClick={() => {
-                          //dispatch()
-                          setOpenDrawer("Chat");
-                        }}
-                      >
-                        {openDrawer === "Chat" ? "Close Chat" : "Open Chat"}
-                      </Button>
-                    )}
-                  {barOptions.includes("salary-league") && (
-                    <Button
-                      color="inherit"
-                      onClick={() => {
-                        navigate("/");
-                      }}
-                    >
-                      League Info
-                    </Button>
-                  )}
-                  {barOptions.includes("league-home") && (
-                    <Button
-                      color="inherit"
-                      onClick={() => {
-                        navigate("/");
-                      }}
-                    >
-                      League Info
-                    </Button>
-                  )}
-                  {!isDemo && barOptions.includes("confidence") && (
-                    <Button
-                      color="inherit"
-                      onClick={() => clearDemoStateAndNav("demo")}
-                    >
-                      See Demo
+                  {/* Show League Home if user has a league */}
+                  {hasFantasyLeague && (
+                    <Button color="inherit" onClick={() => navigate("/league-home")}>
+                      {currentLeague?.league.name || "League Home"}
                     </Button>
                   )}
 
-                  {barOptions.includes("fa-auction") ? (
-                    owner.ownername &&
-                    lots.filter((l) => !l.bid).length > 0 &&
-                    lots.filter(
-                      (l) => l.nominatedBy === currentLeague?.leagueownerid,
-                    ).length <= 3 ? (
+                  {/* Auction-specific options (only on auction page) */}
+                  {isOnAuctionPage && (
+                    <>
                       <Button
                         color="inherit"
-                        onClick={() => addNominationCard()}
+                        onClick={() => dispatch(updateUI({ modal: "team-caps-slab" }))}
                       >
-                        Nominate a Player
+                        Salary Caps
                       </Button>
-                    ) : (
-                      <Button
-                        color="inherit"
-                        onClick={() => {
-                          if (modal === "free-agent-grid") {
-                            dispatch(updateUI({ modal: undefined }));
-                          } else {
-                            seeFreeAgents();
-                          }
-                        }}
-                      >
-                        {modal === "free-agent-grid" ? "Close " : ""}Free Agents
+                      <Button color="inherit" onClick={() => navigate("/rosters")}>
+                        Rosters
                       </Button>
-                    )
-                  ) : (
-                    <></>
+                      {owner.ownername &&
+                      lots.filter((l) => !l.bid).length > 0 &&
+                      lots.filter((l) => l.nominatedBy === currentLeague?.leagueownerid).length <= 3 ? (
+                        <Button color="inherit" onClick={() => addNominationCard()}>
+                          Nominate a Player
+                        </Button>
+                      ) : (
+                        <Button
+                          color="inherit"
+                          onClick={() => {
+                            if (modal === "free-agent-grid") {
+                              dispatch(updateUI({ modal: undefined }));
+                            } else {
+                              seeFreeAgents();
+                            }
+                          }}
+                        >
+                          {modal === "free-agent-grid" ? "Close " : ""}Free Agents
+                        </Button>
+                      )}
+                    </>
                   )}
 
-                  {(barOptions.includes("fa-auction") ||
-                    barOptions.includes("salary-league")) &&
-                    owner.leagues.length > 1 && <LeagueSwitchMenu />}
-                  {barOptions.includes("confidence") && (
+                  {/* Chat button */}
+                  {user?.sub && (
                     <Button
                       color="inherit"
-                      onClick={() => clearDemoStateAndNav("games")}
+                      onClick={() => setOpenDrawer("Chat")}
                     >
-                      {" "}
-                      CONFIDENCE POOL{" "}
+                      {openDrawer === "Chat" ? "Close Chat" : "Open Chat"}
                     </Button>
                   )}
+
+                  {/* League switcher (if multiple leagues) */}
+                  {hasFantasyLeague && owner.leagues.length > 1 && <LeagueSwitchMenu />}
                 </div>
               )}
 
@@ -527,11 +380,7 @@ export function MenuBar({
           open={openDrawer === "Chat"}
           onClose={() => closeDrawer()}
         >
-          <FAChatWindow
-            screen={barOptions.includes("rules") ? "games" : "league"}
-          />
-
-          {/* </Box> */}
+          <FAChatWindow screen="league" />
         </Drawer>
       </Fragment>
     </div>

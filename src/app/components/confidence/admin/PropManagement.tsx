@@ -1,11 +1,10 @@
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../redux/reducers/RootReducer";
-import { DecideMatchups } from "./DecideMatchups";
-import { AddMatchups } from "./AddMatchups";
-import { Button, FormControlLabel, Radio, RadioGroup, TextField } from "@mui/material";
-import { useState } from "react";
+import { RootState, useAppSelector } from "../../../hooks";
 import GeneralApiSvc from "../../../services/GeneralApiSvc";
 import { Prop } from "../../../models/ConfidenceDTOs";
+import { useAuth0 } from "@auth0/auth0-react";
+import { Button, FormControlLabel, Radio, RadioGroup, TextField } from "@mui/material";
+import { useState } from "react";
+
 
 
 interface PropEntries {
@@ -21,19 +20,29 @@ export function PropManagement() {
     const [entries, setEntries] = useState<PropEntries>({prompt: "", left: '', right: ''})
     const [year, setYear] = useState<number>(0)
     const [week, setWeek] = useState<number>(0)
-    const {props} = useSelector((state: RootState) => state.confidence)
+    const {props} = useAppSelector((state:RootState) => state.confidence)
     const [value, setValue] = useState<stateRadio[]>([]);
+    const { user } = useAuth0();
+
     const uploadProp = async () => {
+        if (!user?.sub) {
+            alert('Please log in to upload props');
+            return;
+        }
         const prop: Prop = {
             year, week, prompt: entries.prompt, optionA: entries.left, optionB: entries.right, pickable: true
         }
         const body = [prop]
-        await GeneralApiSvc.submitProp(body);
+        await GeneralApiSvc.submitProp(body, user.sub);
     }
     const submitWinner = async (matchupId: number) => {
+      if (!user?.sub) {
+          alert('Please log in to submit prop results');
+          return;
+      }
       const winningSide = value.find(m => m.id === matchupId)?.value
       if (!winningSide) return
-      await GeneralApiSvc.setWinningProp(matchupId, winningSide);
+      await GeneralApiSvc.setWinningProp(matchupId, winningSide, user.sub);
   }
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>, matchupId: number) => {
       var newVals = value.filter(v => v.id !== matchupId)
@@ -85,7 +94,7 @@ export function PropManagement() {
 
         <div className="flex flex-col border border-black m-6">
         <div>DECIDE PROPS</div>
-        {props?.filter(m => !m.pickable && m.id !== undefined)?.map((m, i) => 
+        {props?.filter((m: any) => !m.pickable && m.id !== undefined)?.map((m: any, i: number) => 
             <div key={m.id} className="rounded-sm border border-black m-1">
                 <RadioGroup
 

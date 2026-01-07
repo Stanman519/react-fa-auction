@@ -20,9 +20,9 @@ import { PrivacyPolicy } from "./app/components/legal/PrivacyPolicy";
 import OverUnderHome from "./app/components/games/OverUnders/OverUnderHome";
 import AuctionRosters from "./app/components/AuctionRosters";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { synchronizeAuth0WithDbLogin } from "./app/redux/actions/LoginActions";
-import { RootState } from "./app/redux/reducers/RootReducer";
+import { useAppSelector } from "./app/hooks";
 import ConfidenceHome from "./app/components/confidence/ConfidenceHome";
 
 function App() {
@@ -40,7 +40,7 @@ function App() {
 function AppRoutes() {
   const theme = useTheme();
   const { user, isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
-  const { authSynchronized } = useSelector((state: RootState) => state.profile);
+  const { authSynchronized } = useAppSelector((state) => state.profile);
   const dispatch = useDispatch();
 
   // Trigger auth sync when user logs in
@@ -52,18 +52,15 @@ function AppRoutes() {
       authSynchronized,
     });
 
-    if (!isLoading && !isAuthenticated) {
-      console.log("[AppRoutes] Redirecting to Auth0 login...");
-      loginWithRedirect();
-    }
-    if (isAuthenticated && user?.sub) {
+    // Only sync if authenticated and not yet synced
+    if (isAuthenticated && user?.sub && !authSynchronized) {
       console.log(
         "[AppRoutes] Dispatching synchronizeAuth0WithDbLogin for user:",
         user.sub,
       );
       dispatch(synchronizeAuth0WithDbLogin(user));
     }
-  }, [isLoading, isAuthenticated, loginWithRedirect, user, dispatch]);
+  }, [isLoading, isAuthenticated, user, authSynchronized, dispatch]);
 
   return (
     <div
@@ -73,7 +70,11 @@ function AppRoutes() {
       <Routes>
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/auth-callback" element={<AuthCallback />} />
-        <Route path="/" element={<PrivateRoute element={<HomeBase />} />} />
+        <Route path="/" element={<PrivateRoute element={<SmartHome />} />} />
+        <Route
+          path="/league-home"
+          element={<PrivateRoute element={<HomeBase />} />}
+        />
         <Route
           path="/auction"
           element={<PrivateRoute element={<AuctionHome />} />}
@@ -88,7 +89,7 @@ function AppRoutes() {
         />
         <Route
           path="/demo"
-          element={<PrivateRoute element={<GamesHome isDemo />} />}
+          element={<PrivateRoute element={<ConfidenceHome isDemo />} />}
         />
         <Route
           path="/admin"
@@ -111,11 +112,52 @@ function AppRoutes() {
 
 export default App;
 
+// Smart Home component that redirects based on user's league status
+const SmartHome: React.FC = () => {
+  const { owner, authSynchronized } = useAppSelector((state) => state.profile);
+  const { isLoading, isAuthenticated } = useAuth0();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log("[SmartHome] State:", {
+      isLoading,
+      isAuthenticated,
+      authSynchronized,
+      hasLeagues: owner?.leagues?.length > 0,
+    });
+
+    // Wait for both auth loading to complete AND profile sync
+    if (isLoading || !authSynchronized) {
+      console.log("[SmartHome] Waiting for auth/sync...");
+      return;
+    }
+
+    // Now decide where to redirect
+    if (owner?.leagues && owner.leagues.length > 0) {
+      console.log("[SmartHome] Has leagues, navigating to /league-home");
+      navigate('/league-home', { replace: true });
+    } else {
+      console.log("[SmartHome] No leagues, navigating to /games");
+      navigate('/games', { replace: true });
+    }
+  }, [isLoading, authSynchronized, owner, navigate]);
+
+  // Show loading while determining where to go
+  const logo = "./stanfan-color-logo.png";
+  return (
+    <div className="flex flex-row justify-center items-center max-w-screen-sm min-h-screen ">
+      <div className="flex-col justify-center items-center max-w-full p-4 m-4 ">
+        <img className="max-w-xs animate-pulse" src={logo} alt="StanFan Logo" />
+      </div>
+    </div>
+  );
+};
+
 const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({
   element,
 }) => {
-  const { isAuthenticated, isLoading } = useAuth0();
-  const { authSynchronized } = useSelector((state: RootState) => state.profile);
+  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+  const { authSynchronized } = useAppSelector((state) => state.profile);
   const logo = "./stanfan-color-logo.png";
 
   console.log("[PrivateRoute] Render state:", {
@@ -130,15 +172,25 @@ const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({
     return (
       <div className="flex flex-row justify-center items-center max-w-screen-sm min-h-screen ">
         <div className="flex-col justify-center items-center max-w-full p-4 m-4 ">
-          <img className="max-w-xs animate-pulse" src={logo} />
+          <img className="max-w-xs animate-pulse" src={logo} alt="StanFan Logo" />
         </div>
       </div>
     );
   }
 
   if (!isAuthenticated) {
-    console.log("[PrivateRoute] Not authenticated, redirecting to landing");
-    return <Navigate to="/landing" />;
+    console.log("[PrivateRoute] Not authenticated, redirecting to Auth0 login");
+    loginWithRedirect({
+      appState: { returnTo: window.location.pathname }
+    });
+    // Show loading while redirect happens
+    return (
+      <div className="flex flex-row justify-center items-center max-w-screen-sm min-h-screen ">
+        <div className="flex-col justify-center items-center max-w-full p-4 m-4 ">
+          <img className="max-w-xs animate-pulse" src={logo} alt="StanFan Logo" />
+        </div>
+      </div>
+    );
   }
 
   console.log("[PrivateRoute] Rendering protected element");

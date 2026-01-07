@@ -21,7 +21,7 @@ import { mdiCashRemove } from "@mdi/js";
 export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
   const { owner } = useSelector((state: RootState) => state.profile);
   const { results } = useSelector((state: RootState) => state.confidence);
-  const [expanded, setExpanded] = React.useState<string | false>(false);
+  const [expanded, setExpanded] = React.useState<string[]>([]);
   const { multiLoader } = useSelector((state: RootState) => state.ui);
   const dispatch = useDispatch();
   const [closedWeeks, setClosedWeeks] = React.useState<string[]>([]);
@@ -38,7 +38,11 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
   }, []);
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpanded(isExpanded ? panel : false);
+      if (isExpanded) {
+        setExpanded([...expanded, panel]);
+      } else {
+        setExpanded(expanded.filter(p => p !== panel));
+      }
     };
   const handleNestChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -51,7 +55,7 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
       }
     };
   return (
-    <div className="flex flex-col max-w-6xl w-full">
+    <div  style={{justifyContent:'center'}} className="flex flex-col max-w-6xl w-full">
       {multiLoader?.includes("con-results") ? (
         <div style={{ flex: 1 }}>
           <Skeleton variant="rectangular" style={{ flex: 1, margin: 10 }} />
@@ -66,7 +70,7 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
           //530
           <>
             {!isDemo && (
-              <div className="flex flex-row justify-between">
+              <div style={{alignItems: 'center'}} className="flex flex-row justify-between ">
                 {/* <Divider orientation="vertical" variant="middle" flexItem />
                 <div className="flex flex-col content-center">
                   <div style={{ textAlign: "center" }}>1st</div>
@@ -98,7 +102,7 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
             {results.map((r) => (
               <Accordion
                 key={r.ownerId}
-                expanded={expanded === `panel${r.ownerId}`}
+                expanded={expanded.includes(`panel${r.ownerId}`)}
                 onChange={handleChange(`panel${r.ownerId}`)}
               >
                 <AccordionSummary

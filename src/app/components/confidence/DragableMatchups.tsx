@@ -24,7 +24,7 @@ export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo
     const { multiLoader, button  } = useSelector((state: RootState) => state.ui)
     const { owner } = useSelector((state: RootState) => state.profile)
     const dispatch = useDispatch()
-    const thisWeekPoints = confidencePoints.find(cp => cp.week === matchups[0]?.week ?? 1) ?? confidencePoints[0]
+    const thisWeekPoints = confidencePoints.find(cp => cp.week === (matchups[0]?.week ?? 1)) ?? confidencePoints[0]
     const [editMode, setEditMode] = useState<boolean>((matchups.some(m => m.pickable) && !picks?.savedPicks)) // (matchups are pickable AND user has NOT made picks)  ----- can be set to true by edit button (only shown if pickable and user made picks)
     const theme = useTheme()
     const [stamp, setStamp] = useState<StampAnim>({showStamp: false, fadeStamp: false, x: 0, y: 0});
@@ -154,10 +154,10 @@ export function DragableMatchups({user, isDemo}: {user: User | undefined, isDemo
             {editMode && 
             <LoadingButton id={'submit-button'} loading={button === 'conf-pick-submit'}
             onClick={() => { 
-                if (!isDemo) dispatch(submitMyPicks(matchups, thisWeekPoints.points, props))
-                else dispatch(submitDemoPicks(thisWeekPoints))
+                if (!isDemo && user?.sub) dispatch(submitMyPicks(matchups, thisWeekPoints.points, props, user.sub))
+                else if (isDemo) dispatch(submitDemoPicks(thisWeekPoints))
             }} variant="contained" 
-            disabled={matchups?.some(m => !m.chosenTeamLocal) || props.some(p => !p.localChoice)}
+            disabled={matchups?.some(m => !m.chosenTeamLocal) || props.some(p => !p.localChoice) || (!isDemo && !user?.sub)}
             style={{width: '100%', height: 50}}>{isDemo ? 'SIMULATE GAMES' : 'SUBMIT'}</LoadingButton>}
             {
                 !editMode && matchups.some(m => m.pickable) && 
