@@ -41,7 +41,7 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
       if (isExpanded) {
         setExpanded([...expanded, panel]);
       } else {
-        setExpanded(expanded.filter(p => p !== panel));
+        setExpanded(expanded.filter((p) => p !== panel));
       }
     };
   const handleNestChange =
@@ -55,7 +55,10 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
       }
     };
   return (
-    <div  style={{justifyContent:'center'}} className="flex flex-col max-w-6xl w-full">
+    <div
+      style={{ justifyContent: "center" }}
+      className="flex flex-col max-w-6xl w-full"
+    >
       {multiLoader?.includes("con-results") ? (
         <div style={{ flex: 1 }}>
           <Skeleton variant="rectangular" style={{ flex: 1, margin: 10 }} />
@@ -70,7 +73,10 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
           //530
           <>
             {!isDemo && (
-              <div style={{alignItems: 'center'}} className="flex flex-row justify-between ">
+              <div
+                style={{ alignItems: "center" }}
+                className="flex flex-row justify-between "
+              >
                 {/* <Divider orientation="vertical" variant="middle" flexItem />
                 <div className="flex flex-col content-center">
                   <div style={{ textAlign: "center" }}>1st</div>
@@ -135,30 +141,43 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
                       src={r.avatar}
                       variant="rounded"
                     />
-                    <div className="flex flex-col justify-start mx-2">
-                      <div className="flex text-sm sm:text-lg grow leading-tight items-center">
-                        {r.displayName}
+                    <div
+                      style={{ alignItems: "space-between" }}
+                      className="flex flex-col justify-start mx-2 "
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          justifyContent: "flex-start",
+                        }}
+                      >
+                        <div className="flex text-sm sm:text-lg grow leading-tight items-center">
+                          {r.displayName}
+
+                          {!r.isPaid && (
+                            <Tooltip
+                              title="This player has not paid and will be disqualified once the games start"
+                              placement="top"
+                            >
+                              <Icon path={mdiCashRemove} size={1} color="red" />
+                            </Tooltip>
+                          )}
+                        </div>
+
                         {r.confidenceTitles &&
                           r.confidenceTitles.length > 0 && (
                             <div className="ml-2 flex gap-1">
                               {r.confidenceTitles.map((year) => (
                                 <span
                                   key={year}
-                                  className="text-xs sm:text-sm px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded"
+                                  className="text-xs sm:text-sm px-2 py-0.5 bg-yellow-300 text-black rounded"
                                 >
                                   {year} champ
                                 </span>
                               ))}
                             </div>
                           )}
-                        {!r.isPaid && (
-                          <Tooltip
-                            title="This player has not paid and will be disqualified once the games start"
-                            placement="top"
-                          >
-                            <Icon path={mdiCashRemove} size={1} color="red" />
-                          </Tooltip>
-                        )}
                       </div>
 
                       {r.pickSubmitted && (
