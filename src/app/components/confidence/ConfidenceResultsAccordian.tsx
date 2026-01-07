@@ -56,7 +56,7 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
     };
   return (
     <div
-      style={{ justifyContent: "center" }}
+      style={{ justifyContent: "center", marginBottom: 20 }}
       className="flex flex-col max-w-6xl w-full"
     >
       {multiLoader?.includes("con-results") ? (
@@ -72,39 +72,6 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
         results.length > 0 && (
           //530
           <>
-            {!isDemo && (
-              <div
-                style={{ alignItems: "center" }}
-                className="flex flex-row justify-between "
-              >
-                {/* <Divider orientation="vertical" variant="middle" flexItem />
-                <div className="flex flex-col content-center">
-                  <div style={{ textAlign: "center" }}>1st</div>
-                  <div>$350</div>
-                </div>
-                <Divider orientation="vertical" variant="middle" flexItem />
-                <div className="flex flex-col content-center">
-                  <div style={{ textAlign: "center" }}>2nd</div>
-                  <div>$100</div>
-                </div>
-                <Divider orientation="vertical" variant="middle" flexItem />
-                <div className="flex flex-col content-center">
-                  <div style={{ textAlign: "center" }}>3rd</div>
-                  <div>$50</div>
-                </div>
-                <Divider orientation="vertical" variant="middle" flexItem />
-                <div className="flex flex-col content-center">
-                  <div style={{ textAlign: "center" }}>4th</div>
-                  <div>$20</div>
-                </div>
-                <Divider orientation="vertical" variant="middle" flexItem />
-                <div className="flex flex-col content-center">
-                  <div style={{ textAlign: "center" }}>5th</div>
-                  <div>$10</div>
-                </div>
-                <Divider orientation="vertical" variant="middle" flexItem /> */}
-              </div>
-            )}
             {results.map((r) => (
               <Accordion
                 key={r.ownerId}
