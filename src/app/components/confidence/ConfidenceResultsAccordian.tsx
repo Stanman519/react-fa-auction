@@ -20,11 +20,16 @@ import { mdiCashRemove } from "@mdi/js";
 
 export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
   const { owner } = useSelector((state: RootState) => state.profile);
-  const { results } = useSelector((state: RootState) => state.confidence);
+  const { results, matchups } = useSelector(
+    (state: RootState) => state.confidence,
+  );
+
   const [expanded, setExpanded] = React.useState<string[]>([]);
   const { multiLoader } = useSelector((state: RootState) => state.ui);
   const dispatch = useDispatch();
   const [closedWeeks, setClosedWeeks] = React.useState<string[]>([]);
+  const activeGame = matchups.find((m) => m.isCurrentGame);
+
   useEffect(() => {
     if (
       results.length === 0 ||
@@ -157,6 +162,48 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
                       )}
                     </div>
                     <div style={{ flex: 1, minWidth: 24 }} />
+                    {(() => {
+                      if (!activeGame) return null;
+
+                      const pickId = r.weeklyResults[
+                        r.weeklyResults.length - 1
+                      ]?.results.find((gm) => gm.matchupId === activeGame?.id)
+                        ?.pickTeam.tricode;
+                      const activeMatchup = matchups.find(
+                        (m) => m.id === activeGame.id,
+                      );
+
+                      let logo = "";
+
+                      if (pickId === activeMatchup?.left.tricode) {
+                        logo = activeMatchup?.left?.logo || "";
+                      } else if (pickId === activeMatchup?.right.tricode) {
+                        logo = activeMatchup?.right?.logo || "";
+                      }
+
+                      return logo ? (
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            minWidth: 60,
+                            minHeight: 40,
+                          }}
+                        >
+                          <img
+                            src={logo}
+                            referrerPolicy="no-referrer"
+                            style={{
+                              maxWidth: 40,
+                              maxHeight: 40,
+                              objectFit: "contain",
+                            }}
+                          />
+                        </div>
+                      ) : null;
+                    })()}
+
                     <div className="leading-tight mr-2 text-xl whitespace-nowrap">
                       {r.totalPoints}
                     </div>

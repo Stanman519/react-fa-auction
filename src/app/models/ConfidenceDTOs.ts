@@ -9,6 +9,7 @@ export interface NflMatchup {
   chosenTeamLocal?: NflTeam;
   choice?: number;
   pick?: NflPick;
+  isCurrentGame: boolean;
 }
 export interface Prop {
   id?: number;
