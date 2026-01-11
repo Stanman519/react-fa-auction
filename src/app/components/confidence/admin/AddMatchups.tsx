@@ -23,12 +23,9 @@ export const AddMatchups = (): JSX.Element => {
   const [year, setYear] = React.useState<number>(0);
   const [week, setWeek] = React.useState<number>(0);
   const [teams, setTeams] = React.useState<NflTeam[]>([]);
-  const { owner, authSynchronized } = useAppSelector(
-    (state) => state.profile,
-  );
-  const { matchups, nflTeams } = useAppSelector(
-    (state) => state.confidence,
-  );
+  const { owner, authSynchronized } = useAppSelector((state) => state.profile);
+  const { matchups, nflTeams } = useAppSelector((state) => state.confidence);
+
   const [newMatchups, setNewMatchups] = React.useState<NewMatchup[]>([]);
   const dispatch = useDispatch();
   const { user, isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
@@ -119,7 +116,8 @@ export const AddMatchups = (): JSX.Element => {
       <Button
         variant="outlined"
         onClick={() =>
-          user?.sub && dispatch(adminAddNewMatchup(teams, newMatchups, week, year, user.sub))
+          user?.sub &&
+          dispatch(adminAddNewMatchup(teams, newMatchups, week, year, user.sub))
         }
         disabled={!user?.sub}
       >
@@ -133,7 +131,9 @@ export const AddMatchups = (): JSX.Element => {
       <Button
         color="error"
         sx={{ margin: 4 }}
-        onClick={() => user?.sub && dispatch(makeMatchupsUnpickable(user.sub, year))}
+        onClick={() =>
+          user?.sub && dispatch(makeMatchupsUnpickable(user.sub, year))
+        }
         disabled={!user?.sub}
       >
         LOCK ALL MATCHUPS

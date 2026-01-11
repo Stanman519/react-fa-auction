@@ -45,7 +45,26 @@ function a11yProps(index: number) {
     "aria-controls": `full-width-tabpanel-${index}`,
   };
 }
+function splitPot(
+  total: number,
+  splits: { place: string; pct: number }[],
+): { place: string; amount: string }[] {
+  const floored = splits.map((s) => ({
+    place: s.place,
+    amount: Math.floor(total * s.pct),
+  }));
 
+  const used = floored.reduce((sum, p) => sum + p.amount, 0);
+  const remainder = total - used;
+
+  // Give leftover dollars to 1st place
+  floored[0].amount += remainder;
+
+  return floored.map((p) => ({
+    place: p.place,
+    amount: `$${p.amount}`,
+  }));
+}
 // Payout Structure Component
 function PayoutStructure({
   results,
@@ -68,35 +87,34 @@ function PayoutStructure({
     // 1 winner gets 100%
     payouts = [{ place: "1st", amount: `$${totalPot}` }];
   } else if (paidEntrants >= 11 && paidEntrants <= 20) {
-    // 2 winners: 70%/30%
-    payouts = [
-      { place: "1st", amount: `$${(totalPot * 0.7).toFixed(0)}` },
-      { place: "2nd", amount: `$${(totalPot * 0.3).toFixed(0)}` },
-    ];
+    payouts = splitPot(totalPot, [
+      { place: "1st", pct: 0.7 },
+      { place: "2nd", pct: 0.3 },
+    ]);
   } else if (paidEntrants >= 21 && paidEntrants <= 30) {
-    // 3 winners: 65%/25%/10%
-    payouts = [
-      { place: "1st", amount: `$${(totalPot * 0.65).toFixed(0)}` },
-      { place: "2nd", amount: `$${(totalPot * 0.25).toFixed(0)}` },
-      { place: "3rd", amount: `$${(totalPot * 0.1).toFixed(0)}` },
-    ];
+    payouts = splitPot(totalPot, [
+      { place: "1st", pct: 0.65 },
+      { place: "2nd", pct: 0.25 },
+      { place: "3rd", pct: 0.1 },
+    ]);
   } else if (paidEntrants >= 31 && paidEntrants <= 40) {
-    // 4 winners: 60%/25%/10%/5%
-    payouts = [
-      { place: "1st", amount: `$${(totalPot * 0.6).toFixed(0)}` },
-      { place: "2nd", amount: `$${(totalPot * 0.25).toFixed(0)}` },
-      { place: "3rd", amount: `$${(totalPot * 0.1).toFixed(0)}` },
-      { place: "4th", amount: `$${(totalPot * 0.05).toFixed(0)}` },
-    ];
+    payouts = splitPot(totalPot, [
+      { place: "1st", pct: 0.6 },
+      { place: "2nd", pct: 0.25 },
+      { place: "3rd", pct: 0.1 },
+      { place: "4th", pct: 0.05 },
+    ]);
   } else if (paidEntrants >= 41) {
-    // 5+ winners: 5th gets entry back, rest split from remaining pot
     const fifthPayout = entryFee;
     const remainingPot = totalPot - fifthPayout;
+
     payouts = [
-      { place: "1st", amount: `$${(remainingPot * 0.6).toFixed(0)}` },
-      { place: "2nd", amount: `$${(remainingPot * 0.25).toFixed(0)}` },
-      { place: "3rd", amount: `$${(remainingPot * 0.1).toFixed(0)}` },
-      { place: "4th", amount: `$${(remainingPot * 0.05).toFixed(0)}` },
+      ...splitPot(remainingPot, [
+        { place: "1st", pct: 0.6 },
+        { place: "2nd", pct: 0.25 },
+        { place: "3rd", pct: 0.1 },
+        { place: "4th", pct: 0.05 },
+      ]),
       { place: "5th", amount: `$${fifthPayout}` },
     ];
   }
@@ -119,15 +137,12 @@ function PayoutStructure({
           sx={{
             display: "flex",
             justifyContent: "space-around",
-            flexWrap: "wrap",
+            flexWrap: "nowrap",
             gap: 2,
           }}
         >
           {payouts.map((payout) => (
-            <Box
-              key={payout.place}
-              sx={{ textAlign: "center", minWidth: "80px" }}
-            >
+            <Box key={payout.place} sx={{ textAlign: "center" }}>
               <Typography
                 variant="body2"
                 sx={{ color: theme.palette.text.secondary, fontWeight: "bold" }}
