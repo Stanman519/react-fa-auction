@@ -63,7 +63,7 @@ export const AddMatchups = (): JSX.Element => {
   };
 
   return (
-    <div className="flex flex-col w-1/2 border border-black m-6">
+    <div className="flex flex-col border border-black m-6">
       <div>ADD MATCHUPS</div>
       {teams.length > 0 &&
         newMatchups.map((nm, index) => (

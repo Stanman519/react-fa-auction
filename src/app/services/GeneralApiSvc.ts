@@ -80,21 +80,21 @@ function determineSuccessOrErrorMsg<Type>(
     // Handle the case where the response is an AxiosError
     if (res.response) {
       const response = res.response as AxiosResponse;
-      
+
       // Handle authentication/authorization errors
       if (response.status === 401) {
-        return { 
-          success: false, 
-          errorMsg: "Please log in to perform this action." 
+        return {
+          success: false,
+          errorMsg: "Please log in to perform this action.",
         };
       }
       if (response.status === 403) {
-        return { 
-          success: false, 
-          errorMsg: "You are not authorized to perform this action." 
+        return {
+          success: false,
+          errorMsg: "You are not authorized to perform this action.",
         };
       }
-      
+
       const errorMsg =
         response.data?.friendlyMessage ||
         response.data?.Message ||
@@ -352,13 +352,20 @@ const getWaiverExtensionCandidates = (
       return undefined;
     });
 };
-const setOwnersToPaid = (body: number[], userSub: string): Promise<Response> => {
+const setOwnersToPaid = (
+  body: number[],
+  userSub: string,
+): Promise<Response> => {
   return axios
-    .post(`${URL}/confidence/admin/mark-paid?user=${encodeUserSub(userSub)}`, body, {
-      headers: {
-        "Content-Type": "application/json",
+    .post(
+      `${URL}/confidence/admin/mark-paid?user=${encodeUserSub(userSub)}`,
+      body,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    })
+    )
     .then((res) => {
       return res.data;
     })
@@ -426,13 +433,20 @@ const postTaxiCut = (body: CutRequestBody): Promise<Response> => {
     });
 };
 
-const postNewMatchups = (matchups: NflMatchup[], userSub: string): Promise<Response> => {
+const postNewMatchups = (
+  matchups: NflMatchup[],
+  userSub: string,
+): Promise<Response> => {
   return axios
-    .post(`${URL}/confidence/admin/new-matchups?user=${encodeUserSub(userSub)}`, matchups, {
-      headers: {
-        "Content-Type": "application/json",
+    .post(
+      `${URL}/confidence/admin/new-matchups?user=${encodeUserSub(userSub)}`,
+      matchups,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    })
+    )
     .then((res) => {
       return res.data;
     })
@@ -462,11 +476,15 @@ const submitPicks = (
 
 const submitProp = (props: Prop[], userSub: string): Promise<Response> => {
   return axios
-    .post(`${URL}/confidence/admin/new-props?user=${encodeUserSub(userSub)}`, props, {
-      headers: {
-        "Content-Type": "application/json",
+    .post(
+      `${URL}/confidence/admin/new-props?user=${encodeUserSub(userSub)}`,
+      props,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    })
+    )
     .then((res) => {
       return res.data;
     })
@@ -479,7 +497,7 @@ const submitProp = (props: Prop[], userSub: string): Promise<Response> => {
 const lockAllMatchups = (userSub: string, year?: number): Promise<Response> => {
   return axios
     .post(
-      `${URL}/confidence/lock-matchups${year ? `?year=${year}&` : '?'}user=${encodeUserSub(userSub)}`,
+      `${URL}/confidence/lock-matchups${year ? `?year=${year}&` : "?"}user=${encodeUserSub(userSub)}`,
       {},
     )
     .then((res) => {
@@ -687,6 +705,28 @@ const cancelTrade = (
       return undefined;
     });
 };
+const setCurrentMatchup = (
+  matchupId: number,
+  userSub: string,
+): Promise<Response> => {
+  return axios
+    .post(
+      `${URL}/confidence/admin/matchups/${matchupId}/set-current?user=${encodeUserSub(userSub)}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    )
+    .then((res) => {
+      return res.data;
+    })
+    .catch((e) => {
+      console.log(e);
+      return undefined;
+    });
+};
 // const getAllOverUnderUsers = (poolId: number): Promise<Owner[]> => {
 //   return axios
 //     .get(`${URL}/games/pools/${poolId}/ou-users`, {
@@ -714,6 +754,7 @@ export default {
   postWaiverExtension,
   postTaxiCut,
   postNewMatchups,
+  setCurrentMatchup,
   setOwnersToPaid,
   getDeadCapAndTransactions,
   getMatchups,

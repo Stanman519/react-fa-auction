@@ -47,7 +47,13 @@ export const DecideMatchups = (): JSX.Element => {
       user.sub,
     );
   };
-
+  const setCurrentMatchup = async (matchupId: number) => {
+    if (!user?.sub) {
+      alert("Please log in to set current matchup");
+      return;
+    }
+    await GeneralApiSvc.setCurrentMatchup(matchupId, user.sub);
+  };
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     matchupId: number,
@@ -81,6 +87,9 @@ export const DecideMatchups = (): JSX.Element => {
             </RadioGroup>
             <Button onClick={async () => await submitWinner(m.id)}>
               SUBMIT
+            </Button>
+            <Button onClick={async () => await setCurrentMatchup(m.id)}>
+              SET CURRENT
             </Button>
           </div>
         ))}
