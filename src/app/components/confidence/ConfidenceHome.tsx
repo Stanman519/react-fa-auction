@@ -5,10 +5,12 @@ import { DragableMatchups } from "../confidence/DragableMatchups";
 import { ConfidenceResultsAccordian } from "../confidence/ConfidenceResultsAccordian";
 import { MenuBar } from "../menuBar";
 import { Rules } from "../confidence/Rules";
+import { FAChatWindow } from "../chat";
 import {
   Alert,
   Box,
   Button,
+  Drawer,
   Snackbar,
   Tab,
   Tabs,
@@ -172,6 +174,12 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
   const { modal, errorText } = useSelector((state: RootState) => state.ui);
   const theme = useTheme();
   const [value, setValue] = useState("1");
+  const [openChat, setOpenChat] = useState(false);
+
+  // Check if game has started (if there are any points in results)
+  const hasGameStarted = results.some((r) =>
+    r.weeklyResults.some((w) => w.totalPoints > 0),
+  );
 
   const testRef = useRef(null);
   const boarding = new Boarding({
@@ -261,9 +269,13 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
       dispatch(updateUI({ modal: "confidence-rules" }));
       return;
     }
-    // If clicking on Demo tab, navigate to demo
+    // If clicking on Chat/Demo tab
     if (newValue === "4") {
-      navigate("/demo");
+      if (hasGameStarted) {
+        setOpenChat(true);
+      } else {
+        navigate("/demo");
+      }
       return;
     }
     // If clicking on EXIT tab (in demo), navigate back to confidence
@@ -297,7 +309,12 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
             <Tab label="My Picks" value={"1"} />
             <Tab ref={testRef} label="Results" value={"2"} />
             <Tab label="Rules" value={"3"} />
-            {!isDemo && <Tab label="See Demo" value={"4"} />}
+            {!isDemo && (
+              <Tab
+                label={hasGameStarted ? "Open Chat" : "See Demo"}
+                value={"4"}
+              />
+            )}
             {isDemo && <Tab label="EXIT DEMO" value={"5"} />}
           </TabList>
         </div>
@@ -414,6 +431,16 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
           {errorText}
         </Alert>
       </Snackbar>
+      <Drawer
+        PaperProps={{
+          sx: { width: "40%", minWidth: 350 },
+        }}
+        anchor={"left"}
+        open={openChat}
+        onClose={() => setOpenChat(false)}
+      >
+        <FAChatWindow screen="league" />
+      </Drawer>
     </div>
   );
 }
