@@ -172,9 +172,9 @@ export const ConfidenceMatchup = ({
   ];
   const getLogoSize = () => {
     if (isMobile) {
-      return longList ? 90 : 120;
+      return longList ? 90 : 90;
     } else {
-      return 150;
+      return longList ? 120 : 150;
     }
   };
   return (
@@ -243,6 +243,12 @@ export const ConfidenceMatchup = ({
               displayType === "my-picks"
                 ? "50%"
                 : "100%",
+            filter:
+              matchup.chosenTeamLocal &&
+              matchup.chosenTeamLocal !== matchup.left &&
+              displayType === "my-picks"
+                ? "grayscale(100%)"
+                : "grayscale(0%)",
             transition: "all",
             transitionDuration: "0.5s",
             position: "relative",
@@ -414,6 +420,12 @@ export const ConfidenceMatchup = ({
               displayType === "my-picks"
                 ? "50%"
                 : "100%",
+            filter:
+              matchup.chosenTeamLocal &&
+              matchup.chosenTeamLocal !== matchup.right &&
+              displayType === "my-picks"
+                ? "grayscale(100%)"
+                : "grayscale(0%)",
             transition: "all",
             transitionDuration: `0.5s`,
             minHeight: getLogoSize(),

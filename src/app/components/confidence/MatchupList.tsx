@@ -18,11 +18,13 @@ export const MatchupList = React.memo(
     thisWeekPoints,
     canEdit,
     onClick,
+    showPickAndDragHeader,
   }: {
     onClick: (e: React.MouseEvent) => void;
     matchups: NflMatchup[];
     placeholder: React.ReactNode;
     thisWeekPoints: ConfidenceWeekPointsMap | undefined;
+    showPickAndDragHeader: boolean;
     canEdit: boolean;
   }): JSX.Element => {
     // const heightRef = useRef<HTMLDivElement>(null)
@@ -136,6 +138,18 @@ export const MatchupList = React.memo(
             </div>
           )}
           <div className="flex flex-col">
+            {showPickAndDragHeader && (
+              <div
+                className="text-center w-full font-bold text-lg text-white"
+                style={{
+                  backgroundColor: theme.palette.primary.main,
+                  borderTopLeftRadius: "8px",
+                  borderTopRightRadius: "8px",
+                }}
+              >
+                PICK AND DRAG
+              </div>
+            )}
             {matchups.map((matchup: NflMatchup, index: number) => {
               let stats = communityStats.find(
                 (s) => s.matchupId === matchup.id,

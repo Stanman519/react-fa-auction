@@ -142,7 +142,10 @@ export function DragableMatchups({
     e.stopPropagation();
   };
   return (
-    <div className="max-w-md w-full lg:w-1/2 " style={{ position: "relative" }}>
+    <div
+      className="w-full lg:w-1/2 max-w-6xl overflow-x-hidden"
+      style={{ position: "relative" }}
+    >
       {multiLoader?.includes("con-matchups") ? (
         <div style={{ width: "100%" }}>
           <Skeleton
@@ -186,28 +189,25 @@ export function DragableMatchups({
                 )}
               {matchups.some((m) => !m.pickable) ? (
                 <MyPicksAndStatsDropdown />
-              ) : (
-                <div
-                  className="text-center w-full font-bold text-lg text-white"
-                  style={{
-                    backgroundColor: theme.palette.primary.main,
-                    borderTopLeftRadius: "8px",
-                    borderTopRightRadius: "8px",
-                  }}
-                >
-                  PICK AND DRAG
-                </div>
-              )}
+              ) : null}
               <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="list">
                   {(provided) => (
-                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className="flex flex-col w-full overflow-x-hidden"
+                      style={{ minWidth: 0 }}
+                    >
                       <MatchupList
                         onClick={(e) => handleStampAnim(e)}
                         placeholder={provided.placeholder}
                         matchups={matchups}
                         thisWeekPoints={thisWeekPoints}
                         canEdit={editMode}
+                        showPickAndDragHeader={matchups.every(
+                          (m) => m.pickable,
+                        )}
                       />
                     </div>
                   )}
