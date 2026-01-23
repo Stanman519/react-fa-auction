@@ -50,6 +50,7 @@ export type Modals =
   | "error"
   | "trade-submit-success"
   | "trade-response-success"
+  | "holdout-confirm"
   | "confidence-rules"
   | undefined;
 

@@ -217,12 +217,12 @@ export function DragableMatchups({
           )}
           {props.length > 0 && (
             <div
-              className="border"
+              className="border w-full"
               style={{ borderColor: theme.palette.primary.main }}
             >
               <div>
                 <div
-                  className="text-center w-full font-bold text-lg text-white"
+                  className="text-center font-bold text-lg text-white"
                   style={{ backgroundColor: theme.palette.primary.main }}
                 >
                   THE EXTRA POINT TIEBREAKER

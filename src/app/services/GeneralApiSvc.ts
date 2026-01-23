@@ -1,6 +1,6 @@
 import { User } from "@auth0/auth0-react";
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { PlayerDTO } from "../redux/reducers/FreeAgentReducer";
+import { HoldoutDTO, PlayerDTO } from "../redux/reducers/FreeAgentReducer";
 import Owner, {
   LeagueInfo,
   PoolUser,
@@ -57,6 +57,13 @@ export interface CutRequestBody {
   player: PlayerDTO;
   mflFranchiseId: number;
   rebate: number;
+}
+export interface HoldoutRequestBody {
+  holdoutId: number;
+  status: string;
+  leagueId: number;
+  mflPlayerId: number;
+  mflFranchiseId: number;
 }
 
 export interface GenericResponse<Type> {
@@ -352,6 +359,27 @@ const getWaiverExtensionCandidates = (
       return undefined;
     });
 };
+const getHoldoutCandidates = (
+  leagueId: number,
+  leagueOwnerId: number,
+): Promise<HoldoutDTO[]> => {
+  return axios
+    .get(
+      `${URL}/dashboard/league/${leagueId}/owners/${leagueOwnerId}/holdouts`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    )
+    .then((res) => {
+      return res.data;
+    })
+    .catch(() => {
+      console.log("catch");
+      return undefined;
+    });
+};
 const setOwnersToPaid = (
   body: number[],
   userSub: string,
@@ -407,6 +435,20 @@ const postWaiverExtension = (body: FranchiseTagBody): Promise<Response> => {
 const postBuyoutPlayer = (body: CutRequestBody): Promise<Response> => {
   return axios
     .post(`${URL}/dashboard/buyout`, body, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(() => {
+      return undefined;
+    });
+};
+const postHoldoutPlayer = (body: HoldoutRequestBody): Promise<Response> => {
+  return axios
+    .post(`${URL}/dashboard/holdout-response`, body, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -751,6 +793,7 @@ export default {
   getErrorTest,
   postFranchiseTagPlayer,
   postBuyoutPlayer,
+  postHoldoutPlayer,
   postWaiverExtension,
   postTaxiCut,
   postNewMatchups,
@@ -771,6 +814,7 @@ export default {
   sendOverUnderPicks,
   getWinOverUndersForLeagueYear,
   getAllOverUnderUsersAndPicks,
+  getHoldoutCandidates,
   proposeTrade,
   cancelTrade,
   acceptTrade,

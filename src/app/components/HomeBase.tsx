@@ -18,6 +18,7 @@ import { OverUnderRow } from "./games/OverUnders/OverUnderRow";
 import AdvancedContractTrades from "./nonAuction/AdvancedContractTrades";
 import PendingTrades from "./nonAuction/PendingTrades";
 import { updateLoginInfo } from "../redux/actions/LoginActions";
+import Holdouts from "./nonAuction/Holdouts";
 
 interface Tab {
   label: string;
@@ -49,6 +50,7 @@ const HomeBase = () => {
     { label: "FREE TAXI CUTS", value: "taxi" },
     { label: "PROPOSE TRADE", value: "new-trades" },
     { label: "PENDING TRADES", value: "pending-trades" },
+    { label: "HOLDOUTS", value: "holdouts" },
   ];
   if (currentLeague?.league.isBuyoutSzn)
     draftTabs.push({ label: "AMNESTY BUYOUTS", value: "buyouts" });
@@ -147,6 +149,7 @@ const HomeBase = () => {
                 {currentTab === "taxi" && <TaxiSquadTile />}
                 {currentTab === "buyouts" && <BuyoutTile />}
                 {currentTab === "waiver" && <WaiverExtensions />}
+                {currentTab === "holdouts" && <Holdouts />}
                 {currentTab === "new-trades" && <AdvancedContractTrades />}
                 {currentTab === "pending-trades" && <PendingTrades />}
               </div>

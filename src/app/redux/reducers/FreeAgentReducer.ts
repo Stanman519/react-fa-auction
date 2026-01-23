@@ -20,6 +20,19 @@ export interface PlayerDTO {
   salary?: number;
   length?: number;
 }
+export interface HoldoutDTO {
+  id: number;
+  leagueId: number;
+  leagueOwnerId: number;
+  year: number;
+  player: PlayerDTO;
+  originalSalary: number;
+  holdoutSalary: number;
+  status: string; // "Pending", "Accepted", "Denied"
+  scoreTier: number;
+  salaryComparison: number;
+  yearsRemaining: number;
+}
 
 export interface PlayerBio {
   firstName: string;

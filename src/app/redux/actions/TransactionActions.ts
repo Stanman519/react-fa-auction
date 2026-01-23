@@ -32,32 +32,40 @@ export const loadDashboardData =
 
     const currentLeague = leagues[idx];
     try {
-      var [deadCap, tagCandidates, taxiSquad, buyouts, waiverExtensions] =
-        await Promise.all([
-          GeneralApiSvc.getDeadCapAndTransactions(
-            currentLeague.league.leagueId,
-          ),
-          GeneralApiSvc.getFranchiseTagCandidates(
-            currentLeague.league.leagueId,
-            currentLeague.leagueownerid,
-            currentLeague.mflfranchiseid,
-          ),
-          GeneralApiSvc.getTaxiSquadPlayers(
-            currentLeague.league.leagueId,
-            currentLeague.leagueownerid,
-            currentLeague.mflfranchiseid,
-          ),
-          GeneralApiSvc.getBuyoutCandidates(
-            currentLeague.league.leagueId,
-            currentLeague.leagueownerid,
-            currentLeague.mflfranchiseid,
-          ),
-          GeneralApiSvc.getWaiverExtensionCandidates(
-            currentLeague.league.leagueId,
-            currentLeague.leagueownerid,
-            currentLeague.mflfranchiseid,
-          ),
-        ]);
+      var [
+        deadCap,
+        tagCandidates,
+        taxiSquad,
+        buyouts,
+        waiverExtensions,
+        holdoutCandidates,
+      ] = await Promise.all([
+        GeneralApiSvc.getDeadCapAndTransactions(currentLeague.league.leagueId),
+        GeneralApiSvc.getFranchiseTagCandidates(
+          currentLeague.league.leagueId,
+          currentLeague.leagueownerid,
+          currentLeague.mflfranchiseid,
+        ),
+        GeneralApiSvc.getTaxiSquadPlayers(
+          currentLeague.league.leagueId,
+          currentLeague.leagueownerid,
+          currentLeague.mflfranchiseid,
+        ),
+        GeneralApiSvc.getBuyoutCandidates(
+          currentLeague.league.leagueId,
+          currentLeague.leagueownerid,
+          currentLeague.mflfranchiseid,
+        ),
+        GeneralApiSvc.getWaiverExtensionCandidates(
+          currentLeague.league.leagueId,
+          currentLeague.leagueownerid,
+          currentLeague.mflfranchiseid,
+        ),
+        GeneralApiSvc.getHoldoutCandidates(
+          currentLeague.league.leagueId,
+          currentLeague.leagueownerid,
+        ),
+      ]);
       console.log("load dashboard taxiSquad", taxiSquad);
       leagues[idx] = {
         ...leagues[idx],
@@ -65,6 +73,7 @@ export const loadDashboardData =
         taxiPlayers: taxiSquad,
         waiverExtensionPlayers: waiverExtensions,
         cutCandidates: buyouts,
+        holdoutCandidates: holdoutCandidates,
       };
 
       dispatch(
@@ -344,7 +353,49 @@ export const submitBuyout =
       dispatch(updateUI({ modal: "error" }));
     }
   };
+export const submitHoldout =
+  (
+    leagueId: number,
+    mflFranchiseId: number,
+    mflPlayerId: number,
+    holdoutId: number,
+  ) =>
+  async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    const { profile } = getState();
+    const requestBody = {
+      leagueId,
+      mflFranchiseId,
+      mflPlayerId: mflPlayerId,
+      status: "accepted",
+      holdoutId,
+    };
+    if (!profile.currentLeagueId) return;
+    try {
+      await GeneralApiSvc.postHoldoutPlayer(requestBody);
+      const leagues = [...profile.owner.leagues];
+      const idx = leagues.findIndex(
+        (l) => l.league.leagueId === profile.currentLeagueId,
+      );
+      if (idx === -1) return;
+      leagues[idx] = {
+        ...leagues[idx],
+        holdoutCandidates: [],
+      };
 
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: {
+            ...profile.owner,
+            leagues,
+          },
+        }),
+      );
+      dispatch(updateUI({ modal: "dashboard-success" }));
+    } catch (e: any) {
+      dispatch(updateUI({ modal: "error" }));
+    }
+  };
 export const submitPendingTrade =
   (
     leagueId: number,

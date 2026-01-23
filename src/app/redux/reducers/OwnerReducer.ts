@@ -1,6 +1,6 @@
 import { OverUnderPick } from "../../services/GeneralApiSvc";
 import { OwnerAction, UPDATE_OWNERS } from "../actions/OwnerActions";
-import { PlayerDTO } from "./FreeAgentReducer";
+import { HoldoutDTO, PlayerDTO } from "./FreeAgentReducer";
 
 export default interface Owner {
   ownerId: number;
@@ -53,6 +53,7 @@ export interface LeagueLoginInfo {
   tagCandidates: TagCandidate[];
   taxiPlayers: PlayerDTO[];
   cutCandidates: PlayerDTO[];
+  holdoutCandidates: HoldoutDTO[];
   waiverExtensionPlayers: PlayerDTO[];
   redirected?: string | null; // track if already redirected to auction/games for this league
 }

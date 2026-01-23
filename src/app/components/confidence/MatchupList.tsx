@@ -46,10 +46,6 @@ export const MatchupList = React.memo(
     return (
       <div>
         <div
-          className="flex flex-row w-full"
-          style={{ userSelect: "none" }}
-        ></div>
-        <div
           onClick={(event) => onClick(event)}
           className="flex flex-row w-full"
           style={{ userSelect: "none" }}
@@ -102,7 +98,7 @@ export const MatchupList = React.memo(
             </div>
           </div>
 
-          {(thisWeekPoints?.points?.length ?? 0) > 1 && (
+          {(thisWeekPoints?.points?.length ?? 0) > 2 && (
             <div className="flex flex-col">
               <div
                 className="text-center w-full font-bold text-lg text-white"
