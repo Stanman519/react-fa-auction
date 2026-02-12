@@ -61,6 +61,9 @@ export default function TriTable() {
       });
   };
   useEffect(() => {
+    setIsLoading(true);
+    setStandings([]);
+    setYears([]);
     getDataAndFormat();
   }, [leagueId]);
   return (

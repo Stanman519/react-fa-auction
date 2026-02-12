@@ -68,6 +68,13 @@ const HomeBase = () => {
     }
   }, [authSynchronized, deadCap, dispatch]);
 
+  // Load dashboard data when league changes
+  useEffect(() => {
+    if (authSynchronized && currentLeagueId) {
+      dispatch(loadDashboardData());
+    }
+  }, [currentLeagueId, authSynchronized, dispatch]);
+
   // Handle one-time redirect to auction (but only if not already redirected for this league)
   // This redirect happens after AuthCallback has routed here, so if we're here and
   // league.redirected is null, we can safely redirect once and set the flag.
