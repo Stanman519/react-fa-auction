@@ -366,7 +366,7 @@ export const submitHoldout =
       leagueId,
       mflFranchiseId,
       mflPlayerId: mflPlayerId,
-      status: "accepted",
+      status: "Accepted",
       holdoutId,
     };
     if (!profile.currentLeagueId) return;
