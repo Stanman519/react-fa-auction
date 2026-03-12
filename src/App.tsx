@@ -178,7 +178,7 @@ const SmartHome: React.FC = () => {
 const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({
   element,
 }) => {
-  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+  const { isAuthenticated, isLoading, loginWithRedirect, error } = useAuth0();
   const { authSynchronized } = useAppSelector((state) => state.profile);
   const logo = "./stanfan-color-logo.png";
 
@@ -187,6 +187,16 @@ const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({
     isAuthenticated,
     authSynchronized,
   });
+
+  if (error) {
+    console.error("[PrivateRoute] Auth0 error:", error.message);
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-4">
+        <p className="text-red-500">Login error: {error.message}</p>
+        <button onClick={() => loginWithRedirect()}>Retry Login</button>
+      </div>
+    );
+  }
 
   // Show loading spinner while Auth0 is checking session or profile is syncing
   if (isLoading || (isAuthenticated && !authSynchronized)) {

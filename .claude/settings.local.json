@@ -5,7 +5,26 @@
       "Read(//c/Users/Stanley/Development/free-agency-auction-api/**)",
       "Read(//mnt/c/Users/Stanley/Development/**)",
       "Read(//c/Users/Stanley/Development/**)",
-      "Bash(ls /c/Users/Stanley/Development/react-fa-auction/.env* 2>/dev/null)"
+      "Bash(ls /c/Users/Stanley/Development/react-fa-auction/.env* 2>/dev/null)",
+      "Bash(cd \"C:\\\\Users\\\\Stanley\\\\Development\\\\react-fa-auction\" && yarn playwright-mcp --help 2>&1 | head -5)",
+      "Bash(npx playwright:*)",
+      "Bash(cd \"C:\\\\Users\\\\Stanley\\\\Development\\\\react-fa-auction\" && node_modules/.bin/playwright install chromium 2>&1 | tail -5)",
+      "Bash(\"/c/Program Files/nodejs/node\" \"C:\\\\Users\\\\Stanley\\\\Development\\\\react-fa-auction\\\\node_modules\\\\playwright\\\\cli.js\" install chromium 2>&1 | tail -10)",
+      "Bash(\"/c/Program Files/nodejs/node\" \"C:\\\\Users\\\\Stanley\\\\Development\\\\react-fa-auction\\\\node_modules\\\\playwright\\\\cli.js\" install chromium 2>&1)",
+      "Bash(cat \"C:\\\\Users\\\\Stanley\\\\Development\\\\react-fa-auction\\\\node_modules\\\\@playwright\\\\mcp\\\\package.json\" | python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('bin',{}\\), indent=2\\)\\)\")",
+      "Bash(find \"C:\\\\Users\\\\Stanley\\\\.claude\" -name \"*.json\" | xargs grep -l \"coplay\\\\|playwright\\\\|mcp\" 2>/dev/null | head -20)",
+      "Bash(find \"C:\\\\Users\\\\Stanley\\\\.claude\" -name \"*.json\" 2>/dev/null | head -30)",
+      "Bash(find \"C:\\\\Users\\\\Stanley\\\\.claude\" -name \"*.json\" 2>/dev/null | xargs grep -l \"coplay\" 2>/dev/null)",
+      "Bash(find \"C:\\\\Users\\\\Stanley\\\\.claude\" -name \"*.json\" 2>/dev/null | tail -20)",
+      "Bash(find \"C:\\\\Users\\\\Stanley\\\\.claude/plugins\" -name \"*.json\" 2>/dev/null | xargs grep -l \"coplay\" 2>/dev/null; find \"C:\\\\Users\\\\Stanley\\\\AppData\" -name \"*.json\" 2>/dev/null | xargs grep -l \"coplay\" 2>/dev/null | head -5)",
+      "Bash(find \"C:\\\\Users\\\\Stanley\\\\.claude/plugins/marketplaces\" -name \"*.json\" | xargs grep -l \"coplay\" 2>/dev/null; ls \"C:\\\\Users\\\\Stanley\\\\.claude/plugins/marketplaces/claude-plugins-official/external_plugins/\" 2>/dev/null)",
+      "Bash(find \"C:\\\\Users\\\\Stanley\\\\.claude\" -name \"mcp*\" -o -name \"*mcp*\" 2>/dev/null | grep -v \".json$\" | head -20)",
+      "Bash(find \"C:\\\\Users\\\\Stanley\\\\AppData\\\\Roaming\" -name \"*claude*\" -o -name \"*mcp*\" 2>/dev/null | head -20)",
+      "Bash(find \"C:\\\\Users\\\\Stanley\\\\AppData\\\\Local\" -name \"*claude*\" -o -name \"*mcp*\" 2>/dev/null | grep -v \"\\\\.log$\\\\|cache\\\\|Cache\" | head -20)",
+      "Bash(find \"C:\\\\Users\\\\Stanley\\\\AppData\\\\Local/Temp/claude\" -name \"*.json\" 2>/dev/null | head -10)",
+      "Bash(find \"C:\\\\Users\\\\Stanley\\\\AppData\\\\Local/Temp/DefaultCompany\" -name \"*.json\" 2>/dev/null | xargs grep -l \"coplay\\\\|mcp\" 2>/dev/null | head -5)",
+      "Bash(find \"C:\\\\Users\\\\Stanley\" -maxdepth 3 -name \"*.json\" 2>/dev/null | xargs grep -l \"coplay\" 2>/dev/null | head -10)",
+      "Bash(find \"C:\\\\Users\\\\Stanley\" -maxdepth 5 -name \"*.json\" 2>/dev/null | xargs grep -l \"coplay-mcp\\\\|coplaydev\" 2>/dev/null | head -10)"
     ]
   }
 }
