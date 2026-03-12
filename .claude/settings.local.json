@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www49.myfantasyleague.com)",
+      "Read(//c/Users/Stanley/Development/free-agency-auction-api/**)",
+      "Read(//mnt/c/Users/Stanley/Development/**)",
+      "Read(//c/Users/Stanley/Development/**)",
+      "Bash(ls /c/Users/Stanley/Development/react-fa-auction/.env* 2>/dev/null)"
+    ]
+  }
+}

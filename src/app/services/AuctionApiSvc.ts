@@ -1,4 +1,5 @@
 import axios from "axios";
+import { axiosInstance } from "./axiosInstance";
 import { PlayerDTO } from "../redux/reducers/FreeAgentReducer";
 import { Bid, Lot } from "../redux/reducers/LotReducer";
 import Owner, {
@@ -66,7 +67,7 @@ const getBundledConfidenceLoadData = async (
 };
 
 const getRosters = async (leagueId: number): Promise<RosterOwner[]> => {
-  const rest = await axios
+  const rest = await axiosInstance
     .get(
       `${process.env.REACT_APP_AUCTION_API_URL}/free-agency/leagues/${leagueId}/rosters`,
       {},
@@ -101,7 +102,7 @@ const getBidHistoryByPlayerId = async (
 };
 
 const login = async (ownername: string, password: string): Promise<Owner> => {
-  const res = await axios
+  const res = await axiosInstance
     .post(`${URL}/free-agency/login`, {
       ownername: ownername,
       password: password,
@@ -136,7 +137,7 @@ const pageLoad = async (
   cookie: string = "",
   leagueId: number = 0,
 ): Promise<PageLoad> => {
-  const rest = await axios
+  const rest = await axiosInstance
     .get(`${URL}/free-agency/leagues/${leagueId}/page-load`, {
       params: { loginInfo: cookie },
     })
@@ -192,7 +193,7 @@ const askCapn = async (
   return res;
 };
 const getLots = async (leagueId: number = 0): Promise<Lot[]> => {
-  const rest = await axios
+  const rest = await axiosInstance
     .get(`${URL}/free-agency/leagues/${leagueId}/lots`, {})
     .catch((error) => {
       throw new Error(error.response.data.friendlyMessage);

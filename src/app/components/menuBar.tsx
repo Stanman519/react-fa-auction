@@ -17,7 +17,7 @@ import { turnOnNominationModeForThisOwnersLot } from "../redux/actions/LotAction
 import { updateUI } from "../redux/actions/UiActions";
 import { FAChatWindow } from "./chat";
 import { useAuth0 } from "@auth0/auth0-react";
-import { redirect, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { clearConfidenceStateBeforeNav } from "../redux/actions/ConfidenceActions";
 import { AuctionTeamSalaryCapsSlab } from "./AuctionTeamSalaryCapsSlab";
 import LeagueSwitchMenu from "./menu/LeagueSwitchMenu";
@@ -48,16 +48,15 @@ export function MenuBar() {
   const logo = process.env.PUBLIC_URL + "/stanfan-logo-white.png";
   const isMobile = useIsMobile(720);
   
-  // Determine what to show based on user's leagues
   const hasFantasyLeague = owner?.leagues && owner.leagues.length > 0;
-  const isOnAuctionPage = window.location.pathname === '/auction';
-  const isOnLeaguePage = window.location.pathname === '/';
 
   const open = Boolean(anchorEl);
   const pfpMenuOpen = Boolean(picAnchorEl);
   const dispatch = useAppThunkDispatch();
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const isOnAuctionPage = location.pathname === "/auction";
   const closeDrawer = () => {
     setOpenDrawer(undefined);
   };
@@ -94,13 +93,6 @@ export function MenuBar() {
       <Fragment>
         <Box>
           <AppBar position="static" color="primary" sx={{ height: 64 }}>
-            <img
-              onClick={() => console.log("hi")}
-              src={user?.picture}
-              referrerPolicy="no-referrer"
-              style={{ height: 0, width: 0 }}
-            />
-
             <Toolbar
               style={{
                 display: "flex",

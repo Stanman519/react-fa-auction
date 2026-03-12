@@ -8,7 +8,6 @@ import { updateLoginInfo } from "./LoginActions";
 import { User } from "@auth0/auth0-react";
 import { LeagueLoginInfo } from "../reducers/OwnerReducer";
 import { PlayerDTO } from "../reducers/FreeAgentReducer";
-import { useNavigate } from "react-router-dom";
 import { TradeRequest } from "../../models/MflModels";
 
 export interface TransactionAction extends Action {
@@ -21,6 +20,10 @@ export const loadTransactions = (
   return { type: "LOAD_TRANSACTIONS", payload: transactions };
 };
 
+/**
+ * Loads only the dead cap / transactions needed for the default LEAGUE INFO tab.
+ * Each other tab's data is fetched lazily via its own action when the tab is first opened.
+ */
 export const loadDashboardData =
   () =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
@@ -32,49 +35,9 @@ export const loadDashboardData =
 
     const currentLeague = leagues[idx];
     try {
-      var [
-        deadCap,
-        tagCandidates,
-        taxiSquad,
-        buyouts,
-        waiverExtensions,
-        holdoutCandidates,
-      ] = await Promise.all([
-        GeneralApiSvc.getDeadCapAndTransactions(currentLeague.league.leagueId),
-        GeneralApiSvc.getFranchiseTagCandidates(
-          currentLeague.league.leagueId,
-          currentLeague.leagueownerid,
-          currentLeague.mflfranchiseid,
-        ),
-        GeneralApiSvc.getTaxiSquadPlayers(
-          currentLeague.league.leagueId,
-          currentLeague.leagueownerid,
-          currentLeague.mflfranchiseid,
-        ),
-        GeneralApiSvc.getBuyoutCandidates(
-          currentLeague.league.leagueId,
-          currentLeague.leagueownerid,
-          currentLeague.mflfranchiseid,
-        ),
-        GeneralApiSvc.getWaiverExtensionCandidates(
-          currentLeague.league.leagueId,
-          currentLeague.leagueownerid,
-          currentLeague.mflfranchiseid,
-        ),
-        GeneralApiSvc.getHoldoutCandidates(
-          currentLeague.league.leagueId,
-          currentLeague.leagueownerid,
-        ),
-      ]);
-      console.log("load dashboard taxiSquad", taxiSquad);
-      leagues[idx] = {
-        ...leagues[idx],
-        tagCandidates: tagCandidates,
-        taxiPlayers: taxiSquad,
-        waiverExtensionPlayers: waiverExtensions,
-        cutCandidates: buyouts,
-        holdoutCandidates: holdoutCandidates,
-      };
+      const deadCap = await GeneralApiSvc.getDeadCapAndTransactions(
+        currentLeague.league.leagueId,
+      );
 
       dispatch(
         updateLoginInfo({
@@ -222,6 +185,57 @@ export const getBuyoutCandidates =
     } catch (e: any) {}
   };
 
+export const getHoldoutCandidates =
+  () =>
+  async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    const { profile } = getState();
+    const leagues = [...profile.owner.leagues];
+    const idx = leagues.findIndex(
+      (l) => l.league.leagueId === profile.currentLeagueId,
+    );
+    if (idx === -1) return;
+
+    try {
+      const res = await GeneralApiSvc.getHoldoutCandidates(
+        leagues[idx].league.leagueId,
+        leagues[idx].leagueownerid,
+      );
+      leagues[idx] = { ...leagues[idx], holdoutCandidates: res ?? [] };
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: { ...profile.owner, leagues },
+        }),
+      );
+    } catch (e: any) {}
+  };
+
+export const getWaiverExtensionCandidates =
+  () =>
+  async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    const { profile } = getState();
+    const leagues = [...profile.owner.leagues];
+    const idx = leagues.findIndex(
+      (l) => l.league.leagueId === profile.currentLeagueId,
+    );
+    if (idx === -1) return;
+
+    try {
+      const res = await GeneralApiSvc.getWaiverExtensionCandidates(
+        leagues[idx].league.leagueId,
+        leagues[idx].leagueownerid,
+        leagues[idx].mflfranchiseid,
+      );
+      leagues[idx] = { ...leagues[idx], waiverExtensionPlayers: res ?? [] };
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: { ...profile.owner, leagues },
+        }),
+      );
+    } catch (e: any) {}
+  };
+
 export const submitFranchiseTag =
   (
     leagueId: number,
@@ -267,7 +281,7 @@ export const submitFranchiseTag =
       );
       dispatch(updateUI({ modal: "dashboard-success" }));
     } catch (e: any) {
-      dispatch(updateUI({ modal: "error" }));
+      dispatch(updateUI({ modal: "error", errorText: e.message || "An error occurred." }));
     }
   };
 
@@ -311,7 +325,7 @@ export const submitWaiverExtension =
       );
       dispatch(updateUI({ modal: "dashboard-success" }));
     } catch (e: any) {
-      dispatch(updateUI({ modal: "error" }));
+      dispatch(updateUI({ modal: "error", errorText: e.message || "An error occurred." }));
     }
   };
 
@@ -350,7 +364,7 @@ export const submitBuyout =
       );
       dispatch(updateUI({ modal: "dashboard-success" }));
     } catch (e: any) {
-      dispatch(updateUI({ modal: "error" }));
+      dispatch(updateUI({ modal: "error", errorText: e.message || "An error occurred." }));
     }
   };
 export const submitHoldout =
@@ -379,7 +393,9 @@ export const submitHoldout =
       if (idx === -1) return;
       leagues[idx] = {
         ...leagues[idx],
-        holdoutCandidates: [],
+        holdoutCandidates: (leagues[idx].holdoutCandidates ?? []).filter(
+          (h) => h.id !== holdoutId,
+        ),
       };
 
       dispatch(
@@ -393,7 +409,7 @@ export const submitHoldout =
       );
       dispatch(updateUI({ modal: "dashboard-success" }));
     } catch (e: any) {
-      dispatch(updateUI({ modal: "error" }));
+      dispatch(updateUI({ modal: "error", errorText: e.message || "An error occurred." }));
     }
   };
 export const submitPendingTrade =
@@ -412,7 +428,7 @@ export const submitPendingTrade =
 
       dispatch(updateUI({ modal: "dashboard-success" }));
     } catch (e: any) {
-      dispatch(updateUI({ modal: "error" }));
+      dispatch(updateUI({ modal: "error", errorText: e.message || "An error occurred." }));
     }
   };
 
@@ -455,7 +471,7 @@ export const submitTaxiCut =
       );
       dispatch(updateUI({ modal: "dashboard-success" }));
     } catch (e: any) {
-      dispatch(updateUI({ modal: "error" }));
+      dispatch(updateUI({ modal: "error", errorText: e.message || "An error occurred." }));
     }
   };
 
@@ -472,7 +488,7 @@ export const submitTradeRequest =
         updateUI({ isLoading: undefined, modal: "trade-submit-success" }),
       );
     } catch (e: any) {
-      dispatch(updateUI({ modal: "error", isLoading: undefined }));
+      dispatch(updateUI({ modal: "error", isLoading: undefined, errorText: e.message || "An error occurred." }));
     }
   };
 
@@ -503,6 +519,6 @@ export const replyToTrade =
         updateUI({ isLoading: undefined, modal: "trade-response-success" }),
       );
     } catch (e: any) {
-      dispatch(updateUI({ modal: "error", isLoading: undefined }));
+      dispatch(updateUI({ modal: "error", isLoading: undefined, errorText: e.message || "An error occurred." }));
     }
   };

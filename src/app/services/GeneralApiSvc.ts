@@ -1,5 +1,6 @@
 import { User } from "@auth0/auth0-react";
 import axios, { AxiosError, AxiosResponse } from "axios";
+import { axiosInstance } from "./axiosInstance";
 import { HoldoutDTO, PlayerDTO } from "../redux/reducers/FreeAgentReducer";
 import Owner, {
   LeagueInfo,
@@ -125,7 +126,7 @@ const fetchDashboardInitialLoad = (
   authUser: User,
   leagueId?: number,
 ): Promise<Dashboard> => {
-  return axios
+  return axiosInstance
     .post(`${URL}/dashboard/league-home`, authUser, {
       params: { leagueId },
       headers: { "Content-Type": "application/json" },
@@ -141,7 +142,7 @@ const fetchDashboardInitialLoad = (
 const getDeadCapAndTransactions = (
   leagueId?: number,
 ): Promise<LeagueCapInfo> => {
-  return axios
+  return axiosInstance
     .get(`${URL}/dashboard/leagues/${leagueId}/league-caps`, {
       headers: { "Content-Type": "application/json" },
     })
@@ -154,7 +155,7 @@ const getDeadCapAndTransactions = (
 };
 
 const synchronizeAuth = (authUser: User): Promise<Owner> => {
-  return axios
+  return axiosInstance
     .post(`${URL}/dashboard/auth`, authUser, {
       headers: {
         "Content-Type": "application/json",
@@ -172,7 +173,7 @@ const getMatchups = (
   year: number,
   auth: string,
 ): Promise<MatchupFormResponse> => {
-  return axios
+  return axiosInstance
     .get(`${URL}/confidence/matchups?year=${year}&user=${auth}`, {
       headers: {
         "Content-Type": "application/json",
@@ -182,14 +183,13 @@ const getMatchups = (
       return res.data;
     })
     .catch((e) => {
-      console.log(e);
-      return undefined;
+      throw e;
     });
 };
 const getConfidenceResults = (
   year: number,
 ): Promise<ConfidencePlayerResult[]> => {
-  return axios
+  return axiosInstance
     .get(`${URL}/confidence/results?year=${year}`, {
       headers: {
         "Content-Type": "application/json",
@@ -205,7 +205,7 @@ const getConfidenceResults = (
 };
 
 const getErrorTest = (): Promise<GenericResponse<string | Type>> => {
-  return axios
+  return axiosInstance
     .get(`${URL}/confidence/error`, {
       headers: {
         "Content-Type": "application/json",
@@ -221,7 +221,7 @@ const getErrorTest = (): Promise<GenericResponse<string | Type>> => {
 };
 
 const getNflTeams = (): Promise<NflTeam[]> => {
-  return axios
+  return axiosInstance
     .get(`${URL}/confidence/nfl-teams`, {
       headers: {
         "Content-Type": "application/json",
@@ -237,7 +237,7 @@ const getNflTeams = (): Promise<NflTeam[]> => {
 };
 
 const getUnpaidOwners = (): Promise<Owner[]> => {
-  return axios
+  return axiosInstance
     .get(`${URL}/confidence/admin/unpaid`, {
       headers: {
         "Content-Type": "application/json",
@@ -256,7 +256,7 @@ const getCommunityStats = (
   year: number,
   week: number,
 ): Promise<CommunityMatchupStats[]> => {
-  return axios
+  return axiosInstance
     .get(`${URL}/confidence/year/${year}/week/${week}/coummunity-stats`, {
       headers: {
         "Content-Type": "application/json",
@@ -275,7 +275,7 @@ const getFranchiseTagCandidates = (
   leagueOwnerId: number,
   mflFranchiseId: number,
 ): Promise<TagCandidate[]> => {
-  return axios
+  return axiosInstance
     .get(
       `${URL}/dashboard/league/${leagueId}/owners/${leagueOwnerId}/mfl/${mflFranchiseId}/tag-candidates`,
       {
@@ -297,7 +297,7 @@ const getTaxiSquadPlayers = (
   leagueOwnerId: number,
   mflFranchiseId: number,
 ): Promise<PlayerDTO[]> => {
-  return axios
+  return axiosInstance
     .get(
       `${URL}/dashboard/league/${leagueId}/owners/${leagueOwnerId}/mfl/${mflFranchiseId}/taxi-squad`,
       {
@@ -320,7 +320,7 @@ const getBuyoutCandidates = (
   leagueOwnerId: number,
   mflFranchiseId: number,
 ): Promise<PlayerDTO[]> => {
-  return axios
+  return axiosInstance
     .get(
       `${URL}/dashboard/league/${leagueId}/owners/${leagueOwnerId}/mfl/${mflFranchiseId}/buyout-candidates`,
       {
@@ -342,7 +342,7 @@ const getWaiverExtensionCandidates = (
   leagueOwnerId: number,
   mflFranchiseId: number,
 ): Promise<PlayerDTO[]> => {
-  return axios
+  return axiosInstance
     .get(
       `${URL}/dashboard/league/${leagueId}/owners/${leagueOwnerId}/mfl/${mflFranchiseId}/waiver-extensions`,
       {
@@ -363,7 +363,7 @@ const getHoldoutCandidates = (
   leagueId: number,
   leagueOwnerId: number,
 ): Promise<HoldoutDTO[]> => {
-  return axios
+  return axiosInstance
     .get(
       `${URL}/dashboard/league/${leagueId}/owners/${leagueOwnerId}/holdouts`,
       {
@@ -384,7 +384,7 @@ const setOwnersToPaid = (
   body: number[],
   userSub: string,
 ): Promise<Response> => {
-  return axios
+  return axiosInstance
     .post(
       `${URL}/confidence/admin/mark-paid?user=${encodeUserSub(userSub)}`,
       body,
@@ -404,7 +404,7 @@ const setOwnersToPaid = (
 };
 
 const postFranchiseTagPlayer = (body: FranchiseTagBody): Promise<Response> => {
-  return axios
+  return axiosInstance
     .post(`${URL}/dashboard/tag-player`, body, {
       headers: {
         "Content-Type": "application/json",
@@ -412,13 +412,10 @@ const postFranchiseTagPlayer = (body: FranchiseTagBody): Promise<Response> => {
     })
     .then((res) => {
       return res.data;
-    })
-    .catch(() => {
-      return undefined;
     });
 };
 const postWaiverExtension = (body: FranchiseTagBody): Promise<Response> => {
-  return axios
+  return axiosInstance
     .post(`${URL}/dashboard/waiver-extension`, body, {
       headers: {
         "Content-Type": "application/json",
@@ -426,14 +423,11 @@ const postWaiverExtension = (body: FranchiseTagBody): Promise<Response> => {
     })
     .then((res) => {
       return res.data;
-    })
-    .catch(() => {
-      return undefined;
     });
 };
 
 const postBuyoutPlayer = (body: CutRequestBody): Promise<Response> => {
-  return axios
+  return axiosInstance
     .post(`${URL}/dashboard/buyout`, body, {
       headers: {
         "Content-Type": "application/json",
@@ -441,13 +435,10 @@ const postBuyoutPlayer = (body: CutRequestBody): Promise<Response> => {
     })
     .then((res) => {
       return res.data;
-    })
-    .catch(() => {
-      return undefined;
     });
 };
 const postHoldoutPlayer = (body: HoldoutRequestBody): Promise<Response> => {
-  return axios
+  return axiosInstance
     .post(`${URL}/dashboard/holdout-response`, body, {
       headers: {
         "Content-Type": "application/json",
@@ -455,13 +446,10 @@ const postHoldoutPlayer = (body: HoldoutRequestBody): Promise<Response> => {
     })
     .then((res) => {
       return res.data;
-    })
-    .catch(() => {
-      return undefined;
     });
 };
 const postTaxiCut = (body: CutRequestBody): Promise<Response> => {
-  return axios
+  return axiosInstance
     .post(`${URL}/dashboard/taxi-cut`, body, {
       headers: {
         "Content-Type": "application/json",
@@ -469,9 +457,6 @@ const postTaxiCut = (body: CutRequestBody): Promise<Response> => {
     })
     .then((res) => {
       return res.data;
-    })
-    .catch(() => {
-      return undefined;
     });
 };
 
@@ -479,7 +464,7 @@ const postNewMatchups = (
   matchups: NflMatchup[],
   userSub: string,
 ): Promise<Response> => {
-  return axios
+  return axiosInstance
     .post(
       `${URL}/confidence/admin/new-matchups?user=${encodeUserSub(userSub)}`,
       matchups,
@@ -493,15 +478,14 @@ const postNewMatchups = (
       return res.data;
     })
     .catch((e) => {
-      console.log(e);
-      return undefined;
+      throw e;
     });
 };
 const submitPicks = (
   picks: NflPickSubmissionBody,
   userSub: string,
 ): Promise<GenericResponse<string | Type>> => {
-  return axios
+  return axiosInstance
     .post(`${URL}/confidence/picks?user=${encodeUserSub(userSub)}`, picks, {
       headers: {
         "Content-Type": "application/json",
@@ -517,7 +501,7 @@ const submitPicks = (
 };
 
 const submitProp = (props: Prop[], userSub: string): Promise<Response> => {
-  return axios
+  return axiosInstance
     .post(
       `${URL}/confidence/admin/new-props?user=${encodeUserSub(userSub)}`,
       props,
@@ -531,13 +515,12 @@ const submitProp = (props: Prop[], userSub: string): Promise<Response> => {
       return res.data;
     })
     .catch((e) => {
-      console.log(e);
-      return undefined;
+      throw e;
     });
 };
 
 const lockAllMatchups = (userSub: string, year?: number): Promise<Response> => {
-  return axios
+  return axiosInstance
     .post(
       `${URL}/confidence/lock-matchups${year ? `?year=${year}&` : "?"}user=${encodeUserSub(userSub)}`,
       {},
@@ -546,8 +529,7 @@ const lockAllMatchups = (userSub: string, year?: number): Promise<Response> => {
       return res.data;
     })
     .catch((e) => {
-      console.log(e);
-      return undefined;
+      throw e;
     });
 };
 
@@ -556,7 +538,7 @@ const setWinnerForMatchup = (
   winningTricode: string,
   userSub: string,
 ): Promise<Response> => {
-  return axios
+  return axiosInstance
     .post(
       `${URL}/confidence/admin/matchups/${matchupId}/results/${winningTricode}?user=${encodeUserSub(userSub)}`,
       {},
@@ -570,8 +552,7 @@ const setWinnerForMatchup = (
       return res.data;
     })
     .catch((e) => {
-      console.log(e);
-      return undefined;
+      throw e;
     });
 };
 
@@ -580,7 +561,7 @@ const setWinningProp = (
   winningSide: string,
   userSub: string,
 ): Promise<Response> => {
-  return axios
+  return axiosInstance
     .post(
       `${URL}/confidence/admin/props/${propId}/results/${winningSide}?user=${encodeUserSub(userSub)}`,
       {},
@@ -594,8 +575,7 @@ const setWinningProp = (
       return res.data;
     })
     .catch((e) => {
-      console.log(e);
-      return undefined;
+      throw e;
     });
 };
 
@@ -604,7 +584,7 @@ const sendOverUnderPicks = (
   picks: OverUnderPick[],
   ownerId: number,
 ): Promise<GenericResponse<OverUnderPick[] | string>> => {
-  return axios
+  return axiosInstance
     .post(
       `${URL}/games/pools/${poolId}/owners/${ownerId}/ou-save-picks`,
       picks,
@@ -629,7 +609,7 @@ const getWinOverUndersForLeagueYear = (
   league: string,
   ownerId: number,
 ): Promise<OverUnderLoadResponse> => {
-  return axios
+  return axiosInstance
     .get(
       `${URL}/games/pools/${poolId}/year/${year}/leagues/${league}/owners/${ownerId}/team-win-totals`,
       {
@@ -642,13 +622,12 @@ const getWinOverUndersForLeagueYear = (
       return res.data;
     })
     .catch((e) => {
-      console.log(e);
-      return undefined;
+      throw e;
     });
 };
 
 const getAllOverUnderUsersAndPicks = (poolId: number): Promise<PoolUser[]> => {
-  return axios
+  return axiosInstance
     .get(`${URL}/games/pools/${poolId}/ou-users-picks`, {
       headers: {
         "Content-Type": "application/json",
@@ -658,13 +637,12 @@ const getAllOverUnderUsersAndPicks = (poolId: number): Promise<PoolUser[]> => {
       return res.data;
     })
     .catch((e) => {
-      console.log(e);
-      return undefined;
+      throw e;
     });
 };
 
 const proposeTrade = (tradeReq: TradeRequest): Promise<Response> => {
-  return axios
+  return axiosInstance
     .post(`${URL}/dashboard/propose-trade`, tradeReq, {
       headers: {
         "Content-Type": "application/json",
@@ -684,7 +662,7 @@ const acceptTrade = (
   leagueOwnerId: number,
   mflFranchiseId: number,
 ): Promise<Response> => {
-  return axios
+  return axiosInstance
     .get(
       `${URL}/dashboard/league/${leagueId}/trades/${tradeId}/${leagueOwnerId}/mfl/${mflFranchiseId}/accept-trade`,
       {
@@ -697,8 +675,7 @@ const acceptTrade = (
       return res.data;
     })
     .catch((e) => {
-      console.log(e);
-      return undefined;
+      throw e;
     });
 };
 const rejectTrade = (
@@ -707,7 +684,7 @@ const rejectTrade = (
   leagueOwnerId: number,
   mflFranchiseId: number,
 ): Promise<Response> => {
-  return axios
+  return axiosInstance
     .get(
       `${URL}/dashboard/league/${leagueId}/trades/${tradeId}/${leagueOwnerId}/mfl/${mflFranchiseId}/reject-trade/comments/sent from stanfan`,
       {
@@ -720,8 +697,7 @@ const rejectTrade = (
       return res.data;
     })
     .catch((e) => {
-      console.log(e);
-      return undefined;
+      throw e;
     });
 };
 const cancelTrade = (
@@ -730,7 +706,7 @@ const cancelTrade = (
   leagueOwnerId: number,
   mflFranchiseId: number,
 ): Promise<Response> => {
-  return axios
+  return axiosInstance
     .get(
       `${URL}/dashboard/league/${leagueId}/trades/${tradeId}/${leagueOwnerId}/mfl/${mflFranchiseId}/revoke-trade/comments/sent from stanfan`,
       {
@@ -743,15 +719,14 @@ const cancelTrade = (
       return res.data;
     })
     .catch((e) => {
-      console.log(e);
-      return undefined;
+      throw e;
     });
 };
 const setCurrentMatchup = (
   matchupId: number,
   userSub: string,
 ): Promise<Response> => {
-  return axios
+  return axiosInstance
     .post(
       `${URL}/confidence/admin/matchups/${matchupId}/set-current?user=${encodeUserSub(userSub)}`,
       {},
@@ -765,8 +740,7 @@ const setCurrentMatchup = (
       return res.data;
     })
     .catch((e) => {
-      console.log(e);
-      return undefined;
+      throw e;
     });
 };
 // const getAllOverUnderUsers = (poolId: number): Promise<Owner[]> => {

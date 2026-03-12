@@ -7,6 +7,8 @@ import { MenuBar } from "../components/menuBar";
 import {
   Alert,
   Backdrop,
+  Button,
+  Chip,
   CircularProgress,
   Snackbar,
   ToggleButton,
@@ -22,12 +24,16 @@ import { NoActiveAuctions } from "./noActiveAuctions";
 import { FreeAgentGridModal } from "./FreeAgentGridModal";
 import { BidHistorySlab, PlayerBioSlab } from "./lot/bioAndHistory";
 import { sortLots } from "../redux/actions/LotActions";
+import LeagueSwitchMenu from "./menu/LeagueSwitchMenu";
+import { updateCurrentLeague } from "../redux/actions/LoginActions";
 
 function AuctionHome() {
   const theme = useTheme();
   const dispatch = useDispatch();
   const [reconSign, setReconSign] = useState<boolean>(false);
-  const { user, isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
+  const [crossLeagueAlertDismissed, setCrossLeagueAlertDismissed] =
+    useState<boolean>(false);
+  const { user, isAuthenticated, isLoading } = useAuth0();
   const newNom = useSelector((state: RootState) =>
     state.lots.find((l) => l.newNom),
   );
@@ -36,15 +42,40 @@ function AuctionHome() {
   const { error, errorText, modal } = useSelector(
     (state: RootState) => state.ui,
   );
-  const { authSynchronized } = useSelector((state: RootState) => state.profile);
+  const { authSynchronized } = useSelector(
+    (state: RootState) => state.profile,
+  );
+  const { owner, currentLeagueId } = useSelector(
+    (state: RootState) => state.profile,
+  );
   const loading = useSelector((state: RootState) => state.ui.isLoading);
   const navigate = useNavigate();
-  const { hasReconnected } = useSelector((state: RootState) => state.signalR);
+  const { hasReconnected } = useSelector(
+    (state: RootState) => state.signalR,
+  );
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
+
+  const currentLeague = owner.leagues.find(
+    (l) => l.league.leagueId === currentLeagueId,
+  );
+
+  // Other leagues that are ALSO currently auctioning
+  const otherAuctioningLeagues = owner.leagues.filter(
+    (l) =>
+      l.league.leagueId !== currentLeagueId && l.league.isAuctioning,
+  );
+
+  // Reset the cross-league alert dismissal when the league changes
+  const prevLeagueRef = useRef(currentLeagueId);
+  useEffect(() => {
+    if (prevLeagueRef.current !== currentLeagueId) {
+      prevLeagueRef.current = currentLeagueId;
+      setCrossLeagueAlertDismissed(false);
+    }
+  }, [currentLeagueId]);
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user?.sub && authSynchronized) {
-      console.log("User authenticated, fetching auction data");
       dispatch(getInitialAuctionData(user.sub));
       dispatch(signalR());
     }
@@ -63,6 +94,7 @@ function AuctionHome() {
       setTimeout(() => setReconSign(false), 5000);
     }
   }, [hasReconnected]);
+
   useEffect(() => {
     if (!sortBy) return;
     dispatch(sortLots(sortBy));
@@ -76,6 +108,7 @@ function AuctionHome() {
       setSortBy(sort);
     }
   };
+
   return (
     <div
       className="App"
@@ -84,25 +117,93 @@ function AuctionHome() {
       <div className="menu-container">
         <MenuBar />
       </div>
-      {reconSign && <div> Reconnected. </div>}
+
+      {/* League identity bar */}
+      {currentLeague && (
+        <div
+          style={{
+            backgroundColor: theme.palette.primary.dark,
+            color: "white",
+            padding: "6px 16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            position: "sticky",
+            top: 64,
+            zIndex: 9,
+          }}
+        >
+          <span
+            style={{
+              fontWeight: 700,
+              letterSpacing: "0.06em",
+              fontSize: "0.8rem",
+            }}
+          >
+            {currentLeague.league.name.toUpperCase()} — FREE AGENT AUCTION
+          </span>
+          {owner.leagues.length > 1 && (
+            <LeagueSwitchMenu />
+          )}
+        </div>
+      )}
+
+      {/* Cross-league active auction alert */}
+      {otherAuctioningLeagues.length > 0 && !crossLeagueAlertDismissed && (
+        <Alert
+          severity="warning"
+          onClose={() => setCrossLeagueAlertDismissed(true)}
+          sx={{ borderRadius: 0 }}
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => {
+                if (user) {
+                  dispatch(
+                    updateCurrentLeague(
+                      otherAuctioningLeagues[0].league.leagueId,
+                      "/auction",
+                      user,
+                    ),
+                  );
+                }
+              }}
+            >
+              SWITCH
+            </Button>
+          }
+        >
+          <strong>{otherAuctioningLeagues[0].league.name}</strong> is also
+          auctioning right now
+          {otherAuctioningLeagues.length > 1 &&
+            ` (+${otherAuctioningLeagues.length - 1} more)`}
+        </Alert>
+      )}
+
+      {reconSign && (
+        <Snackbar open={reconSign} autoHideDuration={5000}>
+          <Alert severity="success">Reconnected to auction.</Alert>
+        </Snackbar>
+      )}
+
       <div style={{ display: "flex", justifyContent: "center" }}>
         {loading === "full-screen" ? (
-          <div>
-            <Backdrop
-              sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-              open={loading === "full-screen"}
-            >
-              <CircularProgress size={100} />
-            </Backdrop>
-          </div>
+          <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={loading === "full-screen"}
+          >
+            <CircularProgress size={100} />
+          </Backdrop>
         ) : (
-          <div className="p-2">
+          <div className="p-2 w-full">
             {lots.length > 0 && (
               <div
                 style={{
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
+                  marginBottom: 8,
                 }}
               >
                 <div style={{ marginRight: 7 }}>Sort By: </div>
@@ -110,20 +211,13 @@ function AuctionHome() {
                   value={sortBy}
                   onChange={handleSort}
                   exclusive
-                  aria-label="device"
+                  aria-label="sort options"
+                  size="small"
                 >
-                  <ToggleButton value="position" aria-label="laptop">
-                    Position
-                  </ToggleButton>
-                  <ToggleButton value="salary" aria-label="tv">
-                    Salary
-                  </ToggleButton>
-                  <ToggleButton value="time" aria-label="phone">
-                    Time
-                  </ToggleButton>
-                  <ToggleButton value="bids" aria-label="phone">
-                    My Bids First
-                  </ToggleButton>
+                  <ToggleButton value="position">Position</ToggleButton>
+                  <ToggleButton value="salary">Salary</ToggleButton>
+                  <ToggleButton value="time">Time</ToggleButton>
+                  <ToggleButton value="bids">My Bids First</ToggleButton>
                 </ToggleButtonGroup>
               </div>
             )}
@@ -133,7 +227,7 @@ function AuctionHome() {
               <FreeAgentGridModal isOpen={modal === "free-agent-grid"} />
             )}
             {newNom && <LotBody lot={newNom} key={newNom.lotId} />}
-            <div className=" flex flex-col md:flex-row flex-wrap items-center justify-center">
+            <div className="flex flex-col md:flex-row flex-wrap items-center justify-center">
               {activeLots.map((l) => (
                 <LotBody lot={l} key={l.lotId} />
               ))}

@@ -6,6 +6,7 @@ import { getInitialAuctionData } from "./FreeAgentActions";
 import GeneralApiSvc from "../../services/GeneralApiSvc";
 import { loadDashboardData } from "./TransactionActions";
 import { updateOverUnders } from "./OverUnderActions";
+import { LEAGUE_PREF_KEY } from "../../components/menu/LeagueSwitchMenu";
 
 export const UPDATE_LOGIN = "UPDATE_LOGIN";
 
@@ -31,17 +32,23 @@ export const synchronizeAuth0WithDbLogin =
 
     var pool = dbUser.pools.length > 0 ? dbUser.pools[0] : undefined;
     dispatch(updateOverUnders({ ...overUnders, currentPool: pool }));
-    
+
+    // Respect the user's last-used league if it's still in their league list
+    const storedId = localStorage.getItem(LEAGUE_PREF_KEY);
+    const storedLeagueId = storedId ? parseInt(storedId, 10) : null;
+    const preferredLeague = storedLeagueId
+      ? dbUser.leagues.find((l) => l.league.leagueId === storedLeagueId)
+      : null;
+    const currentLeagueId =
+      preferredLeague?.league.leagueId ??
+      (dbUser.leagues.length > 0 ? dbUser.leagues[0].league.leagueId : undefined);
+
     const updatedProfile = {
       ...profile,
-      owner: dbUser, // Replace entire owner object with data from API
-      currentLeagueId:
-        dbUser.leagues.length > 0
-          ? dbUser.leagues[0].league.leagueId
-          : undefined,
+      owner: dbUser,
+      currentLeagueId,
       authSynchronized: true,
       authUser: user,
-      // Note: we do NOT set redirected here. Per-league redirect flags are managed in HomeBase.
     };
     
     console.log("[synchronizeAuth0WithDbLogin] Dispatching updated profile:", updatedProfile);
@@ -65,5 +72,5 @@ export const updateCurrentLeague =
     );
     console.log("updateCurrentLeague checking route", currentRoute);
     if (currentRoute == "/auction") dispatch(getInitialAuctionData(user.sub));
-    if (currentRoute == "/") dispatch(loadDashboardData());
+    if (currentRoute == "/league-home") dispatch(loadDashboardData());
   };

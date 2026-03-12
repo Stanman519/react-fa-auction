@@ -40,7 +40,7 @@ import { updateUI } from "../../redux/actions/UiActions";
 import { RootState } from "../../redux/reducers/RootReducer";
 const AdvancedContractTrades = () => {
   const dispatch = useDispatch();
-  const { modal } = useSelector((state: RootState) => state.ui);
+  const { modal, errorText } = useSelector((state: RootState) => state.ui);
 
   const [mflLeagueRoot, setMflLeagueRoot] = useState<
     DashboardTradeLeagueDTO | undefined
@@ -732,7 +732,7 @@ const AdvancedContractTrades = () => {
         >
           {modal === "trade-submit-success"
             ? "Submission Complete!"
-            : "Submission failed."}
+            : errorText || "An error occurred."}
         </Alert>
       </Snackbar>
     </Box>

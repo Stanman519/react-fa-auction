@@ -8,6 +8,8 @@ import { updateCurrentLeague } from "../../redux/actions/LoginActions";
 import { useLocation } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 
+export const LEAGUE_PREF_KEY = "stanfan_default_league_id";
+
 export function LeagueSwitchMenuItems() {
   const { currentLeagueId } = useSelector((state: RootState) => state.profile);
   const otherLeagues = useSelector((state: RootState) =>
@@ -26,6 +28,7 @@ export function LeagueSwitchMenuItems() {
           key={l.league.leagueId}
           onClick={() => {
             if (user) {
+              localStorage.setItem(LEAGUE_PREF_KEY, String(l.league.leagueId));
               dispatch(updateCurrentLeague(l.league.leagueId, pathname, user));
             }
           }}
@@ -82,6 +85,7 @@ export default function LeagueSwitchMenu() {
             key={l.league.leagueId}
             onClick={() => {
               if (user) {
+                localStorage.setItem(LEAGUE_PREF_KEY, String(l.league.leagueId));
                 dispatch(
                   updateCurrentLeague(l.league.leagueId, pathname, user),
                 );
@@ -89,7 +93,6 @@ export default function LeagueSwitchMenu() {
               }
             }}
           >
-            {" "}
             {l.league.name}
           </MenuItem>
         ))}

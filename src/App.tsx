@@ -12,6 +12,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import Auth0ProviderWithHistory from "./app/auth/auth0-provider-with-history";
+import AxiosAuthInterceptor from "./app/components/AxiosAuthInterceptor";
 import { LandingPage } from "./app/components/nonAuction/LandingPage";
 import GamesHome from "./app/components/games/GamesHome";
 import { ConfidenceAdminHome } from "./app/components/confidence/admin/AdminHome";
@@ -21,7 +22,10 @@ import OverUnderHome from "./app/components/games/OverUnders/OverUnderHome";
 import AuctionRosters from "./app/components/AuctionRosters";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useDispatch } from "react-redux";
-import { synchronizeAuth0WithDbLogin } from "./app/redux/actions/LoginActions";
+import {
+  synchronizeAuth0WithDbLogin,
+  updateLoginInfo,
+} from "./app/redux/actions/LoginActions";
 import { useAppSelector } from "./app/hooks";
 import ConfidenceHome from "./app/components/confidence/ConfidenceHome";
 
@@ -31,7 +35,9 @@ function App() {
   return (
     <BrowserRouter>
       <Auth0ProviderWithHistory>
-        <AppRoutes />
+        <AxiosAuthInterceptor>
+          <AppRoutes />
+        </AxiosAuthInterceptor>
       </Auth0ProviderWithHistory>
     </BrowserRouter>
   );
@@ -112,41 +118,57 @@ function AppRoutes() {
 
 export default App;
 
-// Smart Home component that redirects based on user's league status
+// Smart Home: redirects to the right place after auth sync.
+// - If a league is actively auctioning → /auction (skip the league-home middleman)
+// - If leagues exist but nothing is auctioning → /league-home
+// - No leagues → /games
 const SmartHome: React.FC = () => {
-  const { owner, authSynchronized } = useAppSelector((state) => state.profile);
-  const { isLoading, isAuthenticated } = useAuth0();
+  const profileState = useAppSelector((state) => state.profile);
+  const { owner, authSynchronized, authUser, currentLeagueId } = profileState;
+  const { isLoading } = useAuth0();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log("[SmartHome] State:", {
-      isLoading,
-      isAuthenticated,
-      authSynchronized,
-      hasLeagues: owner?.leagues?.length > 0,
-    });
+    if (isLoading || !authSynchronized) return;
 
-    // Wait for both auth loading to complete AND profile sync
-    if (isLoading || !authSynchronized) {
-      console.log("[SmartHome] Waiting for auth/sync...");
+    if (!owner?.leagues || owner.leagues.length === 0) {
+      navigate("/games", { replace: true });
       return;
     }
 
-    // Now decide where to redirect
-    if (owner?.leagues && owner.leagues.length > 0) {
-      console.log("[SmartHome] Has leagues, navigating to /league-home");
-      navigate('/league-home', { replace: true });
-    } else {
-      console.log("[SmartHome] No leagues, navigating to /games");
-      navigate('/games', { replace: true });
-    }
-  }, [isLoading, authSynchronized, owner, navigate]);
+    // Prefer the stored/current league if it's auctioning, otherwise take any auctioning league
+    const currentLeague = owner.leagues.find(
+      (l) => l.league.leagueId === currentLeagueId,
+    );
+    const auctioningLeague =
+      (currentLeague?.league.isAuctioning ? currentLeague : null) ??
+      owner.leagues.find((l) => l.league.isAuctioning);
 
-  // Show loading while determining where to go
+    if (auctioningLeague) {
+      // Mark as redirected so HomeBase won't re-redirect if the user navigates back
+      const leagues = owner.leagues.map((l) =>
+        l.league.leagueId === auctioningLeague.league.leagueId
+          ? { ...l, redirected: "auction" as const }
+          : l,
+      );
+      dispatch(
+        updateLoginInfo({
+          ...profileState,
+          currentLeagueId: auctioningLeague.league.leagueId,
+          owner: { ...owner, leagues },
+        }),
+      );
+      navigate("/auction", { replace: true });
+    } else {
+      navigate("/league-home", { replace: true });
+    }
+  }, [isLoading, authSynchronized, owner, currentLeagueId, navigate, dispatch]);
+
   const logo = "./stanfan-color-logo.png";
   return (
-    <div className="flex flex-row justify-center items-center max-w-screen-sm min-h-screen ">
-      <div className="flex-col justify-center items-center max-w-full p-4 m-4 ">
+    <div className="flex flex-row justify-center items-center max-w-screen-sm min-h-screen">
+      <div className="flex-col justify-center items-center max-w-full p-4 m-4">
         <img className="max-w-xs animate-pulse" src={logo} alt="StanFan Logo" />
       </div>
     </div>

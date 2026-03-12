@@ -11,7 +11,8 @@ import {
   Button,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { Typography } from "@mui/material";
+import { axiosInstance } from "../../services/axiosInstance";
 import {
   PendingTradeResponse,
   TradeOfferAsset,
@@ -19,7 +20,6 @@ import {
 } from "../../models/MflModels";
 import { URL } from "../../services/AuctionApiSvc";
 import { TradeListItemHeader } from "./TradeListItemHeader";
-import { Typography } from "antd";
 import { replyToTrade } from "../../redux/actions/TransactionActions";
 const PendingTrades = () => {
   const [pendingTrades, setPendingTrades] = useState<TradeRequest[]>([]);
@@ -37,7 +37,7 @@ const PendingTrades = () => {
 
   useEffect(() => {
     const fetchPendingTrades = async () => {
-      const response = axios
+      const response = axiosInstance
         .get(
           `${URL}/dashboard/league/${currentLeague?.league.leagueId}/owners/${currentLeague?.leagueownerid}/mfl/${currentLeague?.mflfranchiseid}/pending-trades`,
           {
