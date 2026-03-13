@@ -283,3 +283,6 @@ __pycache__/
 .externalNativeBuild
 .cxx
 .idea
+
+# Playwright MCP screenshots
+.playwright-mcp/

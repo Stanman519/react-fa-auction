@@ -1,7 +1,6 @@
-import { ListItem, Typography } from "@mui/material";
+import { List, ListItem, Typography } from "@mui/material";
 import { PlayerDTO } from "../../redux/reducers/FreeAgentReducer";
 import { CapEat } from "../../models/MflModels";
-import { List } from "material-ui-icons";
 
 export const TradeListPlayerCapEats = ({ capEats }: { capEats: CapEat[] }) => {
   return (

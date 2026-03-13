@@ -20,7 +20,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { clearConfidenceStateBeforeNav } from "../redux/actions/ConfidenceActions";
 import { AuctionTeamSalaryCapsSlab } from "./AuctionTeamSalaryCapsSlab";
-import LeagueSwitchMenu from "./menu/LeagueSwitchMenu";
+import LeagueSwitchMenu, { LeagueSwitchMenuItems } from "./menu/LeagueSwitchMenu";
 import { OverUnderStandingsSlab } from "./games/OverUnders/OverUnderStandingsSlab";
 import { useIsMobile } from "../hooks";
 
@@ -92,7 +92,7 @@ export function MenuBar() {
     <div className="w-full">
       <Fragment>
         <Box>
-          <AppBar position="static" color="primary" sx={{ height: 64 }}>
+          <AppBar position="fixed" color="primary" sx={{ height: 64 }}>
             <Toolbar
               style={{
                 display: "flex",
@@ -174,6 +174,7 @@ export function MenuBar() {
                         {openDrawer === "Chat" ? "Close Chat" : "Open Chat"}
                       </MenuItem>
                     )}
+                    {hasFantasyLeague && owner.leagues.length > 1 && <LeagueSwitchMenuItems />}
                   </Menu>
 
                   <img
@@ -269,6 +270,7 @@ export function MenuBar() {
                 </div>
               )}
 
+              <img src={user?.picture} referrerPolicy="no-referrer" style={{ height: 0, width: 0 }} />
               <Avatar
                 onClick={pfpMenuClick}
                 alt={user?.displayName}

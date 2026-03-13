@@ -11,7 +11,7 @@ import DashboardTabNav, {
 import BuyoutTile from "./nonAuction/BuyoutTile";
 import FranchiseTags from "./nonAuction/FranchiseTags";
 import TaxiSquadTile from "./nonAuction/TaxiSquadTile";
-import { Alert, CircularProgress, Snackbar } from "@mui/material";
+import { Alert, Box, CircularProgress, Snackbar, Typography } from "@mui/material";
 import {
   getBuyoutCandidates,
   getFranchiseTagCandidates,
@@ -146,7 +146,7 @@ const HomeBase = () => {
   ]);
 
   return (
-    <div>
+    <div className="pt-16">
       <MenuBar />
       {isLoading ? (
         <div className="flex-1 flex justify-center mt-8">
@@ -157,9 +157,14 @@ const HomeBase = () => {
           {currentLeague ? (
             <div className="flex flex-col">
               {currentLeague?.teamName && (
-                <div className="text-2xl py-4 text-center">
-                  {currentLeague?.league.name} Dashboard
-                </div>
+                <Box sx={{ textAlign: 'center', py: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                  <Typography variant="h5" fontWeight={700} color="primary.main" letterSpacing="0.03em">
+                    {currentLeague?.league.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" letterSpacing="0.12em" sx={{ textTransform: 'uppercase' }}>
+                    Dashboard
+                  </Typography>
+                </Box>
               )}
               <DashboardTabNav
                 currentValue={currentTab}
@@ -194,7 +199,7 @@ const HomeBase = () => {
                 </Snackbar>
 
                 {currentTab === "league" && (
-                  <div className="flex flex-col">
+                  <div className="flex flex-col gap-4">
                     <DeadCapParentCard />
                     <TriTable />
                   </div>

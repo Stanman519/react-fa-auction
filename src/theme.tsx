@@ -34,7 +34,7 @@ export const themeOptions: ThemeOptions = {
   },
   palette: {
     background: {
-      default: "#E3E2DF",
+      default: "#F0F2F5",
       paper: "white",
     },
     primary: {

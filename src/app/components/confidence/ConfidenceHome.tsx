@@ -301,7 +301,6 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
       <TabContext value={value}>
         <div className="flex flex-row w-full justify-center ">
           <TabList
-            value={value}
             onChange={handleChange}
             indicatorColor="primary"
             textColor="inherit"

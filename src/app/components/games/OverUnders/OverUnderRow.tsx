@@ -227,14 +227,14 @@ declare module "@mui/material/ToggleButton" {
     salmon: true;
   }
 }
-const ProgressBar = styled("div")(
-  ({ themecolor }: { themecolor: "salmon" | "green" }) => ({
-    position: "absolute",
+const ProgressBar = styled("div")<{ themecolor: "salmon" | "green" }>(
+  ({ themecolor }) => ({
+    position: "absolute" as const,
     top: 0,
     left: 0,
     height: "100%",
     backgroundColor:
-      themecolor === "salmon" ? "rgba(155, 0, 0, 0.3)" : "rgba(0, 155, 0, 0.3)", // Progress bar color
+      themecolor === "salmon" ? "rgba(155, 0, 0, 0.3)" : "rgba(0, 155, 0, 0.3)",
     transition: "width 0.1s linear",
   }),
 );

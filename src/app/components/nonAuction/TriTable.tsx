@@ -1,4 +1,5 @@
 import {
+  Box,
   Card,
   CardContent,
   CircularProgress,
@@ -9,6 +10,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
 } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -74,34 +76,34 @@ export default function TriTable() {
             s.teamStandings.some((t) => t.pointsFor > 0),
           ) ? (
             <>
-              <div className="title" style={{ fontSize: 40 }}>
-                Tri-Year Trophy
-              </div>
-              <div className="title">Presented By Taco Bell</div>
+              <Box sx={{ mb: 2, px: 1 }}>
+                <Typography variant="h4" fontWeight={800} color="primary.main" letterSpacing="-0.5px">
+                  Tri-Year Trophy
+                </Typography>
+                <Typography variant="caption" color="text.secondary" fontStyle="italic" letterSpacing="0.05em">
+                  Presented by Taco Bell
+                </Typography>
+              </Box>
               <TableContainer className="tri-scroll">
                 <Table size={"small"}>
                   <TableHead>
-                    <TableRow>
-                      <TableCell className="year-text"></TableCell>
+                    <TableRow sx={{ backgroundColor: 'primary.main' }}>
+                      <TableCell sx={{ border: 0 }} />
                       {years.map((y) => (
                         <React.Fragment key={y}>
-                          <TableCell className="year-text"></TableCell>
-                          <TableCell className="year-text">{y}</TableCell>
-                          <TableCell />
+                          <TableCell sx={{ border: 0 }} />
+                          <TableCell sx={{ color: 'white', fontWeight: 700, fontSize: '0.9rem', textAlign: 'center', border: 0 }}>{y}</TableCell>
+                          <TableCell sx={{ border: 0 }} />
                         </React.Fragment>
                       ))}
                     </TableRow>
-                    <TableRow className="horizontal">
-                      <TableCell></TableCell>
+                    <TableRow sx={{ backgroundColor: 'rgba(47,68,84,0.06)' }}>
+                      <TableCell />
                       {years.map((y) => (
                         <React.Fragment key={y}>
-                          <TableCell className="tritable-text">Wins</TableCell>
-                          <TableCell className="tritable-text">
-                            Pts For
-                          </TableCell>
-                          <TableCell className="tritable-text">
-                            TYT Pts
-                          </TableCell>
+                          <TableCell sx={{ fontWeight: 600, fontSize: '0.7rem', color: 'text.secondary' }}>Wins</TableCell>
+                          <TableCell sx={{ fontWeight: 600, fontSize: '0.7rem', color: 'text.secondary' }}>Pts For</TableCell>
+                          <TableCell sx={{ fontWeight: 600, fontSize: '0.7rem', color: 'text.secondary', borderRight: '2px solid', borderColor: 'divider' }}>TYT Pts</TableCell>
                         </React.Fragment>
                       ))}
                     </TableRow>
@@ -122,7 +124,7 @@ export default function TriTable() {
                       );
                       return (
                         <TableRow className="horizontal" key={row.franchiseId}>
-                          <TableCell className="team-text">
+                          <TableCell className="team-text" sx={{ minWidth: 130, py: 1 }}>
                             {
                               ownerList.find(
                                 (o) => o.franchiseId === row.franchiseId,
@@ -133,6 +135,7 @@ export default function TriTable() {
                               color="secondary"
                               variant="determinate"
                               value={(totalTytPts / highestOfColumn) * 100}
+                              sx={{ height: 6, borderRadius: 3, mt: 0.5 }}
                             />
                           </TableCell>
                           {row.teamStandings.map((tm, i) => {
@@ -144,7 +147,7 @@ export default function TriTable() {
                                 <TableCell className="tritable-text">
                                   {tm.pointsFor ?? 0}
                                 </TableCell>
-                                <TableCell className="vertical tritable-text">
+                                <TableCell className="vertical tritable-text" sx={{ borderRight: '2px solid', borderColor: 'divider' }}>
                                   {tm.h2hWins * 10 + tm.pointsFor}
                                 </TableCell>
                               </React.Fragment>

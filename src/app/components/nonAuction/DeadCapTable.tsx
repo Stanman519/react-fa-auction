@@ -56,7 +56,7 @@ export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number)
 
     return (
             <Card ref={ref} className="flex m-0 justify-center">
-                <CardContent className="flex max-w-lg  flex-col md:flex-1 m-0">
+                <CardContent className="flex flex-col md:flex-1 m-0">
                     <div className="text-xl text-center"> Dead Cap Tracker </div>
                     {!isLoading ?
                         <div >

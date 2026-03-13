@@ -32,7 +32,7 @@ export default function DashboardTabNav({
         borderColor: "divider",
         backgroundColor: "background.paper",
         position: "sticky",
-        top: 0,
+        top: 64,
         zIndex: 10,
       }}
     >

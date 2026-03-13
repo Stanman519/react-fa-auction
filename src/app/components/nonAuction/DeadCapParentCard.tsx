@@ -15,8 +15,8 @@ export default function DeadCapParentCard() {
 
 
     return (
-        <div className="m-4 flex justify-center">
-            <Card className="p-0 max-w-5xl" >
+        <div className="w-full">
+            <Card className="p-0 w-full rounded-none" sx={{ borderTop: '3px solid', borderColor: 'primary.main' }}>
                 <CardContent className="flex flex-col lg:flex-row p-0 flex-wrap">
                     <div className="lg:w-8/12" style={{  }}>
                         <DeadCapTable retHeight={(h) => setHeight(h)} />

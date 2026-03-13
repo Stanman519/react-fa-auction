@@ -165,6 +165,7 @@ export const UserPickChartForTeam = (): JSX.Element => {
                         pointerEvents: "none",
                       }}
                     > */}
+                    <img src={user?.owner.avatar} referrerPolicy="no-referrer" style={{ height: 0, width: 0 }} />
                     <Avatar
                       onClick={() => {
                         dispatch(seePicksForUser(user?.id));

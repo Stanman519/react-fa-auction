@@ -199,9 +199,16 @@ const PendingTrades = () => {
           );
         })
       ) : (
-        <Card>
-          <div>You have no pending trades.</div>
-        </Card>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6, px: 2 }}>
+          <Box sx={{ textAlign: 'center', maxWidth: 360 }}>
+            <Typography variant="h6" fontWeight={600} color="text.primary" gutterBottom>
+              No Pending Trades
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              You have no incoming or outgoing trade offers right now.
+            </Typography>
+          </Box>
+        </Box>
       )}
     </Box>
   );
