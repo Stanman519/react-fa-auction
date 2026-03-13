@@ -25,7 +25,7 @@ No single-test command configured; use `npm test -- --testPathPattern=<file>` fo
 ## Architecture
 
 **Stack:** React 18 / TypeScript / Redux (thunk, not RTK slices) / React Router v6 / MUI v5 + Tailwind CSS
-**Backend:** ASP.NET on Azure; real-time auction bids via SignalR (`@microsoft/signalr`)
+**Backend:** ASP.NET on Azure (`../free-agency-auction-api`); real-time auction bids via SignalR (`@microsoft/signalr`)
 **Auth:** Auth0 (`@auth0/auth0-react`), env vars: `REACT_APP_AUTH0_DOMAIN`, `REACT_APP_AUTH0_CLIENT_ID`, `REACT_APP_AUTH0_AUDIENCE`
 
 ### Component tree
