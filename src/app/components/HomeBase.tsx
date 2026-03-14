@@ -175,7 +175,7 @@ const HomeBase = () => {
               <div className="min-w-full">
                 <Snackbar
                   open={modal === "dashboard-success"}
-                  autoHideDuration={800}
+                  autoHideDuration={5000}
                   onClose={() => dispatch(updateUI({ modal: undefined }))}
                 >
                   <Alert

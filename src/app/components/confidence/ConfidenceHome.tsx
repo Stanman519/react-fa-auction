@@ -406,7 +406,7 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
       </TabContext>
       <Snackbar
         open={modal === "confidence-submit-success"}
-        autoHideDuration={800}
+        autoHideDuration={5000}
         onClose={() => dispatch(updateUI({ modal: undefined }))}
       >
         <Alert
