@@ -13,6 +13,8 @@ import {
   Divider,
   Card,
   CardContent,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
@@ -46,9 +48,12 @@ export const TeamCapDetails = ({ height }: { height: number }) => {
     return relevant;
   };
 
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
+
   useEffect(() => {}, []);
   return (
-    <Card className="flex flex-col" style={{ maxHeight: height }}>
+    <Card className="flex flex-col" style={isDesktop ? { maxHeight: height } : { minHeight: 200 }}>
       <CardContent style={{ overflowY: "auto" }}>
         {selectedTeam ? (
           <div>

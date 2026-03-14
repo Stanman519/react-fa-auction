@@ -20,13 +20,13 @@ export const TogglePlayerCardButton = ({player, attribute1, attribute2, onSelect
             onClick={onSelect}
             sx={{ margin: '8px', cursor: 'pointer', display: 'flex', flexDirection: 'row',  alignItems: 'center',
                 flex: 1, borderColor: 'red', borderWidth: isSelected ? '4px' : 0, borderStyle: 'solid'}} >
-                <div className="h-28 flex flex-row">
+                <div className="h-20 sm:h-24 md:h-28 flex flex-row">
                     <img className="max-h-full max-w-full aspect-[150/109]" src={player.headshot}  />                    
                 </div>
                 <div className="flex flex-row flex-1">
 
                         <div className="flex flex-col w-1/2 " >
-                            <div className="md:text-2xl lg:text-4xl">{player.fullName}</div>
+                            <div className="text-sm sm:text-base md:text-2xl lg:text-4xl">{player.fullName}</div>
                             <div className="flex flex-row content-center">
                                 <Chip label={`${player.team} ${player.position}`}
                                     style={{ backgroundColor: tmColorMap.find(tm => tm.team === player.team)?.primary, 
@@ -37,7 +37,7 @@ export const TogglePlayerCardButton = ({player, attribute1, attribute2, onSelect
 
                     </div>
 
-                    <div className="flex flex-col lg:flex-row md:text-xl lg:text-2xl leading-none flex-1 justify-around content-center">
+                    <div className="flex flex-col lg:flex-row text-xs sm:text-sm md:text-xl lg:text-2xl leading-none flex-1 justify-around content-center">
                         {attribute1 && <div className="self-center">{attribute1}</div>}
                         {attribute2 && <div className="self-center">{attribute2}</div>}
                     </div>

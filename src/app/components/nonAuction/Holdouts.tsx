@@ -98,8 +98,8 @@ const Holdouts = () => {
             <div key={p.player.mflId}>
               <TogglePlayerCardButton
                 player={p.player}
-                attribute1={`Current salary: $${p.originalSalary} · ${p.yearsRemaining} yr${p.yearsRemaining !== 1 ? "s" : ""} left`}
-                attribute2={`Demands: $${p.holdoutSalary} (+$${raise})`}
+                attribute1={`$${p.originalSalary} · ${p.yearsRemaining} yr${p.yearsRemaining !== 1 ? "s" : ""} left`}
+                attribute2={`Wants: $${p.holdoutSalary} (+$${raise})`}
                 onSelect={() =>
                   selectedPlayerIndex === index
                     ? setSelectedPlayerIndex(undefined)
@@ -112,7 +112,7 @@ const Holdouts = () => {
                 <div className="px-4 pb-2 flex gap-2 flex-wrap">
                   <Chip
                     icon={<TrendingUpIcon />}
-                    label={`Ranked as ${label} — paid below threshold ($${p.salaryComparison})`}
+                    label={`${label} · below $${p.salaryComparison} threshold`}
                     size="small"
                     color="warning"
                     variant="outlined"
