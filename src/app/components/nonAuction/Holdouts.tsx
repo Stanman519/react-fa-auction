@@ -40,7 +40,9 @@ const Holdouts = () => {
 
   const franchiseId = currentLeague?.mflfranchiseid;
   const holdouts = currentLeague?.holdoutCandidates ?? [];
-  const selected = selectedPlayerIndex !== undefined ? holdouts[selectedPlayerIndex] : undefined;
+  const pending = holdouts.filter(h => h.status === "Pending");
+  const accepted = holdouts.filter(h => h.status === "Accepted");
+  const selected = selectedPlayerIndex !== undefined ? pending[selectedPlayerIndex] : undefined;
 
   if (holdouts.length === 0) {
     return (
@@ -91,7 +93,7 @@ const Holdouts = () => {
           </Typography>
         </div>
 
-        {holdouts.map((p, index) => {
+        {pending.map((p, index) => {
           const raise = p.holdoutSalary - p.originalSalary;
           const label = tierLabel(p.player.position, p.scoreTier);
           return (
@@ -139,6 +141,38 @@ const Holdouts = () => {
               </Button>
             </div>
           )}
+
+        {accepted.length > 0 && (
+          <>
+            <div className="px-4 pt-4 pb-1">
+              <Typography variant="body2" color="text.secondary" fontWeight={600}>
+                Accepted
+              </Typography>
+            </div>
+            {accepted.map((p) => {
+              const raise = p.holdoutSalary - p.originalSalary;
+              return (
+                <div key={p.player.mflId}>
+                  <TogglePlayerCardButton
+                    player={p.player}
+                    attribute1={`$${p.originalSalary} → $${p.holdoutSalary} (+$${raise})`}
+                    attribute2=""
+                    onSelect={() => {}}
+                    isSelected={false}
+                  />
+                  <div className="px-4 pb-2 flex gap-2 flex-wrap">
+                    <Chip
+                      label="Accepted"
+                      size="small"
+                      color="success"
+                      variant="outlined"
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </>
+        )}
       </Card>
     </div>
   );

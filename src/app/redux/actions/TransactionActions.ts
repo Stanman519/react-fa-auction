@@ -393,8 +393,8 @@ export const submitHoldout =
       if (idx === -1) return;
       leagues[idx] = {
         ...leagues[idx],
-        holdoutCandidates: (leagues[idx].holdoutCandidates ?? []).filter(
-          (h) => h.id !== holdoutId,
+        holdoutCandidates: (leagues[idx].holdoutCandidates ?? []).map(
+          (h) => h.id === holdoutId ? { ...h, status: "Accepted" } : h,
         ),
       };
 

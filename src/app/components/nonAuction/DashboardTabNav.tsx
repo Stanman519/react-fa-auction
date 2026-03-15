@@ -42,8 +42,8 @@ export default function DashboardTabNav({
     >
       <Tabs
         variant={isDesktop ? "standard" : "scrollable"}
-        scrollButtons={isDesktop ? false : "auto"}
-        allowScrollButtonsMobile={!isDesktop}
+        scrollButtons="auto"
+        allowScrollButtonsMobile
         value={currentValue}
         onChange={handleChange}
         textColor="primary"
@@ -53,8 +53,8 @@ export default function DashboardTabNav({
             minWidth: { xs: "auto", sm: 120, md: 140 },
             fontSize: { xs: "0.7rem", sm: "0.75rem", md: "0.875rem" },
             fontWeight: 600,
-            letterSpacing: "0.05em",
-            px: { xs: 1.5, sm: 2, md: 3 },
+            letterSpacing: { xs: 0, sm: "0.05em" },
+            px: { xs: 1, sm: 2, md: 3 },
           },
         }}
       >

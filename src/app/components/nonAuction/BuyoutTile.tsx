@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useTheme } from "@mui/material/styles";
-import { Button, Card } from "@mui/material";
+import { Button, Card, Typography } from "@mui/material";
 import { useState } from "react";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { TogglePlayerCardButton } from "./TogglePlayerCardButton";
@@ -58,6 +58,11 @@ const BuyoutTile = () => {
       <Card className="max-w-4xl flex-1">
         {cutCandidates.length > 0 ? (
           <>
+            <div className="px-4 pt-4 pb-2">
+              <Typography variant="body2" color="text.secondary">
+                Cut a player at a reduced dead cap penalty: 20% of their remaining contract value hits next season only (instead of the usual 40%). Costs $15 to the league pot. One per season — use it wisely.
+              </Typography>
+            </div>
             <div>
               <div className="flex flex-row ml-2 mr-3 flex-1 ">
                 <div className="w-3/4 lg:w-3/5" />

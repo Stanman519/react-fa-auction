@@ -51,7 +51,7 @@ const HomeBase = () => {
   // --- Tab definitions ---
   // Seasonal tabs only appear when their season flag is on.
   // Always-present tabs hide when they have no data after first load.
-  const holdoutCount = currentLeague?.holdoutCandidates?.length ?? 0;
+  const holdoutCount = currentLeague?.holdoutCandidates?.filter(h => h.status === "Pending").length ?? 0;
   const taxiCount = currentLeague?.taxiPlayers?.length ?? 0;
   const tagCount = currentLeague?.tagCandidates?.length ?? 0;
   const buyoutCount = currentLeague?.cutCandidates?.length ?? 0;
@@ -68,10 +68,10 @@ const HomeBase = () => {
     // Always show HOLDOUTS so users know it exists; badge when there are candidates
     { label: "HOLDOUTS", value: "holdouts", badge: holdoutCount || undefined },
     ...(currentLeague?.league.isBuyoutSzn || buyoutCount > 0
-      ? [{ label: "AMNESTY BUYOUTS", value: "buyouts", badge: buyoutCount }]
+      ? [{ label: "AMNESTY BUYOUTS", value: "buyouts" }]
       : []),
     ...(currentLeague?.league.isFranchiseTagSzn || tagCount > 0
-      ? [{ label: "FRANCHISE TAGS", value: "tags", badge: tagCount }]
+      ? [{ label: "FRANCHISE TAGS", value: "tags" }]
       : []),
     ...(currentLeague?.league.isFranchiseTagSzn || waiverCount > 0
       ? [{ label: "WAIVER EXTENSION", value: "waiver", badge: waiverCount }]

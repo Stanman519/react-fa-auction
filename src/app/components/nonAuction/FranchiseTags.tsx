@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useTheme } from "@mui/material/styles";
-import { Button, Card } from "@mui/material";
+import { Button, Card, Typography } from "@mui/material";
 import { lastYear } from "../../services/Common";
 import { useEffect, useState } from "react";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
@@ -50,6 +50,11 @@ const FranchiseTags = () => {
         />
       )}
       <Card className="max-w-3xl flex-1">
+        <div className="px-4 pt-4 pb-2">
+          <Typography variant="body2" color="text.secondary">
+            Tag an expired-contract player to keep them for one more year. The price is the higher of a 20% raise or the avg salary of the top 6 at their position. You get one tag per season — max 2 years in a row, 3 times in a player's career.
+          </Typography>
+        </div>
         <div className="flex flex-col">
           <div className="flex flex-row ml-2 mr-3 flex-1 ">
             <div className="w-3/4" />
