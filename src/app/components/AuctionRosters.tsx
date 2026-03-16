@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  SelectChangeEvent,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Chip,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
+  Typography,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AuctionApiSvc, { RosterOwner } from "../services/AuctionApiSvc";
-import { OpposingFranchiseDTO } from "../redux/reducers/OwnerReducer";
 
 function AuctionRosters() {
   const { currentLeagueId } = useSelector((state: RootState) => state.profile);
@@ -24,85 +25,115 @@ function AuctionRosters() {
       (l) => l.league.leagueId === currentLeagueId,
     ),
   );
-  const dispatch = useDispatch();
   const [rosters, setRosters] = useState<RosterOwner[]>([]);
-  const [selection, setSelection] = useState<RosterOwner | undefined>(
-    undefined,
-  );
-  const [owners, setOwners] = useState<OpposingFranchiseDTO[]>([]);
-  useEffect(() => {
-    const ugh = async () => {
-      if (currentLeague?.league.leagueId) {
-        const res = await AuctionApiSvc.getRosters(
-          currentLeague.league.leagueId,
-        );
-        setRosters(res);
-        const owners = res.map((r) => {
-          return { ...r } as OpposingFranchiseDTO;
-        });
+  const [filter, setFilter] = useState("");
 
-        setOwners(owners);
+  useEffect(() => {
+    const fetchRosters = async () => {
+      if (currentLeague?.league.leagueId) {
+        const res = await AuctionApiSvc.getRosters(currentLeague.league.leagueId);
+        setRosters(res);
       }
     };
-    ugh();
+    fetchRosters();
   }, []);
-  const handleChange = (event: SelectChangeEvent) => {
-    const id = event.target.value;
-    const selection = rosters.find((r) => r.mflfranchiseid == +id);
-    if (!selection) return;
-    setSelection(selection);
+
+  const filtered = filter
+    ? rosters.filter((r) =>
+        r.teamName?.toLowerCase().includes(filter.toLowerCase()) ||
+        r.ownerName?.toLowerCase().includes(filter.toLowerCase()),
+      )
+    : rosters;
+
+  // Group picks by year for a franchise
+  const picksByYear = (picks: RosterOwner["draftPicks"]) => {
+    const groups: Record<string, string[]> = {};
+    (picks ?? []).forEach((p) => {
+      const yr = p.year ?? "?";
+      if (!groups[yr]) groups[yr] = [];
+      groups[yr].push(p.description ?? `Round ${p.round}`);
+    });
+    return groups;
   };
 
   return (
-    <div style={{ marginLeft: 8, marginRight: 8 }}>
+    <div style={{ marginLeft: 8, marginRight: 8, marginTop: 8 }}>
       <div className="text-3xl">Rosters</div>
-      <div>Presented By Eduardo</div>
-      <FormControl
-        style={{ marginTop: 8, marginRight: 16, marginLeft: 16, width: "50%" }}
-      >
-        <InputLabel id="demo-simple-select-label">Choose Team</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={`${selection?.mflfranchiseid}`}
-          label="Choose Team"
-          onChange={handleChange}
-        >
-          {owners.map((o) => {
-            return (
-              <MenuItem key={o.mflfranchiseid} value={o.mflfranchiseid}>
-                {o.ownerName}
-              </MenuItem>
-            );
-          })}
-        </Select>
-      </FormControl>
-      <TableContainer component={Paper} style={{ maxWidth: 800 }}>
-        <Table>
-          {(selection?.players?.length ?? 0) > 0 && (
-            <TableHead>
-              <TableRow>
-                <TableCell>First</TableCell>
-                <TableCell>Last</TableCell>
-                <TableCell>Pos</TableCell>
-                <TableCell>$$</TableCell>
-                <TableCell>Years</TableCell>
-              </TableRow>
-            </TableHead>
-          )}
-          {selection?.players.map((p) => {
-            return (
-              <TableRow>
-                <TableCell>{p.firstName}</TableCell>
-                <TableCell>{p.lastName}</TableCell>
-                <TableCell>{p.position}</TableCell>
-                <TableCell>{p.salary}</TableCell>
-                <TableCell>{p.length}</TableCell>
-              </TableRow>
-            );
-          })}
-        </Table>
-      </TableContainer>
+      <div style={{ marginBottom: 8 }}>Presented By Eduardo</div>
+      <TextField
+        size="small"
+        label="Filter team"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        style={{ marginBottom: 12, width: 240 }}
+      />
+      {filtered.map((r) => {
+        const picks = picksByYear(r.draftPicks);
+        const pickYears = Object.keys(picks).sort();
+        return (
+          <Accordion key={r.mflfranchiseid} defaultExpanded={false}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <div className="flex items-center gap-3 w-full">
+                <Typography fontWeight="bold">{r.teamName}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {r.ownerName}
+                </Typography>
+                <Chip
+                  size="small"
+                  label={`Cap: $${r.capRoom}`}
+                  color={r.capRoom >= 0 ? "success" : "error"}
+                  style={{ marginLeft: "auto" }}
+                />
+              </div>
+            </AccordionSummary>
+            <AccordionDetails style={{ padding: 0 }}>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>First</TableCell>
+                      <TableCell>Last</TableCell>
+                      <TableCell>Pos</TableCell>
+                      <TableCell>$$</TableCell>
+                      <TableCell>Years</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {r.players?.map((p) => (
+                      <TableRow key={p.mflId}>
+                        <TableCell>{p.firstName}</TableCell>
+                        <TableCell>{p.lastName}</TableCell>
+                        <TableCell>{p.position}</TableCell>
+                        <TableCell>{p.salary}</TableCell>
+                        <TableCell>{p.length}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              {pickYears.length > 0 && (
+                <div style={{ padding: "8px 16px" }}>
+                  <Typography variant="subtitle2" style={{ marginBottom: 4 }}>
+                    Draft Picks
+                  </Typography>
+                  {pickYears.map((yr) => (
+                    <div key={yr} style={{ marginBottom: 4 }}>
+                      <Typography variant="body2" fontWeight="bold">
+                        {yr}
+                      </Typography>
+                      {picks[yr].map((desc, i) => (
+                        <Typography key={i} variant="body2" style={{ paddingLeft: 12 }}>
+                          {desc}
+                        </Typography>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </AccordionDetails>
+          </Accordion>
+        );
+      })}
     </div>
   );
 }

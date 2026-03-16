@@ -65,6 +65,7 @@ export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number)
                                     <TableHead>
                                         <TableRow className="md:text-lg font-extrabold">
                                             <TableCell className="">Team</TableCell>
+                                            <TableCell className="">Cap</TableCell>
                                             {YEAR_RANGE?.map(y => <TableCell className="" key={y}>{y}</TableCell>)}
                                         </TableRow>
                                     </TableHead>
@@ -77,6 +78,7 @@ export default function LeagueCapDetails({ retHeight }: { retHeight: (h: number)
                                                 style={{ backgroundColor: selectedTeam === row?.franchiseId ? 'lightgray' : 'white', cursor: 'pointer' }}
                                                 key={row.franchiseId}>
                                                 <TableCell>{row.team}</TableCell>
+                                                <TableCell style={{ color: (row.capRoom ?? 0) >= 0 ? 'green' : 'red' }}>${row.capRoom ?? 0}</TableCell>
                                                 {YEAR_RANGE?.map(yr => {
                                                     return (<TableCell  key={yr}>${row.amount[yr.toString()] ?? 0}</TableCell>)
                                                 }

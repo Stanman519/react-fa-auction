@@ -23,6 +23,7 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
+import { TradeBaitDTO } from "../../models/MflModels";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { axiosInstance } from "../../services/axiosInstance";
@@ -59,6 +60,7 @@ const AdvancedContractTrades = () => {
     ),
   );
   const [isLoading, setIsLoading] = useState(true);
+  const [tradeBait, setTradeBait] = useState<TradeBaitDTO[]>([]);
   const [mySelectedAssets, setMySelectedAssets] = useState<TradeOfferAsset[]>(
     [],
   );
@@ -223,7 +225,18 @@ const AdvancedContractTrades = () => {
       }
     };
 
-    Promise.all([fetchPendingTrades(), fetchData()]).finally(() =>
+    const fetchTradeBait = async () => {
+      try {
+        const res = await axiosInstance.get<TradeBaitDTO[]>(
+          `${URL}/dashboard/leagues/${currentLeague?.league.leagueId}/trade-bait`,
+        );
+        setTradeBait(res.data);
+      } catch (error) {
+        console.error("Error fetching trade bait:", error);
+      }
+    };
+
+    Promise.all([fetchPendingTrades(), fetchData(), fetchTradeBait()]).finally(() =>
       setIsLoading(false),
     );
   }, []);
@@ -341,11 +354,23 @@ const AdvancedContractTrades = () => {
               >
                 {franchises
                   .filter((f) => +f.id !== currentLeague?.mflfranchiseid)
-                  .map((f) => (
-                    <MenuItem key={f.id} value={f.id}>
-                      {f.name}
-                    </MenuItem>
-                  ))}
+                  .map((f) => {
+                    const bait = tradeBait.find((tb) => tb.franchiseId === f.id);
+                    return (
+                      <MenuItem key={f.id} value={f.id}>
+                        <div>
+                          <div>{f.name}</div>
+                          {bait && (
+                            <div style={{ fontSize: 11, color: "#666", lineHeight: 1.3 }}>
+                              {bait.willGiveUp && <span>Offering: {bait.willGiveUp}</span>}
+                              {bait.willGiveUp && bait.inExchangeFor && <span> &bull; </span>}
+                              {bait.inExchangeFor && <span>Wants: {bait.inExchangeFor}</span>}
+                            </div>
+                          )}
+                        </div>
+                      </MenuItem>
+                    );
+                  })}
               </Select>
             </FormControl>
           )}

@@ -34,8 +34,16 @@ export interface PlayerTipResponse {
   yearMin: number;
   yearMax: number;
 }
+export interface FutureDraftPickDTO {
+  year: string;
+  round: string;
+  originalPickFor: string;
+  description: string;
+}
+
 export interface RosterOwner extends OpposingFranchiseDTO {
   players: PlayerDTO[];
+  draftPicks: FutureDraftPickDTO[];
 }
 
 const makeNewBid = async (bid: Bid): Promise<Response> => {

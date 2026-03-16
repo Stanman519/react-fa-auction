@@ -90,3 +90,9 @@ export interface DraftPick {
   description: string;
   pick: string;
 }
+
+export interface TradeBaitDTO {
+  franchiseId: string;
+  willGiveUp: string;
+  inExchangeFor: string;
+}

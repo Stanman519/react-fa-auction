@@ -34,6 +34,7 @@ export interface DeadCapInfo {
     amount: Record<string, number>
     team: string
     startingYear: number
+    capRoom: number
 }
 
 const defaultState = [] as Transaction[]
