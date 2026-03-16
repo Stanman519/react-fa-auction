@@ -12,7 +12,7 @@ export const OwnerPaymentManagement = (): JSX.Element => {
   useEffect(() => {
     const onLoad = async () => {
       const unpaid = await GeneralApiSvc.getUnpaidOwners();
-      setOwners(unpaid);
+      setOwners(unpaid ?? []);
     };
     onLoad();
   }, []);

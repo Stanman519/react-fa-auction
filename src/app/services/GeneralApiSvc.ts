@@ -758,6 +758,11 @@ const setCurrentMatchup = (
 //       return undefined;
 //     });
 // };
+const generateFranchiseTagValues = (leagueId: number, year: number) =>
+  axiosInstance.post(
+    `${URL}/dashboard/admin/leagues/${leagueId}/years/${year}/generate-franchise-tag-values`
+  ).then((res) => res.data);
+
 export default {
   synchronizeAuth,
   getCommunityStats,
@@ -793,4 +798,5 @@ export default {
   cancelTrade,
   acceptTrade,
   rejectTrade,
+  generateFranchiseTagValues,
 };

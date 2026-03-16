@@ -9,6 +9,7 @@ import {
   Avatar,
   ListItemText,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
@@ -23,6 +24,7 @@ import { TradeListItemHeader } from "./TradeListItemHeader";
 import { replyToTrade } from "../../redux/actions/TransactionActions";
 const PendingTrades = () => {
   const [pendingTrades, setPendingTrades] = useState<TradeRequest[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { currentLeagueId } = useSelector((state: RootState) => state.profile);
   const currentLeague = useSelector((state: RootState) =>
     state.profile.owner.leagues.find(
@@ -36,26 +38,28 @@ const PendingTrades = () => {
   };
 
   useEffect(() => {
-    const fetchPendingTrades = async () => {
-      const response = axiosInstance
-        .get(
-          `${URL}/dashboard/league/${currentLeague?.league.leagueId}/owners/${currentLeague?.leagueownerid}/mfl/${currentLeague?.mflfranchiseid}/pending-trades`,
-          {
-            headers: {
-              contentType: "application/json",
-            },
-          },
-        )
-        .then((res) => {
-          const data = res.data as PendingTradeResponse;
-          setPendingTrades(data.tradeRequests);
-        })
-        .catch((err) => {
-          console.log("error", err);
-        });
-    };
-    fetchPendingTrades();
+    axiosInstance
+      .get(
+        `${URL}/dashboard/league/${currentLeague?.league.leagueId}/owners/${currentLeague?.leagueownerid}/mfl/${currentLeague?.mflfranchiseid}/pending-trades`,
+        { headers: { contentType: "application/json" } },
+      )
+      .then((res) => {
+        const data = res.data as PendingTradeResponse;
+        setPendingTrades(data.tradeRequests);
+      })
+      .catch((err) => {
+        console.log("error", err);
+      })
+      .finally(() => setIsLoading(false));
   }, []);
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ width: "100%" }}>

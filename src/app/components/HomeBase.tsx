@@ -38,6 +38,7 @@ const HomeBase = () => {
   const nav = useNavigate();
 
   const [currentTab, setCurrentTab] = useState("league");
+  const [loadingTab, setLoadingTab] = useState<string | null>(null);
   // Track which tabs have already had their data fetched this session
   const fetchedTabs = useRef<Set<string>>(new Set(["league"]));
 
@@ -88,28 +89,32 @@ const HomeBase = () => {
   }, [currentLeagueId, authSynchronized, dispatch]);
 
   // Lazy load when a tab is first opened
-  const handleTabChange = (newTab: string) => {
+  const handleTabChange = async (newTab: string) => {
     setCurrentTab(newTab);
     if (fetchedTabs.current.has(newTab)) return;
     fetchedTabs.current.add(newTab);
-
-    switch (newTab) {
-      case "taxi":
-        dispatch(getTaxiSquadPlayers());
-        break;
-      case "holdouts":
-        dispatch(getHoldoutCandidates());
-        break;
-      case "buyouts":
-        dispatch(getBuyoutCandidates());
-        break;
-      case "tags":
-        dispatch(getFranchiseTagCandidates());
-        break;
-      case "waiver":
-        dispatch(getWaiverExtensionCandidates());
-        break;
-      // pending-trades and new-trades fetch their own data internally
+    setLoadingTab(newTab);
+    try {
+      switch (newTab) {
+        case "taxi":
+          await dispatch(getTaxiSquadPlayers() as any);
+          break;
+        case "holdouts":
+          await dispatch(getHoldoutCandidates() as any);
+          break;
+        case "buyouts":
+          await dispatch(getBuyoutCandidates() as any);
+          break;
+        case "tags":
+          await dispatch(getFranchiseTagCandidates() as any);
+          break;
+        case "waiver":
+          await dispatch(getWaiverExtensionCandidates() as any);
+          break;
+        // pending-trades and new-trades fetch their own data internally
+      }
+    } finally {
+      setLoadingTab(null);
     }
   };
 
@@ -204,11 +209,11 @@ const HomeBase = () => {
                     <TriTable />
                   </div>
                 )}
-                {currentTab === "tags" && <FranchiseTags />}
-                {currentTab === "taxi" && <TaxiSquadTile />}
-                {currentTab === "buyouts" && <BuyoutTile />}
-                {currentTab === "waiver" && <WaiverExtensions />}
-                {currentTab === "holdouts" && <Holdouts />}
+                {currentTab === "tags" && (loadingTab === "tags" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <FranchiseTags />)}
+                {currentTab === "taxi" && (loadingTab === "taxi" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <TaxiSquadTile />)}
+                {currentTab === "buyouts" && (loadingTab === "buyouts" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <BuyoutTile />)}
+                {currentTab === "waiver" && (loadingTab === "waiver" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <WaiverExtensions />)}
+                {currentTab === "holdouts" && (loadingTab === "holdouts" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <Holdouts />)}
                 {currentTab === "new-trades" && <AdvancedContractTrades />}
                 {currentTab === "pending-trades" && <PendingTrades />}
               </div>

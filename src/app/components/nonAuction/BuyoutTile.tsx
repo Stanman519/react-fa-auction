@@ -23,14 +23,14 @@ const BuyoutTile = () => {
       (l) => l.league.leagueId === currentLeagueId,
     ),
   );
-  const cutCandidates = currentLeague?.cutCandidates ?? [];
+  const cutCandidates = currentLeague?.cutCandidates;
 
   return (
     <div className="m-4 flex justify-center">
       {showModal &&
         selectedPlayerIndex !== undefined &&
         selectedPlayerIndex >= 0 &&
-        cutCandidates[selectedPlayerIndex!].salary && (
+        cutCandidates?.[selectedPlayerIndex!]?.salary && (
           <ConfirmModal
             isOpen={showModal}
             actionButtonLabel={"SUBMIT"}
@@ -41,12 +41,12 @@ const BuyoutTile = () => {
               dispatch(
                 submitBuyout(
                   currentLeague?.league.leagueId ?? 0,
-                  cutCandidates[selectedPlayerIndex!],
+                  cutCandidates![selectedPlayerIndex!],
                   currentLeague?.mflfranchiseid ?? 0,
                   Number(
                     (
                       Math.round(
-                        cutCandidates[selectedPlayerIndex!].salary! * 0.4 * 10,
+                        cutCandidates![selectedPlayerIndex!].salary! * 0.4 * 10,
                       ) / 10
                     ).toFixed(1),
                   ),
@@ -56,7 +56,11 @@ const BuyoutTile = () => {
           />
         )}
       <Card className="max-w-4xl flex-1">
-        {cutCandidates.length > 0 ? (
+        {cutCandidates === undefined ? (
+          <div className="p-4">
+            <Typography color="text.secondary">Unable to load buyout eligibility.</Typography>
+          </div>
+        ) : cutCandidates.length > 0 ? (
           <>
             <div className="px-4 pt-4 pb-2">
               <Typography variant="body2" color="text.secondary">
@@ -118,7 +122,7 @@ const BuyoutTile = () => {
             )}
           </>
         ) : (
-          <div>You used your buyout!</div>
+          <div className="p-4">You used your buyout!</div>
         )}
       </Card>
     </div>

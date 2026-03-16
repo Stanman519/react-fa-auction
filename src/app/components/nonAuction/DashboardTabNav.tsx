@@ -1,7 +1,7 @@
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import Badge from "@mui/material/Badge";
+import Chip from "@mui/material/Chip";
 import { useTheme, useMediaQuery } from "@mui/material";
 import React from "react";
 
@@ -64,13 +64,15 @@ export default function DashboardTabNav({
             value={t.value}
             label={
               t.badge && t.badge > 0 ? (
-                <Badge
-                  badgeContent={t.badge}
-                  color="error"
-                  sx={{ "& .MuiBadge-badge": { right: -8, top: -2 } }}
-                >
-                  <span style={{ paddingRight: 10 }}>{t.label}</span>
-                </Badge>
+                <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  {t.label}
+                  <Chip
+                    label={t.badge}
+                    color="error"
+                    size="small"
+                    sx={{ height: 18, fontSize: '0.65rem', '& .MuiChip-label': { px: 0.75 } }}
+                  />
+                </span>
               ) : (
                 t.label
               )

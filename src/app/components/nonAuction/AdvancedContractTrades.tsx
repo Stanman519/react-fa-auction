@@ -21,9 +21,11 @@ import {
   Slider,
   Snackbar,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { axiosInstance } from "../../services/axiosInstance";
 import {
   DashboardTradeLeagueDTO,
   MflFranchise,
@@ -56,6 +58,7 @@ const AdvancedContractTrades = () => {
       (l) => l.league.leagueId === currentLeagueId,
     ),
   );
+  const [isLoading, setIsLoading] = useState(true);
   const [mySelectedAssets, setMySelectedAssets] = useState<TradeOfferAsset[]>(
     [],
   );
@@ -192,65 +195,37 @@ const AdvancedContractTrades = () => {
   };
 
   useEffect(() => {
-    const fetchPendingTrades = async () => {
-      const response = axios
+    const fetchPendingTrades = () =>
+      axios
         .get(
           `${URL}/dashboard/league/${currentLeague?.league.leagueId}/owners/${currentLeague?.leagueownerid}/mfl/${currentLeague?.mflfranchiseid}/pending-trades`,
-          {
-            headers: {
-              contentType: "application/json",
-            },
-          },
+          { headers: { contentType: "application/json" } },
         )
         .then((res) => {
           const data = res.data as PendingTradeResponse;
           setPendingTrades(data.tradeRequests);
-          // newTeam.assets.players.forEach((a) => {
-          //   const foundPlayer = data.find((d) => d.mflId == a.mflId);
-          //   if (foundPlayer) {
-          //     a.fullName = foundPlayer.fullName;
-          //     a.age = foundPlayer.age;
-          //     a.position = foundPlayer.position;
-          //     a.team = foundPlayer.team;
-          //   }
-          // });
-          // const foundIndex = mflLeagueRoot?.franchises.findIndex(
-          //   (t) => t.id === tradeTeamId,
-          // );
-          // if (foundIndex !== undefined && foundIndex >= 0)
-          //   newLeague.franchises[foundIndex] = newTeam;
-          // setMflLeagueRoot(newLeague);
         })
         .catch((err) => {
           console.log("error", err);
         });
-    };
+
     const fetchData = async () => {
       try {
         const now = new Date();
         const year = now.getFullYear();
-        const response = await fetch(
+        const res = await axiosInstance.get<DashboardTradeLeagueDTO>(
           `${URL}/dashboard/leagues/${currentLeague?.league.leagueId}/years/${year}/franchises/${currentLeague?.mflfranchiseid}/full-mfl-league`,
-          {
-            headers: {
-              contentType: "application/json",
-            },
-          },
         );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = (await response.json()) as DashboardTradeLeagueDTO;
-        setMflLeagueRoot(data);
-        setFranchises(data.franchises);
+        setMflLeagueRoot(res.data);
+        setFranchises(res.data.franchises);
       } catch (error) {
-        //@ts-ignore
         console.error("Error fetching data:", error);
       }
     };
-    fetchPendingTrades();
-    fetchData();
+
+    Promise.all([fetchPendingTrades(), fetchData()]).finally(() =>
+      setIsLoading(false),
+    );
   }, []);
 
   useEffect(() => {
@@ -265,17 +240,12 @@ const AdvancedContractTrades = () => {
       const playerIds = newTeam.assets.players.map((p) => p.mflId).join(",");
       const now = new Date();
       const year = now.getFullYear();
-      const response = axios
-        .get(
+      const response = axiosInstance
+        .get<PlayerDTO[]>(
           `${URL}/dashboard/leagues/${currentLeague?.league.leagueId}/years/${year}/playerIds/${playerIds}`,
-          {
-            headers: {
-              contentType: "application/json",
-            },
-          },
         )
         .then((res) => {
-          const data = res.data as PlayerDTO[];
+          const data = res.data;
           newTeam.assets.players.forEach((a) => {
             const foundPlayer = data.find((d) => d.mflId == a.mflId);
             if (foundPlayer) {
@@ -328,43 +298,26 @@ const AdvancedContractTrades = () => {
   const handleReset = () => {
     setActiveStep(0);
   };
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ width: "100%" }}>
+      <Typography variant="body2" color="text.secondary" sx={{ px: 2, pt: 2, pb: 1 }}>
+        Propose a contract trade with cap retention. Both teams can optionally retain a portion of traded players' salaries, which counts against the retaining team's cap.
+      </Typography>
       <Stepper activeStep={activeStep}>
-        {steps.map((label, index) => {
-          const stepProps: { completed?: boolean } = {};
-          const labelProps: {
-            optional?: React.ReactNode;
-          } = {};
-          return (
-            <Step key={label} {...stepProps}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
-            </Step>
-          );
-        })}
+        {steps.map((label) => (
+          <Step key={label}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
+        ))}
       </Stepper>
-      <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-        <Button
-          color="inherit"
-          disabled={activeStep === 0}
-          onClick={handleBack}
-          sx={{ mr: 1 }}
-        >
-          Back
-        </Button>
-        <Box sx={{ flex: "1 1 auto" }} />
-        <Button
-          onClick={handleNext}
-          disabled={
-            (activeStep == 0 && !tradeTeamId) ||
-            (activeStep == 1 &&
-              mySelectedAssets.length === 0 &&
-              otherSelectedAssets.length === 0)
-          }
-        >
-          {activeStep === steps.length - 1 ? "Submit" : "Next"}
-        </Button>
-      </Box>
       {activeStep === steps.length ? (
         <React.Fragment>
           <Typography sx={{ mt: 2, mb: 1 }}>
@@ -379,8 +332,10 @@ const AdvancedContractTrades = () => {
         <React.Fragment>
           {activeStep === 0 && (
             <FormControl fullWidth>
-              <InputLabel>Trading Partner</InputLabel>
+              <InputLabel id="trade-partner-label">Trading Partner</InputLabel>
               <Select
+                labelId="trade-partner-label"
+                label="Trading Partner"
                 onChange={(e) => setTradeTeamId(e.target.value)}
                 value={tradeTeamId}
               >
@@ -395,7 +350,7 @@ const AdvancedContractTrades = () => {
             </FormControl>
           )}
           {activeStep === 1 && (
-            <div className="flex md:flex-row">
+            <div className="flex flex-col md:flex-row gap-4 p-2">
               <Card sx={{ borderWidth: 1, borderColor: "black", padding: 1 }}>
                 <Typography>My Assets</Typography>
                 <FormControl>
@@ -408,6 +363,7 @@ const AdvancedContractTrades = () => {
                     })
                     .map((mp) => (
                       <FormControlLabel
+                        key={mp.mflId}
                         control={
                           <Checkbox
                             checked={Boolean(
@@ -423,24 +379,7 @@ const AdvancedContractTrades = () => {
                             }}
                           />
                         }
-                        label={
-                          <Box
-                            sx={{
-                              flexDirection: "row",
-                              display: "flex",
-                              flexWrap: "wrap",
-                            }}
-                          >
-                            <Typography sx={{ marginRight: 1 }}>
-                              {mp.fullName}{" "}
-                            </Typography>
-                            <Typography>({mp.position}</Typography>
-                            <span> &nbsp;-&nbsp; </span>
-                            <Typography>{mp.team}) </Typography>
-                            <Typography>&nbsp;${mp.salary}/</Typography>
-                            <Typography>{mp.length} yr</Typography>
-                          </Box>
-                        }
+                        label={`${mp.fullName} (${mp.position} - ${mp.team}) $${mp.salary}/${mp.length}yr`}
                       />
                     ))}
                   {mflLeagueRoot?.franchises
@@ -482,45 +421,27 @@ const AdvancedContractTrades = () => {
                       const positionB = b?.position ?? "";
                       return positionA.localeCompare(positionB);
                     })
-                    .map((mp) => {
-                      return (
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={
-                                !!otherSelectedAssets.find(
-                                  (a) => a.mflId === mp.mflId.toString(),
-                                )
-                              }
-                              onChange={(e) =>
-                                handleOtherAssetChange(
-                                  mp.mflId.toString(),
-                                  e.target.checked,
-                                )
-                              }
-                            />
-                          }
-                          label={
-                            <Box
-                              sx={{
-                                flexDirection: "row",
-                                display: "flex",
-                                flexWrap: "wrap",
-                              }}
-                            >
-                              <Typography sx={{ marginRight: 1 }}>
-                                {mp.fullName}{" "}
-                              </Typography>
-                              <Typography>({mp.position}</Typography>
-                              <span> &nbsp;-&nbsp; </span>
-                              <Typography>{mp.team}) </Typography>
-                              <Typography>&nbsp;${mp.salary}/</Typography>
-                              <Typography>{mp.length} yr</Typography>
-                            </Box>
-                          }
-                        />
-                      );
-                    })}
+                    .map((mp) => (
+                      <FormControlLabel
+                        key={mp.mflId}
+                        control={
+                          <Checkbox
+                            checked={
+                              !!otherSelectedAssets.find(
+                                (a) => a.mflId === mp.mflId.toString(),
+                              )
+                            }
+                            onChange={(e) =>
+                              handleOtherAssetChange(
+                                mp.mflId.toString(),
+                                e.target.checked,
+                              )
+                            }
+                          />
+                        }
+                        label={`${mp.fullName} (${mp.position} - ${mp.team}) $${mp.salary}/${mp.length}yr`}
+                      />
+                    ))}
                   {mflLeagueRoot?.franchises
                     .find((f) => f.id === tradeTeamId)
                     ?.assets.currentYearDraftPicks.concat(
@@ -552,9 +473,9 @@ const AdvancedContractTrades = () => {
           {activeStep === 2 && (
             <div className="flex flex-col md:flex-row p-1 md:justify-around">
               <Card
-                style={{
-                  padding: 4,
-                  margin: 10,
+                sx={{
+                  p: 2,
+                  m: 1,
                   flexDirection: "column",
                   alignItems: "center",
                   flex: 1,
@@ -634,9 +555,9 @@ const AdvancedContractTrades = () => {
                 })}
               </Card>
               <Card
-                style={{
-                  padding: 4,
-                  margin: 10,
+                sx={{
+                  p: 2,
+                  m: 1,
                   flexDirection: "column",
                   alignItems: "center",
                   flex: 1,
@@ -718,6 +639,28 @@ const AdvancedContractTrades = () => {
               </Card>
             </div>
           )}
+          <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+            <Button
+              color="inherit"
+              disabled={activeStep === 0}
+              onClick={handleBack}
+              sx={{ mr: 1 }}
+            >
+              Back
+            </Button>
+            <Box sx={{ flex: "1 1 auto" }} />
+            <Button
+              onClick={handleNext}
+              disabled={
+                (activeStep == 0 && !tradeTeamId) ||
+                (activeStep == 1 &&
+                  mySelectedAssets.length === 0 &&
+                  otherSelectedAssets.length === 0)
+              }
+            >
+              {activeStep === steps.length - 1 ? "Submit" : "Next"}
+            </Button>
+          </Box>
         </React.Fragment>
       )}
 
