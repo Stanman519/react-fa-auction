@@ -34,7 +34,7 @@ export default function TriTable() {
   const getDataAndFormat = () => {
     axios
       .get(
-        `https://capncrunch-api.azurewebsites.net/Mfl/leagues/${leagueId}/years/${thisYear}/standings`,
+        `${process.env.REACT_APP_BOT_API_URL || 'https://capncrunch-api.azurewebsites.net'}/Mfl/leagues/${leagueId}/years/${thisYear}/standings`,
       )
       .then((res) => {
         let sorted = res.data.sort(

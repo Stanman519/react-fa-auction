@@ -15,7 +15,10 @@
       "Bash(find /c/Users/Stanley/Development/free-agency-auction-api -name \"*.cs\" -type f | xargs grep -l \"GetTokenAsync\\\\|User\\\\.Claims\\\\|User\\\\.FindFirst\\\\|sub\" | head -20)",
       "Bash(cd /c/Users/Stanley/Development/free-agency-auction-api && grep -r \"sub\\\\|User\\\\.Claims\\\\|User\\\\.Identity\" FreeAgencyAuctionAPI/*.cs | grep -v \"Sub \" | head -20)",
       "Bash(npm install:*)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "Bash(gh run:*)",
+      "Bash(cd \"C:/Users/Stanley/Development/free-agency-auction-api\" && dotnet build 2>&1 | tail -20)",
+      "Bash(find /c/Users/Stanley/Development/free-agency-auction-api -type f -name \"*.cs\" | xargs grep -l \"class.*PlayerRepo\" | head -5)"
     ]
   }
 }
