@@ -30,7 +30,7 @@ export const synchronizeAuth0WithDbLogin =
     const dbUser = await GeneralApiSvc.synchronizeAuth(user);
     console.log("[synchronizeAuth0WithDbLogin] API returned dbUser:", dbUser);
 
-    var pool = dbUser.pools.length > 0 ? dbUser.pools[0] : undefined;
+    var pool = dbUser.pools && dbUser.pools.length > 0 ? dbUser.pools[0] : undefined;
     dispatch(updateOverUnders({ ...overUnders, currentPool: pool }));
 
     // Respect the user's last-used league if it's still in their league list
