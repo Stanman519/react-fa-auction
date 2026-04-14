@@ -27,32 +27,39 @@ export const synchronizeAuth0WithDbLogin =
     const { overUnders } = getState();
 
     console.log("[synchronizeAuth0WithDbLogin] Calling API...");
-    const dbUser = await GeneralApiSvc.synchronizeAuth(user);
-    console.log("[synchronizeAuth0WithDbLogin] API returned dbUser:", dbUser);
+    try {
+      const dbUser = await GeneralApiSvc.synchronizeAuth(user);
+      console.log("[synchronizeAuth0WithDbLogin] API returned dbUser:", dbUser);
 
-    var pool = dbUser.pools && dbUser.pools.length > 0 ? dbUser.pools[0] : undefined;
-    dispatch(updateOverUnders({ ...overUnders, currentPool: pool }));
+      var pool = dbUser.pools && dbUser.pools.length > 0 ? dbUser.pools[0] : undefined;
+      dispatch(updateOverUnders({ ...overUnders, currentPool: pool }));
 
-    // Respect the user's last-used league if it's still in their league list
-    const storedId = localStorage.getItem(LEAGUE_PREF_KEY);
-    const storedLeagueId = storedId ? parseInt(storedId, 10) : null;
-    const preferredLeague = storedLeagueId
-      ? dbUser.leagues.find((l) => l.league.leagueId === storedLeagueId)
-      : null;
-    const currentLeagueId =
-      preferredLeague?.league.leagueId ??
-      (dbUser.leagues.length > 0 ? dbUser.leagues[0].league.leagueId : undefined);
+      // Respect the user's last-used league if it's still in their league list
+      const storedId = localStorage.getItem(LEAGUE_PREF_KEY);
+      const storedLeagueId = storedId ? parseInt(storedId, 10) : null;
+      const preferredLeague = storedLeagueId
+        ? dbUser.leagues.find((l) => l.league.leagueId === storedLeagueId)
+        : null;
+      const currentLeagueId =
+        preferredLeague?.league.leagueId ??
+        (dbUser.leagues.length > 0 ? dbUser.leagues[0].league.leagueId : undefined);
 
-    const updatedProfile = {
-      ...profile,
-      owner: dbUser,
-      currentLeagueId,
-      authSynchronized: true,
-      authUser: user,
-    };
-    
-    console.log("[synchronizeAuth0WithDbLogin] Dispatching updated profile:", updatedProfile);
-    dispatch(updateLoginInfo(updatedProfile));
+      const updatedProfile = {
+        ...profile,
+        owner: dbUser,
+        currentLeagueId,
+        authSynchronized: true,
+        authUser: user,
+        authError: undefined,
+      };
+
+      console.log("[synchronizeAuth0WithDbLogin] Dispatching updated profile:", updatedProfile);
+      dispatch(updateLoginInfo(updatedProfile));
+    } catch (err: any) {
+      // Render may be cold-starting (takes up to 45s) or API is down — surface so user sees retry UI instead of infinite spinner
+      console.error("[synchronizeAuth0WithDbLogin] API failed:", err);
+      dispatch(updateLoginInfo({ ...profile, authError: err?.message ?? "Login failed" }));
+    }
   };
 
 export const updateCurrentLeague =

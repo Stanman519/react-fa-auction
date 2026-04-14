@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../redux/reducers/RootReducer";
 import { CircularProgress } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
+import { synchronizeAuth0WithDbLogin, updateLoginInfo } from "../redux/actions/LoginActions";
 
 /**
  * AuthCallback component.
@@ -19,12 +21,19 @@ import { useNavigate, useLocation } from "react-router-dom";
  *    - / (HomeBase) otherwise
  */
 const AuthCallback: React.FC = () => {
-  const { authSynchronized, owner, currentLeagueId } = useSelector(
-    (s: RootState) => s.profile,
-  );
+  const profile = useSelector((s: RootState) => s.profile);
+  const { authSynchronized, owner, currentLeagueId, authError } = profile;
   const navigate = useNavigate();
   const location = useLocation();
   const returnTo = (location.state as any)?.returnTo ?? null;
+  const dispatch = useDispatch();
+  const { user } = useAuth0();
+
+  const retry = () => {
+    if (!user) return;
+    dispatch(updateLoginInfo({ ...profile, authError: undefined }));
+    (dispatch as any)(synchronizeAuth0WithDbLogin(user));
+  };
 
   useEffect(() => {
     console.log("[AuthCallback] Render state:", {
@@ -78,8 +87,35 @@ const AuthCallback: React.FC = () => {
     }
   }, [authSynchronized, owner, currentLeagueId, navigate, returnTo]);
 
-  // Show loading spinner while waiting for sync
   const logo = "./stanfan-color-logo.png";
+
+  if (authError) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen gap-4 p-4">
+        <img className="max-w-xs" src={logo} />
+        <p style={{ fontSize: 16, color: "#f87171", textAlign: "center" }}>
+          Couldn't sign you in: {authError}
+        </p>
+        <p style={{ fontSize: 13, color: "#ccc", textAlign: "center", maxWidth: 360 }}>
+          Server may be waking up (free tier). Wait a few seconds and retry.
+        </p>
+        <button
+          onClick={retry}
+          style={{
+            padding: "8px 20px",
+            background: "#2563eb",
+            color: "white",
+            borderRadius: 6,
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-row justify-center items-center max-w-screen-sm min-h-screen ">
       <div className="flex-col justify-center items-center max-w-full p-4 m-4 ">

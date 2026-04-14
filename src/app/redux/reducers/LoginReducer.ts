@@ -8,6 +8,7 @@ export interface LoginState {
   authUser?: User;
   authSynchronized: boolean;
   redirected: string;
+  authError?: string;
 }
 
 const defaultState: LoginState = {

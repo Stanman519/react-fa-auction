@@ -9,7 +9,7 @@ import axios from "axios";
  * your Auth0 application must have an API audience configured and that audience
  * must be passed to Auth0Provider via `authorizationParams.audience`.
  */
-export const axiosInstance = axios.create();
+export const axiosInstance = axios.create({ timeout: 45000 });
 
 type GetTokenFn = () => Promise<string>;
 let getTokenFn: GetTokenFn | null = null;

@@ -161,12 +161,7 @@ const synchronizeAuth = (authUser: User): Promise<Owner> => {
         "Content-Type": "application/json",
       },
     })
-    .then((res) => {
-      return res.data;
-    })
-    .catch(() => {
-      return undefined;
-    });
+    .then((res) => res.data);
 };
 
 const getMatchups = (
