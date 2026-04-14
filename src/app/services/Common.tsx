@@ -23,7 +23,7 @@ export interface BidValidity {
 
 const file = process.env.PUBLIC_URL + "/avatars/";
 
-export const lastYear = 2024;
+export const lastYear = new Date().getFullYear() - 1;
 
 export const checkValidity = (
   league: LeagueLoginInfo,
