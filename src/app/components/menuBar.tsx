@@ -132,11 +132,14 @@ export function MenuBar() {
                       </MenuItem>
                     )}
                     
+                    {hasFantasyLeague && (
+                      <MenuItem onClick={() => { navigate("/rosters"); setAnchorEl(null); }}>
+                        Rosters
+                      </MenuItem>
+                    )}
+
                     {/* Auction-specific options (only on auction page) */}
                     {isOnAuctionPage && [
-                      <MenuItem key="rosters" onClick={() => { navigate("/rosters"); setAnchorEl(null); }}>
-                        Rosters
-                      </MenuItem>,
                       <MenuItem key="salary-caps" onClick={() => {
                         dispatch(updateUI({ modal: "team-caps-slab" }));
                         setAnchorEl(null);
@@ -220,6 +223,12 @@ export function MenuBar() {
                     </Button>
                   )}
 
+                  {hasFantasyLeague && (
+                    <Button color="inherit" onClick={() => navigate("/rosters")}>
+                      Rosters
+                    </Button>
+                  )}
+
                   {/* Auction-specific options (only on auction page) */}
                   {isOnAuctionPage && (
                     <>
@@ -228,9 +237,6 @@ export function MenuBar() {
                         onClick={() => dispatch(updateUI({ modal: "team-caps-slab" }))}
                       >
                         Salary Caps
-                      </Button>
-                      <Button color="inherit" onClick={() => navigate("/rosters")}>
-                        Rosters
                       </Button>
                       {owner.ownername &&
                       lots.filter((l) => !l.bid).length > 0 &&

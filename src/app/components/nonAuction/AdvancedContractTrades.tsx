@@ -41,7 +41,10 @@ import { TradeListItemHeader } from "./TradeListItemHeader";
 import { submitTradeRequest } from "../../redux/actions/TransactionActions";
 import { updateUI } from "../../redux/actions/UiActions";
 import { RootState } from "../../redux/reducers/RootReducer";
+import { TERMINAL_UI_ENABLED } from "../../../theme";
+import AdvancedContractTradesTerminal from "./AdvancedContractTradesTerminal";
 const AdvancedContractTrades = () => {
+  if (TERMINAL_UI_ENABLED) return <AdvancedContractTradesTerminal />;
   const dispatch = useDispatch();
   const { modal, errorText } = useSelector((state: RootState) => state.ui);
 

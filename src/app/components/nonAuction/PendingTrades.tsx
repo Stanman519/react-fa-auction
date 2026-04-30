@@ -22,7 +22,10 @@ import {
 import { URL } from "../../services/AuctionApiSvc";
 import { TradeListItemHeader } from "./TradeListItemHeader";
 import { replyToTrade } from "../../redux/actions/TransactionActions";
+import { TERMINAL_UI_ENABLED } from "../../../theme";
+import PendingTradesTerminal from "./PendingTradesTerminal";
 const PendingTrades = () => {
+  if (TERMINAL_UI_ENABLED) return <PendingTradesTerminal />;
   const [pendingTrades, setPendingTrades] = useState<TradeRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { currentLeagueId } = useSelector((state: RootState) => state.profile);

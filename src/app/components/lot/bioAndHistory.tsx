@@ -1,178 +1,174 @@
-
-import { ListItem, ListItemAvatar, Avatar, ListItemText, List, Button, ButtonGroup, Drawer, Container, Typography, TableCell, Table, TableBody, TableContainer, TableHead, TableRow, Card, CardMedia, CardContent, useTheme, Divider, Skeleton } from "@mui/material";
-import { useState } from "react";
+import { Avatar, Box, Drawer, IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
-import { PlayerBio } from "../../redux/reducers/FreeAgentReducer";
-import { Bid } from "../../redux/reducers/LotReducer";
-import AuctionApiSvc from "../../services/AuctionApiSvc";
-import { getRankStringSuffix, lastYear, ownerMap, tmColorMap } from "../../services/Common";
 import { RootState } from "../../store";
 import { updateUI } from "../../redux/actions/UiActions";
+import { terminal, fontStacks } from "../../../theme";
+import { dfs } from "../nonAuction/terminal/tokens";
 
+const labelSx = {
+  fontFamily: fontStacks.mono,
+  fontSize: dfs(10),
+  letterSpacing: "0.08em",
+  color: terminal.textMute,
+  textTransform: "uppercase" as const,
+};
 
-export const PlayerBioSlab = (): JSX.Element => {
-    const { isLoading, modal, currentPlayerBio } = useSelector((state: RootState) => state.ui)
-    let bio = currentPlayerBio
-    const theme = useTheme()
-    const slabWidthMultiplier = window.innerWidth < 720 ? 0.7 : 0.4;
-const dispatch = useDispatch()
-    const getLocalBidTimeStamp = (expires: Date) => {
-        let dayBefore = new Date(expires);
-        dayBefore.setUTCDate(expires.getUTCDate() - 1)
-        return `${dayBefore.toLocaleDateString()} ${dayBefore.toLocaleTimeString()} `
-    }
-    return (
-        <> 
-            <div style={{ display: 'flex', width: '100%' }}>
-                <Drawer 
-
-                    sx={{backgroundColor: 'transparent'}}
-                    open={modal ===  'player-bio-slab'}
-                    variant="temporary"
-                    anchor="right"
-                    onClose={() => dispatch(updateUI({modal: undefined}))}
-                >
-                    <Container style={{ backgroundColor: theme.palette.background.default, width: window.innerWidth * slabWidthMultiplier, maxWidth: 600, flexDirection: 'column', flex: 1 }}>
-                        {isLoading !== 'slab' ?
-                        <Card sx={{marginTop: '20px' }}>
-                            <CardMedia component='img' image={bio?.actionShot} />
-                                <CardContent>
-                                    <List>
-                                        <ListItem>
-                                            <ListItemText>
-                                                <Typography variant="h3">{bio?.firstName.toUpperCase()} {bio?.lastName.toUpperCase()}</Typography>
-                                            </ListItemText>
-                                        </ListItem>
-                                        <Divider /> 
-                                        <ListItem >
-                                            <ListItemText>
-                                                <Typography variant="h5"> {tmColorMap.find(tm => tm.team=== bio?.team)?.nickname ?? "Free Agent"} {bio?.position}</Typography>
-                                            </ListItemText>
-                                        </ListItem>
-                                        <Divider /> 
-                                        <ListItem>
-                                            <ListItemText>
-                                                {bio?.height && bio?.weight && <Typography variant="h5">{Math.floor(bio?.height / 12)}'{Math.floor(bio?.height % 12)}"</Typography>
-}</ListItemText>
-                                        </ListItem>
-                                        <ListItem>
-                                            <ListItemText>
-                                                <Typography variant="h5">{bio?.weight} lbs </Typography>
-                                            </ListItemText>
-                                        </ListItem>
-                                        <ListItem>
-                                            <ListItemText>
-                                                <Typography variant="h5">Age: {bio?.age}</Typography>
-                                            </ListItemText>
-                                        </ListItem>
-                                        <Divider /> 
-                                        <ListItem>
-                                            <ListItemText secondary={bio?.draftRound ? `Rd. ${bio?.draftRound} Pk. ${bio?.draftPick} (${bio?.college})` : ''}>
-                                                <Typography variant="h5">{bio?.draftRound ? `Drafted: ${bio?.draftYear}`: `${bio?.draftYear} undrafted`}</Typography>
-                                            </ListItemText>
-                                        </ListItem>
-                                        <Divider />
-                                        {/* {(bio?.lastSeasonSalary && bio.lastSeasonSalary > 0) && 
-                                        <ListItem>
-                                            <ListItemText secondary={`(${bio?.prevOwner})`}>
-                                                <div>{`2023 Salary: ${bio?.lastSeasonSalary}`}</div>
-                                            </ListItemText>
-                                        </ListItem>} */}
-                                    </List>
-                                </CardContent> 
-                        </Card>
-                        : 
-                        <>
-                            <Skeleton variant="rectangular" height={window.innerWidth/2}/>
-                            <Skeleton variant="text"/>
-                            <Skeleton variant="text"/>
-                            <Skeleton variant="text"/>
-                            <Skeleton variant="text"/>
-                        </> }
-                        {bio?.positionRanks.some(yr => yr.points > 0) &&
-                            <Card sx={{bgcolor: theme.palette.background.paper, marginTop: '20px', marginBottom: '20px'}}>
-                                <CardContent style={{padding: 8}}>
-                                    {!isLoading ? <TableContainer >
-                                        <Table size="small">
-                                            <TableHead >
-                                                <TableRow >
-                                                    <TableCell></TableCell>
-                                                    <TableCell style={{fontWeight: 'bold'}} align="right">PTS</TableCell>
-                                                    <TableCell style={{fontWeight: 'bold'}} align="right">POS RNK</TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {bio?.positionRanks.map((row) =>
-                                                    <TableRow key={row.year}>
-                                                        <TableCell style={{fontWeight: 'bold', marginRight: 0}} align="left">{row.year}</TableCell>
-                                                        <TableCell align="right">{Math.floor(row.points)}</TableCell>
-                                                        <TableCell align="right">{getRankStringSuffix(row.rank)}</TableCell>
-                                                    </TableRow>
-                                                )}
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer> :
-                                    <Skeleton variant="rectangular" />
-                                    }
-
-                                </CardContent>
-                            </Card>
-                        }
-                    </Container>
-                </Drawer>
-
-                {/* <ButtonGroup sx={{ display: 'flex', width: '100%' }} aria-label="small button group">
-                    <Button  sx={{ flex: 1 }} onClick={() => loadBio()}>Bio</Button>
-                    {bid?.expires && <Button sx={{ flex: 2, lineHeight: '14px' }} onClick={() => loadHistory()}>Bid History</Button>}
-                    <Button>Open Offer Sheet</Button>
-                </ButtonGroup> */}
-
-            </div> 
-        </>
-    );
-}
+const formatTimestamp = (expires: Date) => {
+  const dayBefore = new Date(expires);
+  dayBefore.setUTCDate(expires.getUTCDate() - 1);
+  return `${dayBefore.toLocaleDateString()} ${dayBefore.toLocaleTimeString()}`;
+};
 
 export const BidHistorySlab = (): JSX.Element => {
-    const { owners } = useSelector((state: RootState) => state)
-    const { modal, currentBidHistory } = useSelector((state: RootState) => state.ui)
-    const dispatch = useDispatch()
-    const getLocalBidTimeStamp = (expires: Date) => {
-        let dayBefore = new Date(expires);
-        dayBefore.setUTCDate(expires.getUTCDate() - 1)
-        return `${dayBefore.toLocaleDateString()} ${dayBefore.toLocaleTimeString()} `
-    }
-    return (
-        <>
-            <div style={{ display: 'flex', width: '100%' }}>
+  const owners = useSelector((s: RootState) => s.owners);
+  const { modal, currentBidHistory, isMobile } = useSelector(
+    (s: RootState) => s.ui,
+  );
+  const dispatch = useDispatch();
+  const close = () => dispatch(updateUI({ modal: undefined }));
+  const open = modal === "bid-history-slab";
+  const bottom = !!isMobile;
 
-                <Drawer
-                    open={modal === 'bid-history-slab'}
-                    variant="temporary"
-                    anchor="right"
-                    onClose={() => dispatch(updateUI({modal: undefined}))}
+  return (
+    <Drawer
+      open={open}
+      onClose={close}
+      variant="temporary"
+      anchor={bottom ? "bottom" : "right"}
+      sx={{ zIndex: (t) => t.zIndex.modal + 1 }}
+      PaperProps={{
+        sx: {
+          background: terminal.bg,
+          color: terminal.text,
+          ...(bottom
+            ? {
+                borderTop: `1px solid ${terminal.lineBold}`,
+                borderTopLeftRadius: 8,
+                borderTopRightRadius: 8,
+                maxHeight: "75vh",
+                width: "100%",
+              }
+            : {
+                borderLeft: `1px solid ${terminal.lineBold}`,
+                width: "min(420px, 90vw)",
+              }),
+        },
+      }}
+      ModalProps={{ keepMounted: false }}
+    >
+      {bottom && (
+        <Box sx={{ display: "flex", justifyContent: "center", pt: 0.75 }}>
+          <Box
+            sx={{
+              width: 40,
+              height: 4,
+              borderRadius: 2,
+              background: terminal.lineBold,
+            }}
+          />
+        </Box>
+      )}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          px: 1.5,
+          py: 1,
+          background: terminal.panel,
+          borderBottom: `1px solid ${terminal.line}`,
+        }}
+      >
+        <Box sx={{ ...labelSx, fontSize: dfs(11), color: terminal.text }}>
+          Bid History
+        </Box>
+        <IconButton
+          size="small"
+          onClick={close}
+          sx={{ color: terminal.textDim }}
+        >
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </Box>
+      <Box sx={{ overflowY: "auto", flex: 1 }}>
+        {(!currentBidHistory || currentBidHistory.length === 0) && (
+          <Box
+            sx={{
+              ...labelSx,
+              textAlign: "center",
+              py: 4,
+            }}
+          >
+            No bids yet
+          </Box>
+        )}
+        {currentBidHistory?.map((p) => {
+          const owner = owners.find((o) => o.leagueownerid === p.ownerId);
+          return (
+            <Box
+              key={p.bidId}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.25,
+                px: 1.5,
+                py: 1,
+                borderBottom: `1px solid ${terminal.line}`,
+              }}
+            >
+              <Avatar
+                src={owner?.avatar}
+                sx={{ width: 32, height: 32 }}
+                imgProps={{ referrerPolicy: "no-referrer" }}
+              />
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Box
+                  sx={{
+                    fontFamily: fontStacks.sans,
+                    fontSize: dfs(12),
+                    color: terminal.text,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
                 >
-                    <Container>
-                        <List dense>
-                            {currentBidHistory?.map(p =>{
-                                const avatar = owners.find(o => o.leagueownerid === p.ownerId)?.avatar
-                                return (<ListItem key={p.bidId}>
-                                    <img onClick={() => console.log('hi')}  src={avatar} referrerPolicy="no-referrer" style={{ height: 0, width: 0 }} />
-                                    <ListItemAvatar>
-                                        <Avatar src={avatar}/>
-                                    </ListItemAvatar>
-                                    <ListItemText
-                                        primary={`$${p.bidSalary}, ${p.bidLength} ${p.bidLength=== 1 ? 'year' : 'years'}`}
-                                        secondary={`${getLocalBidTimeStamp(new Date(p.expires ?? ""))}`}
-                                    />
-                                </ListItem>)
-})}
-                        </List>
-                    </Container>
-                </Drawer>
-            </div>
-        </>
-    );
-}
-
-
-
+                  {owner?.ownerName ?? "—"}
+                </Box>
+                <Box
+                  sx={{
+                    fontFamily: fontStacks.mono,
+                    fontSize: dfs(10),
+                    color: terminal.textDim,
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
+                  {p.expires ? formatTimestamp(new Date(p.expires)) : ""}
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  fontFamily: fontStacks.mono,
+                  fontSize: dfs(13),
+                  fontWeight: 700,
+                  fontVariantNumeric: "tabular-nums",
+                  color: terminal.lime,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                ${p.bidSalary}
+                <Box
+                  component="span"
+                  sx={{ color: terminal.textDim, ml: 0.5, fontWeight: 400 }}
+                >
+                  · {p.bidLength}
+                  {p.bidLength === 1 ? "yr" : "yrs"}
+                </Box>
+              </Box>
+            </Box>
+          );
+        })}
+      </Box>
+    </Drawer>
+  );
+};

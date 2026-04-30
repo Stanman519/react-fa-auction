@@ -78,6 +78,6 @@ export const updateCurrentLeague =
       }),
     );
     console.log("updateCurrentLeague checking route", currentRoute);
-    if (currentRoute == "/auction") dispatch(getInitialAuctionData(user.sub));
+    if (currentRoute == "/auction") dispatch(getInitialAuctionData(user.sub, true));
     if (currentRoute == "/league-home") dispatch(loadDashboardData());
   };

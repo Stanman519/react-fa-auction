@@ -8,7 +8,10 @@ import { TogglePlayerCardButton } from "./TogglePlayerCardButton";
 import { updateUI } from "../../redux/actions/UiActions";
 import { ConfirmModal } from "../ConfirmModal";
 import { submitBuyout } from "../../redux/actions/TransactionActions";
+import { TERMINAL_UI_ENABLED } from "../../../theme";
+import BuyoutTileTerminal from "./BuyoutTileTerminal";
 const BuyoutTile = () => {
+  if (TERMINAL_UI_ENABLED) return <BuyoutTileTerminal />;
   const dispatch = useDispatch();
   const showModal = useSelector(
     (state: RootState) => state.ui.modal === "buyout-confirm",

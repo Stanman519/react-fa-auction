@@ -12,8 +12,11 @@ import {
   getFranchiseTagCandidates,
   submitFranchiseTag,
 } from "../../redux/actions/TransactionActions";
+import { TERMINAL_UI_ENABLED } from "../../../theme";
+import FranchiseTagsTerminal from "./FranchiseTagsTerminal";
 
 const FranchiseTags = () => {
+  if (TERMINAL_UI_ENABLED) return <FranchiseTagsTerminal />;
   const dispatch = useDispatch();
   const confirmModal = useSelector(
     (state: RootState) => state.ui.modal === "tag-confirm",

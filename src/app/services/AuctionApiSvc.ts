@@ -56,14 +56,12 @@ const makeNewBid = async (bid: Bid): Promise<Response> => {
   });
 };
 
-const makeNewNom = async (bid: Bid): Promise<Response> => {
-  return await fetch(`${URL}/free-agency/nominate`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(bid),
-  });
+const makeNewNom = async (bid: Bid): Promise<void> => {
+  await axiosInstance
+    .post(`${URL}/free-agency/nominate`, bid)
+    .catch((error) => {
+      throw new Error(error.response?.data?.friendlyMessage ?? "Service unreachable.");
+    });
 };
 
 const getBundledConfidenceLoadData = async (
@@ -94,19 +92,28 @@ const getFullPlayerBio = async (
   lastName: string,
   actionShot: boolean,
   leagueId: number = 13894,
-): Promise<Response> => {
-  return await fetch(
-    `${URL}/free-agency/leagues/${leagueId}/year/${lastYear}/playerId/${id}/position/${position}/firstName/${firstName}/lastName/${lastName}?hasAction=${actionShot}`,
-  );
+): Promise<any> => {
+  const res = await axiosInstance
+    .get(
+      `${URL}/free-agency/leagues/${leagueId}/year/${lastYear}/playerId/${id}/position/${position}/firstName/${firstName}/lastName/${lastName}`,
+      { params: { hasAction: actionShot } },
+    )
+    .catch((error) => {
+      throw new Error(error.response?.data?.friendlyMessage ?? "Service unreachable.");
+    });
+  return res.data;
 };
 
 const getBidHistoryByPlayerId = async (
   leagueId: number,
   mflId: number,
-): Promise<Response> => {
-  return await fetch(
-    `${URL}/free-agency/leagues/${leagueId}/players/${mflId}/bid-history`,
-  );
+): Promise<any[]> => {
+  const res = await axiosInstance
+    .get(`${URL}/free-agency/leagues/${leagueId}/players/${mflId}/bid-history`)
+    .catch((error) => {
+      throw new Error(error.response?.data?.friendlyMessage ?? "Service unreachable.");
+    });
+  return res.data;
 };
 
 const login = async (ownername: string, password: string): Promise<Owner> => {
@@ -179,14 +186,12 @@ async function handleErrorResponse<Type>(
   }
 }
 
-const sendWin = async (bid: Bid): Promise<Response> => {
-  const json = JSON.stringify(bid);
-  const res = await fetch(`${URL}/free-agency/win`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: json,
-  });
-  return res;
+const sendWin = async (bid: Bid): Promise<void> => {
+  await axiosInstance
+    .put(`${URL}/free-agency/win`, bid)
+    .catch((error) => {
+      throw new Error(error.response?.data?.friendlyMessage ?? "Service unreachable.");
+    });
 };
 
 const askCapn = async (

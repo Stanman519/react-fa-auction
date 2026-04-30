@@ -78,6 +78,21 @@ import { freshenUpTheLotsAfterAbsence } from '../redux/actions/LotActions';
       eventHandler && dispatch(eventHandler(res));
     });
 
+    connection.on('NewHeadline', res => {
+      const eventHandler = actionEventMap.NewHeadline;
+      eventHandler && dispatch(eventHandler(res));
+    });
+
+    connection.on('NewQuote', res => {
+      const eventHandler = actionEventMap.NewQuote;
+      eventHandler && dispatch(eventHandler(res));
+    });
+
+    connection.on('QuoteRemoved', res => {
+      const eventHandler = actionEventMap.QuoteRemoved;
+      eventHandler && dispatch(eventHandler(res));
+    });
+
 
   
     startSignalRConnection(connection);

@@ -293,3 +293,8 @@ __pycache__/
 .dev.vars*
 !.dev.vars.example
 !.env.example
+
+# design handoff directories
+design_handoff_terminal/
+design_handoff_terminal_pt2/
+design_handoff_terminal_pt3/

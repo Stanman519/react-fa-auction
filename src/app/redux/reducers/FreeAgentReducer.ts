@@ -19,6 +19,7 @@ export interface PlayerDTO {
   strMflId?: string; //necessary for draft pick trades ??
   salary?: number;
   length?: number;
+  rosterStatus?: string;
 }
 export interface HoldoutDTO {
   id: number;

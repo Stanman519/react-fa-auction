@@ -758,6 +758,11 @@ const generateFranchiseTagValues = (leagueId: number, year: number) =>
     `${URL}/dashboard/admin/leagues/${leagueId}/years/${year}/generate-franchise-tag-values`
   ).then((res) => res.data);
 
+const trueUpSalaryCaps = (leagueId: number) =>
+  axiosInstance.post(
+    `${URL}/dashboard/admin/leagues/${leagueId}/true-up-salary-caps`
+  ).then((res) => res.data);
+
 export default {
   synchronizeAuth,
   getCommunityStats,
@@ -794,4 +799,5 @@ export default {
   acceptTrade,
   rejectTrade,
   generateFranchiseTagValues,
+  trueUpSalaryCaps,
 };
