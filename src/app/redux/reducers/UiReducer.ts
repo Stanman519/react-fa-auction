@@ -11,13 +11,14 @@ const defaultState: UIState = {
   isMobile: true,
   audioOn: true,
   multiLoader: [],
-  currentPlayerBio: undefined,
+  playerBioCache: {},
   currentBidHistory: [],
+  soldMoment: undefined,
 };
 
 export interface UIState {
   currentBidHistory?: Bid[];
-  currentPlayerBio?: PlayerBio;
+  playerBioCache?: Record<number, PlayerBio>;
   isLoading?: LoadingStates;
   button?: ButtonLoads;
   error?: ErrorTypes;
@@ -27,6 +28,7 @@ export interface UIState {
   chatOpen?: boolean;
   isMobile?: boolean;
   audioOn?: boolean;
+  soldMoment?: Bid;
 }
 
 export type ErrorTypes = "snackbar" | undefined;
@@ -42,7 +44,6 @@ export type Modals =
   | "buyout-confirm"
   | "tag-confirm"
   | "bid-history-slab"
-  | "player-bio-slab"
   | "team-caps-slab"
   | "free-agent-grid"
   | "confidence-submit-success"

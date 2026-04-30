@@ -1,120 +1,165 @@
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { Card, Button } from "@mui/material";
 import { useState } from "react";
-import { TogglePlayerCardButton } from "./TogglePlayerCardButton";
-import { updateUI } from "../../redux/actions/UiActions";
+import { Box } from "@mui/material";
+import { RootState } from "../../store";
 import { ConfirmModal } from "../ConfirmModal";
+import { updateUI } from "../../redux/actions/UiActions";
 import { submitTaxiCut } from "../../redux/actions/TransactionActions";
+import {
+  A,
+  TPanel,
+  TLabel,
+  TPosBadge,
+  TActionButton,
+  useIsMobile,
+} from "./terminal";
+
+const round1 = (n: number) => Math.round(n * 10) / 10;
 
 const TaxiSquadTile = () => {
   const dispatch = useDispatch();
-  const modal = useSelector(
-    (state: RootState) => state.ui.modal === "taxi-confirm",
+  const mobile = useIsMobile();
+  const modal = useSelector((s: RootState) => s.ui.modal === "taxi-confirm");
+  const { currentLeagueId } = useSelector((s: RootState) => s.profile);
+  const currentLeague = useSelector((s: RootState) =>
+    s.profile.owner.leagues.find((l) => l.league.leagueId === currentLeagueId),
   );
-  const { currentLeagueId } = useSelector((state: RootState) => state.profile);
-  const [selectedPlayerIndex, setSelectedPlayerIndex] = useState<
-    number | undefined
-  >(undefined);
+  const [selectedIdx, setSelectedIdx] = useState<number | undefined>(undefined);
 
-  const currentLeague = useSelector((state: RootState) =>
-    state.profile.owner.leagues.find(
-      (l) => l.league.leagueId === currentLeagueId,
-    ),
-  );
+  const players = currentLeague?.taxiPlayers ?? [];
+  const selected = selectedIdx !== undefined ? players[selectedIdx] : undefined;
 
   return (
-    <div className="m-4 flex justify-center">
-      {modal &&
-        selectedPlayerIndex !== undefined &&
-        selectedPlayerIndex >= 0 &&
-        currentLeague?.taxiPlayers[selectedPlayerIndex!].salary && (
-          <ConfirmModal
-            isOpen={modal}
-            actionButtonLabel={"SUBMIT"}
-            mainText={`Are you sure you want to cut ${currentLeague?.taxiPlayers[selectedPlayerIndex ?? 0].fullName}?`}
-            onAction={() =>
-              dispatch(
-                submitTaxiCut(
-                  currentLeague?.league?.leagueId ?? 0,
-                  currentLeague?.taxiPlayers[selectedPlayerIndex!],
-                  currentLeague?.mflfranchiseid ?? 0,
-                  Number(
-                    (
-                      Math.round(
-                        currentLeague?.taxiPlayers[selectedPlayerIndex!]
-                          .salary! *
-                          0.4 *
-                          10,
-                      ) / 10
-                    ).toFixed(1),
-                  ),
-                ),
-              )
-            }
-          />
-        )}
-      {currentLeague?.taxiPlayers && currentLeague?.taxiPlayers.length > 0 ? (
-        <Card className="max-w-4xl flex-1">
-          <div>
-            <div className="flex flex-row ml-2 mr-3 flex-1 ">
-              <div className="w-3/4 lg:w-3/5" />
-              <div className="flex flex-col lg:flex-row w-1/4 lg:w-2/5 justify-around">
-                <div className="whitespace-nowrap text-sm lg:text-xl">
-                  FULL SALARY
-                </div>
-                <div className="whitespace-nowrap text-sm lg:text-xl">
-                  TAXI SALARY
-                </div>
-              </div>
-            </div>
-            {currentLeague?.taxiPlayers.map((p, index) => {
+    <Box sx={{ background: A.bg, padding: mobile ? "12px" : "18px", color: A.text, minHeight: "100%" }}>
+      {modal && selected?.salary && (
+        <ConfirmModal
+          isOpen={modal}
+          actionButtonLabel="SUBMIT"
+          mainText={`Are you sure you want to cut ${selected.fullName}? This cannot be reversed.`}
+          onAction={() =>
+            dispatch(
+              submitTaxiCut(
+                currentLeague?.league?.leagueId ?? 0,
+                selected,
+                currentLeague?.mflfranchiseid ?? 0,
+                round1(selected.salary! * 0.4),
+              ) as any,
+            )
+          }
+        />
+      )}
+
+      <Box sx={{ mb: "14px" }}>
+        <TLabel>FREE TAXI CUTS · NO DEAD CAP</TLabel>
+        <Box sx={{ fontSize: mobile ? 20 : 24, fontWeight: 800, color: A.text, letterSpacing: "-0.02em" }}>
+          Clear the squad
+        </Box>
+        <Box sx={{ fontSize: 12, color: A.textDim, mt: "4px" }}>
+          Cut taxi players during the amnesty window with zero dead cap. Window closes when the regular season begins.
+        </Box>
+      </Box>
+
+      {players.length === 0 ? (
+        <TPanel sx={{ textAlign: "center", py: 4 }}>
+          <Box sx={{ color: A.textDim, fontSize: 13 }}>No players on your taxi squad.</Box>
+        </TPanel>
+      ) : (
+        <Box sx={{ mb: "14px" }}>
+          <TLabel sx={{ display: "block", mb: "8px" }}>
+            TAXI SQUAD · {players.length} PLAYER{players.length === 1 ? "" : "S"}
+          </TLabel>
+          <Box sx={{ background: A.panel, border: `1px solid ${A.line}` }}>
+            {/* Header row */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: mobile ? "1fr 90px" : "auto 2fr 1fr 1fr 100px",
+                columnGap: "12px",
+                padding: "8px 14px",
+                borderBottom: `1px solid ${A.lineBold}`,
+                fontFamily: A.mono,
+                fontSize: 9,
+                color: A.textMute,
+                letterSpacing: "0.08em",
+              }}
+            >
+              {!mobile && <Box>POS</Box>}
+              <Box>PLAYER</Box>
+              {!mobile && <Box sx={{ textAlign: "right" }}>FULL SALARY</Box>}
+              {!mobile && <Box sx={{ textAlign: "right" }}>TAXI HIT (20%)</Box>}
+              <Box sx={{ textAlign: "right" }}>ACTION</Box>
+            </Box>
+
+            {/* Player rows */}
+            {players.map((p, i) => {
+              const isSelected = selectedIdx === i;
+              const taxiHit = round1((p.salary ?? 0) * 0.2);
               return (
-                <TogglePlayerCardButton
+                <Box
                   key={p.mflId}
-                  player={p}
-                  attribute1={`$${p.salary}`}
-                  attribute2={`$${((p.salary ?? 1) * 0.2).toFixed(1)}`} //(Math.round(5.01 * 10) / 10).toFixed(1)
-                  onSelect={() =>
-                    selectedPlayerIndex === index
-                      ? setSelectedPlayerIndex(undefined)
-                      : setSelectedPlayerIndex(index)
-                  }
-                  isSelected={index === selectedPlayerIndex}
-                />
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: mobile ? "1fr 90px" : "auto 2fr 1fr 1fr 100px",
+                    columnGap: "12px",
+                    padding: "12px 14px",
+                    borderBottom: i === players.length - 1 ? "none" : `1px solid ${A.line}`,
+                    fontFamily: A.mono,
+                    fontSize: 12,
+                    alignItems: "center",
+                    background: isSelected ? A.panel2 : "transparent",
+                  }}
+                >
+                  {!mobile && <TPosBadge pos={p.position ?? "—"} />}
+                  <Box>
+                    <Box sx={{ color: A.text, fontWeight: 600, fontSize: 13 }}>
+                      {p.fullName}
+                    </Box>
+                    <Box sx={{ color: A.textDim, fontSize: 10 }}>
+                      {mobile && `${p.position ?? ""} · `}
+                      {p.team ?? "—"}
+                      {p.age != null && `, age ${p.age}`}
+                      {mobile && ` · $${p.salary}M → $${taxiHit}M taxi`}
+                    </Box>
+                  </Box>
+                  {!mobile && (
+                    <Box sx={{ textAlign: "right", color: A.text, fontWeight: 700 }}>
+                      ${p.salary}M
+                    </Box>
+                  )}
+                  {!mobile && (
+                    <Box sx={{ textAlign: "right", color: A.textDim }}>
+                      ${taxiHit}M
+                    </Box>
+                  )}
+                  <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                    <TActionButton
+                      variant={isSelected ? "red" : "ghost"}
+                      dense
+                      onClick={() => setSelectedIdx(isSelected ? undefined : i)}
+                      sx={isSelected ? {} : { color: A.red, borderColor: A.red }}
+                    >
+                      {isSelected ? "✓ SELECTED" : "CUT"}
+                    </TActionButton>
+                  </Box>
+                </Box>
               );
             })}
-          </div>
-          {selectedPlayerIndex !== undefined && (
-            <div className="flex flex-row justify-center content-center m-3">
-              <Button
-                className="w-full"
-                style={{ backgroundColor: "crimson" }}
-                onClick={() => dispatch(updateUI({ modal: "taxi-confirm" }))}
-              >
-                <div className="flex flex-row justify-center content-center pl-3 pr-4 pt-2 pb-2 ">
-                  <DeleteOutlineIcon
-                    style={{
-                      color: "white",
-                      marginRight: 8,
-                      alignSelf: "center",
-                    }}
-                  />
-                  <div className="lg:text-2xl text-white">
-                    CUT THIS TAXI PLAYER FOR NO DEAD CAP
-                  </div>
-                </div>
-              </Button>
-            </div>
-          )}
-        </Card>
-      ) : (
-        <Card>
-          <div>There are no players on your taxi squad.</div>
-        </Card>
+          </Box>
+        </Box>
       )}
-    </div>
+
+      {selected && (
+        <Box sx={{ mb: "20px" }}>
+          <TActionButton
+            variant="red"
+            fullWidth
+            onClick={() => dispatch(updateUI({ modal: "taxi-confirm" }))}
+          >
+            CUT {selected.fullName} · NO DEAD CAP
+          </TActionButton>
+        </Box>
+      )}
+    </Box>
   );
 };
 

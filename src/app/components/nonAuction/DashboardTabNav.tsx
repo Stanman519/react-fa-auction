@@ -4,6 +4,8 @@ import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import { useTheme, useMediaQuery } from "@mui/material";
 import React from "react";
+import { TERMINAL_UI_ENABLED } from "../../../theme";
+import TTabsHeader from "./terminal/TTabsHeader";
 
 export interface DashboardTab {
   label: string;
@@ -27,6 +29,10 @@ export default function DashboardTabNav({
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     onChange(newValue);
   };
+
+  if (TERMINAL_UI_ENABLED) {
+    return <TTabsHeader tabs={tabs} currentValue={currentValue} onChange={onChange} />;
+  }
 
   return (
     <Box

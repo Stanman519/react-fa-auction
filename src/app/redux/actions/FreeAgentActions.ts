@@ -21,11 +21,11 @@ export const updateFreeAgents = (freeAgents: PlayerDTO[]): FreeAgentAction => {
 };
 
 export const getInitialAuctionData =
-  (userSub: string = "") =>
+  (userSub: string = "", silent: boolean = false) =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     try {
       const { currentLeagueId, owner } = getState().profile;
-      dispatch(updateUI({ isLoading: "full-screen" }));
+      if (!silent) dispatch(updateUI({ isLoading: "full-screen" }));
       const leagueId = currentLeagueId ?? 0;
       console.log(
         "profile before fetch init auction data",

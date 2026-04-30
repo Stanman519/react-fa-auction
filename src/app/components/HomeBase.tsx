@@ -1,10 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
-import TriTable from "./nonAuction/TriTable";
+import PowerRankings from "./dashboard/PowerRankings";
 import { RootState } from "../store";
 import DeadCapParentCard from "./nonAuction/DeadCapParentCard";
 import { MenuBar } from "./menuBar";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import DashboardTabNav, {
   DashboardTab,
 } from "./nonAuction/DashboardTabNav";
@@ -26,6 +26,13 @@ import AdvancedContractTrades from "./nonAuction/AdvancedContractTrades";
 import PendingTrades from "./nonAuction/PendingTrades";
 import { updateLoginInfo } from "../redux/actions/LoginActions";
 import Holdouts from "./nonAuction/Holdouts";
+import { RosterContracts } from "./dashboard/RosterContracts";
+import { CapOutlook } from "./dashboard/CapOutlook";
+import { Rulebook } from "./dashboard/Rulebook";
+import { TERMINAL_UI_ENABLED } from "../../theme";
+import TLeagueBar from "./nonAuction/terminal/TLeagueBar";
+import LeagueInfoTerminal from "./nonAuction/terminal/LeagueInfoTerminal";
+import { fetchRosters, clearRosters } from "../redux/actions/RosterActions";
 
 const HomeBase = () => {
   const profileState = useSelector((state: RootState) => state.profile);
@@ -36,8 +43,14 @@ const HomeBase = () => {
   );
   const dispatch = useDispatch();
   const nav = useNavigate();
+  const location = useLocation();
 
   const [currentTab, setCurrentTab] = useState("league");
+
+  useEffect(() => {
+    const tabState = (location.state as any)?.tab;
+    if (tabState) setCurrentTab(tabState);
+  }, [location.state]);
   const [loadingTab, setLoadingTab] = useState<string | null>(null);
   // Track which tabs have already had their data fetched this session
   const fetchedTabs = useRef<Set<string>>(new Set(["league"]));
@@ -60,6 +73,8 @@ const HomeBase = () => {
 
   const tabs: DashboardTab[] = [
     { label: "LEAGUE INFO", value: "league" },
+    { label: "ROSTER", value: "roster" },
+    { label: "CAP OUTLOOK", value: "cap-outlook" },
     { label: "PROPOSE TRADE", value: "new-trades" },
     { label: "PENDING TRADES", value: "pending-trades" },
     // Show TAXI CUTS if season is active OR there's data already loaded
@@ -77,6 +92,7 @@ const HomeBase = () => {
     ...(currentLeague?.league.isFranchiseTagSzn || waiverCount > 0
       ? [{ label: "WAIVER EXTENSION", value: "waiver", badge: waiverCount }]
       : []),
+    { label: "RULES", value: "rules" },
   ];
 
   // --- Data loading ---
@@ -85,16 +101,24 @@ const HomeBase = () => {
     if (authSynchronized && currentLeagueId) {
       fetchedTabs.current = new Set(["league"]);
       dispatch(loadDashboardData());
+      dispatch(clearRosters() as any);
     }
   }, [currentLeagueId, authSynchronized, dispatch]);
 
   // Lazy load when a tab is first opened
   const handleTabChange = async (newTab: string) => {
     setCurrentTab(newTab);
+    // Roster and cap-outlook share the same data; fetching one satisfies both
+    const rosterTab = newTab === "roster" || newTab === "cap-outlook";
+    const rosterAlreadyFetched =
+      fetchedTabs.current.has("roster") || fetchedTabs.current.has("cap-outlook");
     if (fetchedTabs.current.has(newTab)) return;
     fetchedTabs.current.add(newTab);
     setLoadingTab(newTab);
     try {
+      if (rosterTab && !rosterAlreadyFetched && currentLeagueId) {
+        await dispatch(fetchRosters(currentLeagueId) as any);
+      }
       switch (newTab) {
         case "taxi":
           await dispatch(getTaxiSquadPlayers() as any);
@@ -161,15 +185,36 @@ const HomeBase = () => {
         <>
           {currentLeague ? (
             <div className="flex flex-col">
-              {currentLeague?.teamName && (
-                <Box sx={{ textAlign: 'center', py: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
-                  <Typography variant="h5" fontWeight={700} color="primary.main" letterSpacing="0.03em">
-                    {currentLeague?.league.name}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary" letterSpacing="0.12em" sx={{ textTransform: 'uppercase' }}>
-                    Dashboard
-                  </Typography>
-                </Box>
+              {TERMINAL_UI_ENABLED ? (
+                <TLeagueBar
+                  leagueName={currentLeague.league.name}
+                  teamName={currentLeague.teamName}
+                  stats={[
+                    ...(currentLeague.league.isAuctioning
+                      ? [{ label: "STATUS", value: <Link to="/auction" style={{ color: "inherit", textDecoration: "underline" }}>AUCTION LIVE</Link>, tone: "lime" as const }]
+                      : []),
+                    ...(currentLeague.league.isFranchiseTagSzn
+                      ? [{ label: "WINDOW", value: "TAG · WAIVER", tone: "amber" as const }]
+                      : []),
+                    ...(currentLeague.league.isBuyoutSzn
+                      ? [{ label: "WINDOW", value: "BUYOUT", tone: "amber" as const }]
+                      : []),
+                    ...(currentLeague.league.isTaxiCutSzn
+                      ? [{ label: "WINDOW", value: "TAXI CUTS", tone: "amber" as const }]
+                      : []),
+                  ]}
+                />
+              ) : (
+                currentLeague?.teamName && (
+                  <Box sx={{ textAlign: 'center', py: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                    <Typography variant="h5" fontWeight={700} color="primary.main" letterSpacing="0.03em">
+                      {currentLeague?.league.name}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" letterSpacing="0.12em" sx={{ textTransform: 'uppercase' }}>
+                      Dashboard
+                    </Typography>
+                  </Box>
+                )
               )}
               <DashboardTabNav
                 currentValue={currentTab}
@@ -204,11 +249,18 @@ const HomeBase = () => {
                 </Snackbar>
 
                 {currentTab === "league" && (
-                  <div className="flex flex-col gap-4">
-                    <DeadCapParentCard />
-                    <TriTable />
-                  </div>
+                  TERMINAL_UI_ENABLED ? (
+                    <LeagueInfoTerminal onNavigateTab={handleTabChange} />
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      <DeadCapParentCard />
+                      <PowerRankings />
+                    </div>
+                  )
                 )}
+                {currentTab === "roster" && <RosterContracts />}
+                {currentTab === "cap-outlook" && <CapOutlook />}
+                {currentTab === "rules" && <Rulebook />}
                 {currentTab === "tags" && (loadingTab === "tags" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <FranchiseTags />)}
                 {currentTab === "taxi" && (loadingTab === "taxi" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <TaxiSquadTile />)}
                 {currentTab === "buyouts" && (loadingTab === "buyouts" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <BuyoutTile />)}

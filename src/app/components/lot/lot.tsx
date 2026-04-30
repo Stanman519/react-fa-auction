@@ -1,72 +1,62 @@
-import { Button, ButtonGroup, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Bid, Lot } from "../../redux/reducers/LotReducer";
-import { RootState } from "../../store";
+import { Box, IconButton, Tooltip } from "@mui/material";
+import HistoryIcon from "@mui/icons-material/History";
+import { useDispatch } from "react-redux";
+import { Lot } from "../../redux/reducers/LotReducer";
 import { BidForm } from "./bidForm";
 import { PlayerCard } from "./playerCard";
-import { Timer } from "./timer";
-import AuctionApiSvc from "../../services/AuctionApiSvc";
-import { PlayerBio } from "../../redux/reducers/FreeAgentReducer";
-import { lastYear } from "../../services/Common";
-import {
-  updateBidHistory,
-  updatePlayerBio,
-  updateUI,
-} from "../../redux/actions/UiActions";
+import { PlayerBio } from "./playerBio";
+import { BidInfo } from "./bidInfo";
+import { updateBidHistory } from "../../redux/actions/UiActions";
+import { terminal } from "../../../theme";
 
 interface LotProps {
   lot: Lot;
 }
 
 export const LotBody = ({ lot }: LotProps): JSX.Element => {
-  const dateProp = lot.bid?.expires ? lot.bid.expires : undefined;
   const bidMode = !lot.newNom;
-  const theme = useTheme();
   const dispatch = useDispatch();
 
-  const [bidTabExtended, setBidTabExtended] = useState<boolean>(false);
-
   return (
-    <div
-      className="rounded mt-1 mb-1 pb-1 mr-1 relative h-fit md:h-96 2xl:h-auto w-full md:w-2/5 2xl:w-1/4 3xl:w-1/5"
-      style={{
-        overflow: bidMode ? "hidden" : undefined,
-        backgroundColor: theme.palette.background.paper,
-        borderStyle: lot.isFresh ? "ridge" : "none",
-        borderWidth: 4,
-        borderColor: "green",
+    <Box
+      className="mt-1 mb-1 mr-1 relative w-full"
+      sx={{
+        background: terminal.panel,
+        border: `1px solid ${lot.isFresh ? terminal.lime : terminal.line}`,
+        borderRadius: "3px",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        transition: "border-color 900ms ease-out",
       }}
     >
       <PlayerCard lot={lot} />
-      <ButtonGroup
-        sx={{ display: "flex", width: "100%" }}
-        className="px-4 pb-4"
-        aria-label="small button group"
-      >
-        <Button
-          sx={{ flex: 1 }}
-          onClick={() => dispatch(updatePlayerBio(lot.bid))}
+      {lot.bid?.player && <PlayerBio lot={lot} />}
+      {bidMode && <BidInfo lot={lot} />}
+      <BidForm bidMode={bidMode} lot={lot} />
+      {bidMode && lot.bid?.expires && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 0.5,
+            px: 1,
+            py: 0.5,
+            borderTop: `1px solid ${terminal.line}`,
+            background: terminal.panel2,
+          }}
         >
-          Bio
-        </Button>
-        {lot.bid?.expires && (
-          <Button
-            sx={{ flex: 2, lineHeight: "14px" }}
-            onClick={() => dispatch(updateBidHistory(lot?.bid))}
-          >
-            Bid History
-          </Button>
-        )}
-        <Button
-          onClick={() => setBidTabExtended(!bidTabExtended)}
-          className="w-2/3"
-        >
-          {bidTabExtended ? "Close" : "Open"} Offer Sheet
-        </Button>
-      </ButtonGroup>
-      <Timer endTime={dateProp} lot={lot} />
-      <BidForm bidTabExtended={bidTabExtended} bidMode={bidMode} lot={lot} />
-    </div>
+          <Tooltip title="Bid history">
+            <IconButton
+              size="small"
+              onClick={() => dispatch(updateBidHistory(lot.bid))}
+              sx={{ color: terminal.textDim }}
+            >
+              <HistoryIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      )}
+    </Box>
   );
 };

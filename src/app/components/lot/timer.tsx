@@ -1,77 +1,114 @@
+import { Box, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { dfs } from "../nonAuction/terminal/tokens";
 import { submitWin } from "../../redux/actions/LotActions";
 import { Lot } from "../../redux/reducers/LotReducer";
-import { ownerMap } from "../../services/Common";
 import { RootState } from "../../redux/reducers/RootReducer";
 
 export interface ExpirationObj {
-    days: number
-    hours: number
-    minutes: number
-    seconds: number
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  totalMs: number;
 }
 
+const calculateTimeLeft = (endTime?: Date): ExpirationObj | undefined => {
+  if (!endTime) return;
+  const now = new Date();
+  const utcNow = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+    now.getUTCHours(),
+    now.getUTCMinutes(),
+    now.getUTCSeconds(),
+    now.getUTCMilliseconds(),
+  );
+  const utcEnd = Date.UTC(
+    endTime.getUTCFullYear(),
+    endTime.getUTCMonth(),
+    endTime.getUTCDate(),
+    endTime.getUTCHours(),
+    endTime.getUTCMinutes(),
+    endTime.getUTCSeconds(),
+    now.getUTCMilliseconds(),
+  );
+  const difference = utcEnd - utcNow;
+  if (difference <= 0)
+    return { days: 0, hours: 0, minutes: 0, seconds: 0, totalMs: 0 };
+  return {
+    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+    minutes: Math.floor((difference / 1000 / 60) % 60),
+    seconds: Math.floor((difference / 1000) % 60) + 1,
+    totalMs: difference,
+  };
+};
 
-export const Timer = ({ endTime, lot }: { endTime?: Date, lot: Lot }): JSX.Element => {
-    const dispatch = useDispatch();
-    const [remaining, setRemaining] = useState<ExpirationObj>();
-    const [preventClockTick, setPreventClockTick] = useState<boolean>(false);
-    const { isConnected } = useSelector((state: RootState) => state.signalR)
-    const calculateTimeLeft = (endTime: Date | undefined) => {
-        if (!endTime) return
-        const now = new Date();
+const formatTime = (r: ExpirationObj): string => {
+  if (r.days > 0) return `${r.days}d ${r.hours}:${String(r.minutes).padStart(2, "0")}`;
+  if (r.hours > 0)
+    return `${r.hours}:${String(r.minutes).padStart(2, "0")}:${String(r.seconds).padStart(2, "0")}`;
+  return `${r.minutes}:${String(r.seconds).padStart(2, "0")}`;
+};
 
-        let utcNow = Date.UTC(
-            now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
-            now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
-        let utcEnd = Date.UTC(endTime.getUTCFullYear(), endTime.getUTCMonth(), endTime.getUTCDate(),
-            endTime.getUTCHours(), endTime.getUTCMinutes(), endTime.getUTCSeconds(), now.getUTCMilliseconds())
+export const Timer = ({
+  endTime,
+  lot,
+  size = "lg",
+}: {
+  endTime?: Date;
+  lot: Lot;
+  size?: "sm" | "md" | "lg";
+}): JSX.Element => {
+  const dispatch = useDispatch();
+  const theme = useTheme();
+  const [remaining, setRemaining] = useState<ExpirationObj | undefined>(() =>
+    calculateTimeLeft(endTime),
+  );
+  const [preventClockTick, setPreventClockTick] = useState(false);
+  const { isConnected } = useSelector((state: RootState) => state.signalR);
 
-        let difference = utcEnd - utcNow;
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (!endTime || preventClockTick) return;
+      const next = calculateTimeLeft(endTime);
+      setRemaining(next);
+      if (next && next.totalMs <= 0 && isConnected && !preventClockTick) {
+        setPreventClockTick(true);
+        if (lot.bid) dispatch(submitWin(lot.bid));
+      }
+    }, 1000);
+    return () => clearInterval(id);
+  }, [endTime, preventClockTick, lot, dispatch, isConnected]);
 
-        if (utcEnd <= utcNow && isConnected ) {
-            setPreventClockTick(true)
-            if(lot.bid) {
-                dispatch(submitWin(lot.bid))
-            }
-            return {
-                days: 0,
-                hours: 0,
-                minutes: 0,
-                seconds: 0
-            } as ExpirationObj;
-        }
+  const fontSize = size === "sm" ? dfs(14) : size === "md" ? dfs(22) : dfs(36);
+  const urgent = !!remaining && remaining.totalMs < 60_000 && remaining.totalMs > 0;
+  const critical = !!remaining && remaining.totalMs < 10_000 && remaining.totalMs > 0;
 
-        let timeLeft: ExpirationObj = {
-            days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-            hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-            minutes: Math.floor((difference / 1000 / 60) % 60),
-            seconds: Math.floor((difference / 1000) % 60) + 1
-        };
-        return timeLeft;
-    }
-
-
-    const getTimerColor = (): string => {
-        if (!endTime || !remaining) return 'linear-gradient(90deg, rgba(192,192,192,0) 0%, rgba(192,192,192.73) 50%, rgba(192,192,192,0) 100%)'
-        if (remaining.hours < 1) return 'linear-gradient(90deg, rgba(255,0,0,0) 0%, rgba(255,0,0,0.73) 50%, rgba(255,0,0,0) 100%)'
-        if (remaining.hours < 3) return 'linear-gradient(90deg, rgba(255,153,0,0) 0%, rgba(255,153,0,0.73) 50%, rgba(255,153,0,0) 100%)'
-        if (remaining.hours < 6) return 'linear-gradient(90deg, rgba(255,255,51,0) 0%, rgba(255,255,51,0.73) 50%, rgba(255,255,51,0) 100%)'
-        else return 'linear-gradient(90deg, rgba(51,204,0,0) 0%, rgba(51,204,0,0.73) 50%, rgba(51,204,0,0) 100%)'
-    }
-    useEffect(() => {
-        const timer = setInterval( () => {
-            if (endTime && !preventClockTick) setRemaining(calculateTimeLeft(endTime));
-        }, 1000);
-        return () => clearInterval(timer);
-    }, [endTime, preventClockTick, lot, dispatch, setPreventClockTick]);
-
-    return (
-        <div className="mb-1 flex content-center" style={{ background: getTimerColor() }}>
-            {endTime && remaining && 
-                <div className="text-xl text-center w-full">{remaining.days}:{remaining.hours.toString().padStart(2, '0')}:{remaining.minutes.toString().padStart(2, '0')}:{remaining.seconds.toString().padStart(2, '0')} 
-                </div>}
-        </div>
-    );
-}
+  return (
+    <Box
+      sx={{
+        fontFamily: theme.palette.terminal
+          ? '"JetBrains Mono", ui-monospace, monospace'
+          : "monospace",
+        fontWeight: 800,
+        fontSize,
+        lineHeight: 1,
+        color: urgent
+          ? theme.palette.error.main
+          : theme.palette.text.primary,
+        fontVariantNumeric: "tabular-nums",
+        animation: critical ? "timerPulse 1s ease-in-out infinite" : "none",
+        "@keyframes timerPulse": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.05)" },
+        },
+      }}
+    >
+      {endTime && remaining ? formatTime(remaining) : "—:—"}
+    </Box>
+  );
+};

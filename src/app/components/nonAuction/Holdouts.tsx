@@ -8,6 +8,8 @@ import { TogglePlayerCardButton } from "./TogglePlayerCardButton";
 import { ConfirmModal } from "../ConfirmModal";
 import { updateUI } from "../../redux/actions/UiActions";
 import { submitHoldout } from "../../redux/actions/TransactionActions";
+import { TERMINAL_UI_ENABLED } from "../../../theme";
+import HoldoutsTerminal from "./HoldoutsTerminal";
 
 /** Map scoreTier (1-based position rank tier) to a readable label */
 const tierLabel = (position: string, tier: number): string => {
@@ -23,6 +25,7 @@ const tierLabel = (position: string, tier: number): string => {
 };
 
 const Holdouts = () => {
+  if (TERMINAL_UI_ENABLED) return <HoldoutsTerminal />;
   const dispatch = useDispatch();
   const confirmModal = useSelector(
     (state: RootState) => state.ui.modal === "holdout-confirm",

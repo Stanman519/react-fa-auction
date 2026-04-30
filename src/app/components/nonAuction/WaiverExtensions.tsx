@@ -13,8 +13,11 @@ import {
   submitFranchiseTag,
   submitWaiverExtension,
 } from "../../redux/actions/TransactionActions";
+import { TERMINAL_UI_ENABLED } from "../../../theme";
+import WaiverExtensionsTerminal from "./WaiverExtensionsTerminal";
 
 const WaiverExtensions = () => {
+  if (TERMINAL_UI_ENABLED) return <WaiverExtensionsTerminal />;
   const dispatch = useDispatch();
   const confirmModal = useSelector(
     (state: RootState) => state.ui.modal === "waiver-confirm",

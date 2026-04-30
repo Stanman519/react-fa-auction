@@ -4,6 +4,7 @@ import { PlayerDTO } from "../reducers/FreeAgentReducer";
 import { Lot, Bid } from "../reducers/LotReducer";
 import { RootState } from "../reducers/RootReducer";
 import { updateUI } from "./UiActions";
+import { recordActivity } from "./ActivityActions";
 
 export const UPDATE_LOTS = "UPDATE_LOTS";
 
@@ -79,6 +80,28 @@ export const updateLotWithFreshBid =
     } as Lot;
     //TODO: how can i add animation or sound here to show new bid -- add a flag on client side only to say isHotChange
     dispatch(updateLots(updated));
+    dispatch(
+      recordActivity({
+        kind: "bid",
+        ownerId: reformattedBid.ownerId,
+        ownername: reformattedBid.ownername,
+        playerName: `${reformattedBid.player?.firstName ?? ""} ${reformattedBid.player?.lastName ?? ""}`.trim(),
+        bidSalary: reformattedBid.bidSalary,
+        bidLength: reformattedBid.bidLength,
+      }),
+    );
+  };
+
+export const cancelNomination =
+  () =>
+  async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    const { lots } = getState();
+    if (lots.length === 0) return;
+    const updated = [...lots];
+    const idx = updated.findIndex((l) => l.newNom);
+    if (idx < 0) return;
+    updated[idx] = { ...updated[idx], newNom: false, bid: undefined };
+    dispatch(updateLots(updated));
   };
 
 export const turnOnNominationModeForThisOwnersLot =
@@ -114,8 +137,7 @@ export const makeNewBid =
   };
 
 export const makeNewNomination = (bid: Bid) => async (): Promise<any> => {
-  const res = await AuctionApiSvc.makeNewNom(bid);
-  const bidBody = await AuctionApiSvc.handleErrorResponse(res);
+  await AuctionApiSvc.makeNewNom(bid);
 };
 
 export const submitWin =
@@ -135,8 +157,7 @@ export const submitWin =
       return;
     }
     try {
-      const res = await AuctionApiSvc.sendWin(bid);
-      const complete = await AuctionApiSvc.handleErrorResponse(res);
+      await AuctionApiSvc.sendWin(bid);
     } catch (e: any) {
       dispatch(updateUI({ error: "snackbar", errorText: e.message }));
     }
@@ -149,6 +170,17 @@ export const submitWin =
         newNom: false,
       } as Lot;
       dispatch(updateLots(lots));
+      dispatch(updateUI({ soldMoment: bid }));
+      dispatch(
+        recordActivity({
+          kind: "win",
+          ownerId: bid.ownerId,
+          ownername: bid.ownername,
+          playerName: `${bid.player?.firstName ?? ""} ${bid.player?.lastName ?? ""}`.trim(),
+          bidSalary: bid.bidSalary,
+          bidLength: bid.bidLength,
+        }),
+      );
     }
   };
 

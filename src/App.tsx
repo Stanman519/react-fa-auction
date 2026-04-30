@@ -28,6 +28,11 @@ import {
 } from "./app/redux/actions/LoginActions";
 import { useAppSelector } from "./app/hooks";
 import ConfidenceHome from "./app/components/confidence/ConfidenceHome";
+import {
+  AMobileBottomNav,
+  MOBILE_BOTTOM_NAV_HEIGHT,
+} from "./app/components/nonAuction/terminal";
+import { useIsMobile } from "./app/components/nonAuction/terminal/useIsMobile";
 
 function App() {
   const theme = useTheme();
@@ -68,10 +73,15 @@ function AppRoutes() {
     }
   }, [isLoading, isAuthenticated, user, authSynchronized, dispatch]);
 
+  const isMobile = useIsMobile();
+
   return (
     <div
       className="min-h-screen max-w-screen"
-      style={{ backgroundColor: theme.palette.background.default }}
+      style={{
+        backgroundColor: theme.palette.background.default,
+        paddingBottom: isMobile ? MOBILE_BOTTOM_NAV_HEIGHT : 0,
+      }}
     >
       <Routes>
         <Route path="/landing" element={<LandingPage />} />
@@ -112,6 +122,7 @@ function AppRoutes() {
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
+      <AMobileBottomNav />
     </div>
   );
 }

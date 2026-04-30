@@ -25,47 +25,32 @@ export const updateBidHistory =
     if (!bid) return;
     const { currentLeagueId } = getState().profile;
     if (!currentLeagueId) return;
-    const res = await AuctionApiSvc.getBidHistoryByPlayerId(
+    const historyRes = (await AuctionApiSvc.getBidHistoryByPlayerId(
       currentLeagueId,
       bid.player.mflId,
-    );
-    const historyRes = (await AuctionApiSvc.handleErrorResponse(res)) as Bid[];
+    )) as Bid[];
     dispatch(
       updateUI({ currentBidHistory: historyRes, modal: "bid-history-slab" }),
     );
   };
 
-export const updatePlayerBio =
+export const loadPlayerBio =
   (bid?: Bid) =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
     if (!bid) return;
-    const { currentLeagueId: currentLeague } = getState().profile;
-    dispatch(
-      updateUI({
-        modal: "player-bio-slab",
-        isLoading: "slab",
-      }),
-    );
-    const hasAction: boolean = bid.player.actionShot ? true : false;
-    const res = await AuctionApiSvc.getFullPlayerBio(
+    const { mflId, position, firstName, lastName } = bid.player;
+    const state = getState();
+    if (state.ui.playerBioCache?.[mflId]) return;
+    const { currentLeagueId } = state.profile;
+    const bio = (await AuctionApiSvc.getFullPlayerBio(
       lastYear,
-      bid.player.mflId,
-      bid.player.position,
-      bid.player.firstName,
-      bid.player.lastName,
-      true,
-    ); //fix later I ran out of quota for the bing images
-    const bioRes = (await AuctionApiSvc.handleErrorResponse(res)) as PlayerBio;
-    dispatch(
-      updateUI({
-        currentPlayerBio: {
-          ...bioRes,
-          actionShot: hasAction
-            ? (bid.player.actionShot ?? "")
-            : bioRes.actionShot,
-        },
-        modal: "player-bio-slab",
-        isLoading: undefined,
-      }),
-    );
+      mflId,
+      position,
+      firstName,
+      lastName,
+      false,
+      currentLeagueId ?? 13894,
+    )) as PlayerBio;
+    const prev = getState().ui.playerBioCache ?? {};
+    dispatch(updateUI({ playerBioCache: { ...prev, [mflId]: bio } }));
   };
