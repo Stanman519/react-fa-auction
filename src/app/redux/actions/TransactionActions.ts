@@ -485,7 +485,7 @@ export const submitTradeRequest =
       const res = await GeneralApiSvc.proposeTrade(tradeReq);
 
       dispatch(
-        updateUI({ isLoading: undefined, modal: "trade-submit-success" }),
+        updateUI({ isLoading: undefined, modal: "dashboard-success", successText: "Trade proposed successfully." }),
       );
     } catch (e: any) {
       dispatch(updateUI({ modal: "error", isLoading: undefined, errorText: e.message || "An error occurred." }));
@@ -515,8 +515,12 @@ export const replyToTrade =
         await GeneralApiSvc.rejectTrade(leagueId, tradeId, 0, franchId);
       else if (answer === "revoke")
         await GeneralApiSvc.cancelTrade(leagueId, tradeId, 0, franchId);
+      const successText =
+        answer === "accept" ? "Trade accepted." :
+        answer === "reject" ? "Trade rejected." :
+        "Trade revoked.";
       dispatch(
-        updateUI({ isLoading: undefined, modal: "trade-response-success" }),
+        updateUI({ isLoading: undefined, modal: "dashboard-success", successText }),
       );
     } catch (e: any) {
       dispatch(updateUI({ modal: "error", isLoading: undefined, errorText: e.message || "An error occurred." }));

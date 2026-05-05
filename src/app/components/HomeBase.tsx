@@ -37,7 +37,7 @@ import { fetchRosters, clearRosters } from "../redux/actions/RosterActions";
 const HomeBase = () => {
   const profileState = useSelector((state: RootState) => state.profile);
   const { currentLeagueId, authSynchronized, owner } = profileState;
-  const { modal, errorText } = useSelector((state: RootState) => state.ui);
+  const { modal, errorText, successText } = useSelector((state: RootState) => state.ui);
   const isLoading = useSelector(
     (state: RootState) => state.ui.isLoading === "full-screen",
   );
@@ -195,13 +195,13 @@ const HomeBase = () => {
                 <Snackbar
                   open={modal === "dashboard-success"}
                   autoHideDuration={5000}
-                  onClose={() => dispatch(updateUI({ modal: undefined }))}
+                  onClose={() => dispatch(updateUI({ modal: undefined, successText: undefined }))}
                 >
                   <Alert
                     severity="success"
-                    onClose={() => dispatch(updateUI({ modal: undefined }))}
+                    onClose={() => dispatch(updateUI({ modal: undefined, successText: undefined }))}
                   >
-                    Submission Complete!
+                    {successText || "Submission complete!"}
                   </Alert>
                 </Snackbar>
                 <Snackbar

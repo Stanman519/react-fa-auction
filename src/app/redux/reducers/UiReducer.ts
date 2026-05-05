@@ -6,6 +6,7 @@ const defaultState: UIState = {
   isLoading: undefined,
   error: undefined,
   errorText: "",
+  successText: undefined,
   modal: undefined,
   chatOpen: false,
   isMobile: true,
@@ -24,6 +25,7 @@ export interface UIState {
   error?: ErrorTypes;
   multiLoader?: MultiLoads[];
   errorText?: string;
+  successText?: string;
   modal?: Modals;
   chatOpen?: boolean;
   isMobile?: boolean;
@@ -49,8 +51,6 @@ export type Modals =
   | "confidence-submit-success"
   | "ou-standings"
   | "error"
-  | "trade-submit-success"
-  | "trade-response-success"
   | "holdout-confirm"
   | "confidence-rules"
   | undefined;
