@@ -99,9 +99,10 @@ const HomeBase = () => {
   // On mount / league change: load dead cap (LEAGUE INFO tab only)
   useEffect(() => {
     if (authSynchronized && currentLeagueId) {
-      fetchedTabs.current = new Set(["league"]);
+      fetchedTabs.current = new Set(["league", "roster"]);
       dispatch(loadDashboardData());
       dispatch(clearRosters() as any);
+      dispatch(fetchRosters(currentLeagueId) as any);
     }
   }, [currentLeagueId, authSynchronized, dispatch]);
 

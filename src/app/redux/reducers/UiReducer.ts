@@ -49,6 +49,7 @@ export type Modals =
   | "team-caps-slab"
   | "free-agent-grid"
   | "confidence-submit-success"
+  | "trade-submit-success"
   | "ou-standings"
   | "error"
   | "holdout-confirm"

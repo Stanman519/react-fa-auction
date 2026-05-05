@@ -50,6 +50,8 @@ export default function MyTeamStatStrip() {
   const ownerName = useSelector((s: RootState) => s.profile.owner.ownername);
   const deadCapList = useSelector((s: RootState) => s.deadCap.deadCap);
   const leagueId = useSelector((s: RootState) => s.profile.currentLeagueId);
+  const rosters = useSelector((s: RootState) => s.rosters);
+
   const standings = useSelector((s: RootState) =>
     leagueId ? s.triYearStandings.byLeague[leagueId]?.data ?? [] : [],
   );
@@ -58,7 +60,17 @@ export default function MyTeamStatStrip() {
 
   const capRoom = currentLeague.capRoom ?? 0;
   const capUsed = LEAGUE_CAP_MAX - capRoom;
-  const yearsLeft = currentLeague.yearsLeft ?? 0;
+
+  const myRosterPlayers =
+    rosters.leagueId === leagueId
+      ? (rosters.data ?? []).find((r) => r.mflfranchiseid === currentLeague.mflfranchiseid)?.players
+      : undefined;
+  const yearsUsed =
+    myRosterPlayers !== undefined
+      ? myRosterPlayers
+          .filter((p) => p.rosterStatus !== "TAXI_SQUAD")
+          .reduce((sum, p) => sum + (p.length ?? 0), 0)
+      : null;
   const myDeadCap = deadCapList.find((d) => d.franchiseId === currentLeague.mflfranchiseid);
   const futureYears = myDeadCap
     ? Object.entries(myDeadCap.amount)
@@ -133,7 +145,7 @@ export default function MyTeamStatStrip() {
           sub={`of $${LEAGUE_CAP_MAX}M`}
           tone={capUsed > LEAGUE_CAP_MAX ? "red" : "lime"}
         />
-        <Stat label="YEARS" value={`${yearsLeft}`} sub="of 75 max" />
+        <Stat label="YEARS" value={yearsUsed !== null ? `${yearsUsed}` : "—"} sub="of 75 max" />
         <Stat
           label="DEAD CAP"
           value={`$${deadCapTotal.toFixed(1)}M`}
