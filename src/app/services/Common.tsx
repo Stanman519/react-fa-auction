@@ -1,5 +1,6 @@
 import { profileEnd } from "console";
 import Owner, { LeagueLoginInfo } from "../redux/reducers/OwnerReducer";
+import { FranchiseStandings } from "../redux/reducers/TransactionReducer";
 
 interface OwnerLookup {
   name: string;
@@ -24,6 +25,9 @@ export interface BidValidity {
 const file = process.env.PUBLIC_URL + "/avatars/";
 
 export const lastYear = new Date().getFullYear() - 1;
+
+export const tytFor = (s: FranchiseStandings): number =>
+  s.teamStandings.reduce((sum, ts) => sum + ts.pointsFor + ts.h2hWins * 10, 0);
 
 export const checkValidity = (
   league: LeagueLoginInfo,

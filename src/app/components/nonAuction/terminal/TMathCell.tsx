@@ -20,6 +20,7 @@ export default function TMathCell({
   value: React.ReactNode;
   tone?: Tone;
 }) {
+  console.log("TMathCell render");
   return (
     <Box>
       <TLabel>{label}</TLabel>

@@ -1,100 +1,45 @@
 import { StreamChat } from "stream-chat";
-import {
-  AttachmentType,
-  ChannelType,
-  MessageType,
-  CommandType,
-  EventType,
-  ReactionType,
-  UserType,
-} from "../components/chat";
+import { StreamChatGenerics } from "../components/chat";
 
 export const apiKey = process.env.REACT_APP_STREAM_KEY;
-interface ChatClientInstance {
-  chatInstance: StreamChat;
-  isInitialized: boolean;
-}
+
+type StreamUser = {
+  id: string;
+  name?: string;
+  image?: string;
+  role?: string;
+};
 
 export class ChatClient {
-  private static instance: ChatClientInstance;
-  private constructor() {}
+  private static client: StreamChat<StreamChatGenerics> | null = null;
+  private static connectPromise: Promise<void> | null = null;
 
-  public static getInstance(): ChatClientInstance {
-    if (!ChatClient.instance) {
-      ChatClient.instance = {
-        chatInstance: StreamChat.getInstance<{
-          attachmentType: AttachmentType;
-          channelType: ChannelType;
-          commandType: CommandType;
-          eventType: EventType;
-          messageType: MessageType;
-          reactionType: ReactionType;
-          userType: UserType;
-        }>(apiKey!, { enableWSFallback: true }),
-        isInitialized: false,
-      };
+  public static getInstance(): StreamChat<StreamChatGenerics> {
+    if (!ChatClient.client) {
+      ChatClient.client = StreamChat.getInstance<StreamChatGenerics>(apiKey!, {
+        enableWSFallback: true,
+      });
     }
-    return ChatClient.instance;
+    return ChatClient.client;
   }
 
-  public static finishSetup = async (
-    user: any,
-    token: string,
-    leagueId: number | string,
-  ) => {
-    if (
-      !ChatClient.instance.isInitialized ||
-      !ChatClient.instance.chatInstance.activeChannels[`messaging:${leagueId}`]
-    ) {
-      try {
-        const resp = await ChatClient.instance.chatInstance.connectUser(
-          //{
-          // id: user.id,
-          // name: user.d,
-          // role: 'admin',
-          // image: user.image,
-          user,
-          //},
-          token,
-        );
-      } catch (e: any) {}
+  public static connect(user: StreamUser, token: string): Promise<void> {
+    if (ChatClient.connectPromise) return ChatClient.connectPromise;
+    const client = ChatClient.getInstance();
+    ChatClient.connectPromise = client
+      .connectUser(user as any, token)
+      .then(() => undefined)
+      .catch((e) => {
+        ChatClient.connectPromise = null;
+        throw e;
+      });
+    return ChatClient.connectPromise;
+  }
 
-      ChatClient.instance.isInitialized = true;
-    }
-    return ChatClient.instance.chatInstance.channel(`messaging`, `${leagueId}`); //'chat');
-  };
-
-  public static disconnectUser = async () => {
-    await ChatClient.instance.chatInstance.disconnectUser();
-  };
+  public static async disconnect(): Promise<void> {
+    if (!ChatClient.connectPromise) return;
+    const client = ChatClient.getInstance();
+    ChatClient.connectPromise = null;
+    await client.disconnectUser();
+  }
 }
-
-export const initChat = async () => {
-  return StreamChat.getInstance<{
-    attachmentType: AttachmentType;
-    channelType: ChannelType;
-    commandType: CommandType;
-    eventType: EventType;
-    messageType: MessageType;
-    reactionType: ReactionType;
-    userType: UserType;
-  }>(apiKey!, { enableWSFallback: true });
-};
-
-export const finishSetup = async (
-  client: StreamChat,
-  user: any,
-  token: string,
-) => {
-  await client.connectUser(
-    {
-      id: user.id,
-      name: user.name,
-      role: "admin",
-      image: user.image,
-    },
-    token,
-  );
-  //@ts-ignore
-  setChannel(client.channel("messaging", "chat"));
-};

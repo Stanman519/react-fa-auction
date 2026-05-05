@@ -522,3 +522,4 @@ export const replyToTrade =
       dispatch(updateUI({ modal: "error", isLoading: undefined, errorText: e.message || "An error occurred." }));
     }
   };
+

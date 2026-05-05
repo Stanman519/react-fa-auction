@@ -11,7 +11,7 @@ import {
 import { EmojiIcon } from '../../../../assets/EmojiIcon';
 import { LightningBoltSmall } from '../../../../assets/LightningBoltSmall';
 import { SendIcon } from '../../../../assets/SendIcon';
-import { GiphyContext, AttachmentType, MessageType, ChannelType, CommandType, EventType, ReactionType, UserType } from '../../chat';
+import { GiphyContext, StreamChatGenerics } from '../../chat';
 
 import './MessagingInput.css';
 
@@ -23,28 +23,12 @@ const GiphyIcon = () => (
   </div>
 );
 
-const MessagingInput: React.FC<MessageInputProps> = () => {
+const MessagingInput: React.FC<MessageInputProps<StreamChatGenerics>> = () => {
   const { giphyState, setGiphyState } = useContext(GiphyContext);
 
-  const { acceptedFiles, maxNumberOfFiles, multipleUploads } = useChannelStateContext<
-    AttachmentType,
-    ChannelType,
-    CommandType,
-    EventType,
-    MessageType,
-    ReactionType,
-    UserType
-  >();
+  const { acceptedFiles, maxNumberOfFiles, multipleUploads } = useChannelStateContext<StreamChatGenerics>();
 
-  const messageInput = useMessageInputContext<
-    AttachmentType,
-    ChannelType,
-    CommandType,
-    EventType,
-    MessageType,
-    ReactionType,
-    UserType
-  >();
+  const messageInput = useMessageInputContext<StreamChatGenerics>();
 
   const onChange: React.ChangeEventHandler<HTMLTextAreaElement> = useCallback(
     (event) => {

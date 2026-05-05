@@ -5,7 +5,11 @@ import TLabel from "./TLabel";
 interface TLeagueBarProps {
   leagueName: string;
   teamName?: string;
-  stats?: Array<{ label: string; value: React.ReactNode; tone?: "text" | "lime" | "red" | "amber" }>;
+  stats?: Array<{
+    label: string;
+    value: React.ReactNode;
+    tone?: "text" | "lime" | "red" | "amber";
+  }>;
 }
 
 const valueTone = {
@@ -15,7 +19,11 @@ const valueTone = {
   amber: A.amber,
 };
 
-export default function TLeagueBar({ leagueName, teamName, stats = [] }: TLeagueBarProps) {
+export default function TLeagueBar({
+  leagueName,
+  teamName,
+  stats = [],
+}: TLeagueBarProps) {
   return (
     <Box
       sx={{
@@ -43,7 +51,14 @@ export default function TLeagueBar({ leagueName, teamName, stats = [] }: TLeague
           {leagueName}
         </Box>
         {teamName && (
-          <Box sx={{ fontSize: dfs(11), color: A.textDim, fontFamily: A.mono, mt: "2px" }}>
+          <Box
+            sx={{
+              fontSize: dfs(11),
+              color: A.textDim,
+              fontFamily: A.mono,
+              mt: "2px",
+            }}
+          >
             {teamName}
           </Box>
         )}
@@ -57,9 +72,17 @@ export default function TLeagueBar({ leagueName, teamName, stats = [] }: TLeague
               background: A.lineBold,
             }}
           />
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: "20px", fontFamily: A.mono, fontSize: dfs(11) }}>
-            {stats.map((s) => (
-              <Box key={s.label}>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "20px",
+              fontFamily: A.mono,
+              fontSize: dfs(11),
+            }}
+          >
+            {stats.map((s, i) => (
+              <Box key={`${s.label}-${i}`}>
                 <TLabel>{s.label}</TLabel>
                 <Box
                   sx={{

@@ -1,72 +1,35 @@
 import { Box, CircularProgress } from "@mui/material";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../redux/reducers/RootReducer";
-import {
-  FranchiseStandings,
-  SeasonFranchiseStanding,
-} from "../../../redux/reducers/TransactionReducer";
-import { lastYear } from "../../../services/Common";
+import { tytFor } from "../../../services/Common";
+import { loadTriYearStandings } from "../../../redux/actions/TriYearStandingsActions";
+import { ThunkAppDispatch } from "../../../store";
 import { A, dfs, TERMINAL_FONT_SCALE } from "./tokens";
 import TLabel from "./TLabel";
 
-interface Props {
-  onLoaded?: (info: {
-    myFranchiseId: number;
-    rows: { franchiseId: number; tytPts: number }[];
-    currentSeason?: SeasonFranchiseStanding;
-  }) => void;
-}
-
-const tytFor = (s: FranchiseStandings) =>
-  s.teamStandings.reduce((sum, ts) => sum + ts.pointsFor + ts.h2hWins * 10, 0);
-
-export default function TriYearTrophyTerminal({ onLoaded }: Props) {
+export default function TriYearTrophyTerminal() {
+  const dispatch = useDispatch<ThunkAppDispatch>();
   const ownerList = useSelector((s: RootState) => s.deadCap.deadCap);
   const leagueId = useSelector((s: RootState) => s.profile.currentLeagueId);
   const myFranchiseId = useSelector(
     (s: RootState) =>
-      s.profile.owner.leagues.find((l) => l.league.leagueId === s.profile.currentLeagueId)
-        ?.mflfranchiseid,
+      s.profile.owner.leagues.find(
+        (l) => l.league.leagueId === s.profile.currentLeagueId,
+      )?.mflfranchiseid,
   );
-  const [standings, setStandings] = useState<FranchiseStandings[]>([]);
-  const [years, setYears] = useState<number[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const thisYear = lastYear + 1;
+  const entry = useSelector((s: RootState) =>
+    leagueId ? s.triYearStandings.byLeague[leagueId] : undefined,
+  );
+  const standings = entry?.data ?? [];
+  const isLoading = !entry || entry.status === "loading";
+  const years =
+    standings.length > 0 ? standings[0].teamStandings.map((t) => t.year) : [];
 
   useEffect(() => {
     if (!leagueId) return;
-    setIsLoading(true);
-    setStandings([]);
-    setYears([]);
-    axios
-      .get(
-        `${process.env.REACT_APP_BOT_API_URL || "https://capncrunch-api.azurewebsites.net"}/Mfl/leagues/${leagueId}/years/${thisYear}/standings`,
-      )
-      .then((res) => {
-        const data = (res.data ?? []) as FranchiseStandings[];
-        const sorted = [...data].sort((a, b) => tytFor(b) - tytFor(a));
-        setStandings(sorted);
-        setYears(
-          sorted.length > 0
-            ? sorted[0].teamStandings.map((t) => t.year)
-            : [],
-        );
-      })
-      .catch(() => setStandings([]))
-      .finally(() => setIsLoading(false));
-  }, [leagueId, thisYear]);
-
-  useEffect(() => {
-    if (!onLoaded || isLoading || !myFranchiseId) return;
-    const me = standings.find((s) => s.franchiseId === myFranchiseId);
-    onLoaded({
-      myFranchiseId,
-      rows: standings.map((s) => ({ franchiseId: s.franchiseId, tytPts: tytFor(s) })),
-      currentSeason: me?.teamStandings.find((t) => t.year === thisYear),
-    });
-  }, [standings, isLoading, myFranchiseId, onLoaded, thisYear]);
+    dispatch(loadTriYearStandings());
+  }, [leagueId, dispatch]);
 
   const hasData = standings.some((s) =>
     s.teamStandings.some((t) => t.pointsFor > 0),
@@ -74,7 +37,13 @@ export default function TriYearTrophyTerminal({ onLoaded }: Props) {
   const maxTyt = Math.max(1, ...standings.map(tytFor));
 
   return (
-    <Box sx={{ background: A.panel, border: `1px solid ${A.line}`, borderRadius: "3px" }}>
+    <Box
+      sx={{
+        background: A.panel,
+        border: `1px solid ${A.line}`,
+        borderRadius: "3px",
+      }}
+    >
       <Box
         sx={{
           padding: { xs: "12px 14px", md: "14px 18px" },
@@ -85,7 +54,13 @@ export default function TriYearTrophyTerminal({ onLoaded }: Props) {
           flexWrap: "wrap",
         }}
       >
-        <Box sx={{ fontSize: { xs: 16, md: Math.round(18 * TERMINAL_FONT_SCALE) }, fontWeight: 700, color: A.text }}>
+        <Box
+          sx={{
+            fontSize: { xs: 16, md: Math.round(18 * TERMINAL_FONT_SCALE) },
+            fontWeight: 700,
+            color: A.text,
+          }}
+        >
           TRI-YEAR TROPHY
         </Box>
         <Box
@@ -105,7 +80,15 @@ export default function TriYearTrophyTerminal({ onLoaded }: Props) {
           <CircularProgress size={24} sx={{ color: A.lime }} />
         </Box>
       ) : !hasData ? (
-        <Box sx={{ p: 3, textAlign: "center", color: A.textDim, fontFamily: A.mono, fontSize: dfs(12) }}>
+        <Box
+          sx={{
+            p: 3,
+            textAlign: "center",
+            color: A.textDim,
+            fontFamily: A.mono,
+            fontSize: dfs(12),
+          }}
+        >
           standings appear when next cycle begins
         </Box>
       ) : (
@@ -124,7 +107,10 @@ export default function TriYearTrophyTerminal({ onLoaded }: Props) {
                 component="tr"
                 sx={{ borderBottom: `1px solid ${A.lineBold}` }}
               >
-                <Box component="th" sx={{ p: "10px 14px", textAlign: "left" }} />
+                <Box
+                  component="th"
+                  sx={{ p: "10px 14px", textAlign: "left" }}
+                />
                 {years.map((y) => (
                   <Box
                     key={y}
@@ -194,15 +180,17 @@ export default function TriYearTrophyTerminal({ onLoaded }: Props) {
                 const tyt = tytFor(row);
                 const isMe = row.franchiseId === myFranchiseId;
                 const team =
-                  ownerList.find((o) => o.franchiseId === row.franchiseId)?.team ??
-                  `#${row.franchiseId}`;
+                  ownerList.find((o) => o.franchiseId === row.franchiseId)
+                    ?.team ?? `#${row.franchiseId}`;
                 return (
                   <Box
                     component="tr"
                     key={row.franchiseId}
                     sx={{
                       borderBottom: `1px solid ${A.line}`,
-                      background: isMe ? "rgba(132, 204, 22, 0.05)" : "transparent",
+                      background: isMe
+                        ? "rgba(132, 204, 22, 0.05)"
+                        : "transparent",
                     }}
                   >
                     <Box

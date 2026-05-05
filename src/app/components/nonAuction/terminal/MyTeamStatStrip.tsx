@@ -4,12 +4,7 @@ import { RootState } from "../../../store";
 import { A, dfs, TERMINAL_FONT_SCALE } from "./tokens";
 import TLabel from "./TLabel";
 import { LEAGUE_CAP_MAX } from "../../dashboard/rosterMath";
-
-interface Props {
-  record?: { wins: number; losses: number };
-  triYearPts?: number;
-  triYearRank?: { rank: number; total: number };
-}
+import { lastYear, tytFor } from "../../../services/Common";
 
 const Stat = ({
   label,
@@ -48,12 +43,16 @@ const Stat = ({
   );
 };
 
-export default function MyTeamStatStrip({ record, triYearPts, triYearRank }: Props) {
+export default function MyTeamStatStrip() {
   const currentLeague = useSelector((s: RootState) =>
     s.profile.owner.leagues.find((l) => l.league.leagueId === s.profile.currentLeagueId),
   );
   const ownerName = useSelector((s: RootState) => s.profile.owner.ownername);
   const deadCapList = useSelector((s: RootState) => s.deadCap.deadCap);
+  const leagueId = useSelector((s: RootState) => s.profile.currentLeagueId);
+  const standings = useSelector((s: RootState) =>
+    leagueId ? s.triYearStandings.byLeague[leagueId]?.data ?? [] : [],
+  );
 
   if (!currentLeague) return null;
 
@@ -70,6 +69,21 @@ export default function MyTeamStatStrip({ record, triYearPts, triYearRank }: Pro
   const deadCapThruYear = futureYears.length
     ? Math.max(...futureYears.map((e) => e.y))
     : new Date().getFullYear();
+
+  const thisYear = lastYear + 1;
+  const myFranchiseId = currentLeague.mflfranchiseid;
+  const sortedByTyt = [...standings].sort((a, b) => tytFor(b) - tytFor(a));
+  const myIdx = sortedByTyt.findIndex((s) => s.franchiseId === myFranchiseId);
+  const me = sortedByTyt.find((s) => s.franchiseId === myFranchiseId);
+  const triYearPts = me ? tytFor(me) : undefined;
+  const triYearRank =
+    myIdx >= 0 && sortedByTyt.length > 0
+      ? { rank: myIdx + 1, total: sortedByTyt.length }
+      : undefined;
+  const currentSeason = me?.teamStandings.find((t) => t.year === thisYear);
+  const record = currentSeason
+    ? { wins: currentSeason.h2hWins, losses: currentSeason.h2hLosses }
+    : undefined;
 
   const winPct = record && record.wins + record.losses > 0
     ? record.wins / (record.wins + record.losses)

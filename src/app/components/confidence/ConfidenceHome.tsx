@@ -5,12 +5,10 @@ import { DragableMatchups } from "../confidence/DragableMatchups";
 import { ConfidenceResultsAccordian } from "../confidence/ConfidenceResultsAccordian";
 import { MenuBar } from "../menuBar";
 import { Rules } from "../confidence/Rules";
-import { FAChatWindow } from "../chat";
 import {
   Alert,
   Box,
   Button,
-  Drawer,
   Snackbar,
   Tab,
   Tabs,
@@ -430,16 +428,6 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
           {errorText}
         </Alert>
       </Snackbar>
-      <Drawer
-        PaperProps={{
-          sx: { width: "40%", minWidth: 350 },
-        }}
-        anchor={"left"}
-        open={openChat}
-        onClose={() => setOpenChat(false)}
-      >
-        <FAChatWindow screen="league" />
-      </Drawer>
     </div>
   );
 }

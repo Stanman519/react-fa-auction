@@ -11,82 +11,95 @@ interface Section {
 
 const SECTIONS: Section[] = [
   {
-    id: "cap",
-    title: "Salary Cap",
+    id: "rosters",
+    title: "Roster & Salary Cap",
     body: [
-      "$500M total cap per roster. Every contract counts against the cap at its annual salary for each active year.",
+      "Active Rosters comprise 25 spots plus two IR spots. Each team must carry at least 20 active players before the season starts.",
+      "The total salary cap is $500. A spending floor is enforced during the season: teams cannot have more than $200 in available cap space.",
       {
         bullets: [
-          "Dead cap = 40% of remaining contract value per year dropped (standard cut).",
-          "Roster must carry between 35 and 75 total contract-years across all players.",
+          "Standard cut penalty: 40% of remaining contract value (rounded up) for each year remaining.",
+          "IR Relief: Only 50% of a player's salary counts against the cap while in an IR spot.",
+          "Cap exceptions: Players may be cut without penalty if they retire, die, or are placed on indefinite NFL suspension.",
         ],
       },
     ],
   },
   {
     id: "contracts",
-    title: "Contracts",
+    title: "Contract Years",
     body: [
-      "Players signed in free-agency auction receive a contract of 1–5 years at a flat annual salary.",
-      "Contract length sets how many years the player's salary hits the cap. When the contract expires, the player becomes a free agent (or eligible for franchise tag).",
+      "Active rosters must maintain between 35 and 75 total contract years. These limits are lifted during the off-season.",
+      "Individual players must have a contract between 1 and 5 years.",
     ],
   },
   {
     id: "taxi",
     title: "Taxi Squad",
     body: [
-      "Rookies only. Max 5 players on taxi at a time. Taxi players count 20% of their salary against the cap.",
+      "Max 5 players per team. Only rookies are eligible to be added, but they may remain on the taxi squad after their rookie year.",
       {
         bullets: [
-          "Cut during the amnesty window: no dead cap charged.",
-          "Promoted to active roster: full salary hits cap from that point forward.",
+          "Taxi players count only 20% toward the cap and do not count toward the 35–75 team contract-year limit.",
+          "The contract clock continues to run while a player is on the taxi squad.",
+          "Graduation: Once a player is on an active roster for one game, they are no longer taxi squad eligible.",
+          "Owners cannot claim players off another team’s taxi squad.",
         ],
       },
     ],
   },
   {
-    id: "waiver",
-    title: "Waiver Extensions",
+    id: "rookie-draft",
+    title: "Rookie Draft",
     body: [
-      "Once per offseason, per team. A player picked up on waivers last season can be extended.",
+      "Consists of 4 rounds with salaries and years determined by draft slot. The draft order is the inverse of the prior year's standings.",
       {
         bullets: [
-          "Non-QBs only.",
-          "1 year, $25M — flat.",
+          "RB Multiplier: Players eligible at RB during their rookie year have a 1.2x multiplier applied to their rookie contract salary.",
+          "5th Year Option: Owners of 1st round picks can extend the contract to a 5th year at the original value plus a 30% increase.",
         ],
       },
+    ],
+  },
+  {
+    id: "waivers",
+    title: "Waivers & Extensions",
+    body: [
+      "In-season free agents are awarded via blind bid. These players receive a 1-year contract for the winning bid amount.",
+      "Once per offseason, a team can extend one player acquired via waivers the previous season. The extension is 1 year at $25 and is only available for non-QBs.",
     ],
   },
   {
     id: "tags",
     title: "Franchise Tags",
     body: [
-      "Apply to players whose contract has just expired. One tag per team per season, max 2 consecutive and 3 career per player.",
+      "Applied to players with expired contracts. One tag per team per season; max 2 consecutive and 3 career tags per player.",
       {
         bullets: [
-          "1st tag price = max(average top-6 salaries at position, 20% raise over last salary).",
-          "2nd tag price = max(average top-3 salaries at position, 20% raise).",
+          "1st Tag: One year at the greater of: average top-6 salaries at the position OR a 20% raise.",
+          "2nd Tag: One year at the greater of: average top-3 salaries at the position OR a 20% raise.",
         ],
       },
     ],
   },
   {
     id: "amnesty",
-    title: "Amnesty Buyouts",
+    title: "Offseason Amnesty",
     body: [
-      "One buyout per team per season. $15 real-money buy-in.",
-      "Dead cap = 20% of remaining value (next season only), vs the normal 40%. Cuts the player.",
+      "Early in the offseason, teams may use a one-time Amnesty Buyout for a $15 fee. The dead cap hit is reduced to 20% and applies only to the following season.",
+      "During the same window, players may be cut from the taxi squad with zero dead cap penalty.",
     ],
   },
   {
     id: "holdouts",
     title: "Holdouts",
     body: [
-      "Drawn post-Super-Bowl. Highest-raise candidate per team is flagged.",
+      "Drawn after the Super Bowl. Only one player per team can hold out per year (the eligible player with the highest potential raise).",
+      "A holdout demands a 20% raise, with the increase capped between $3 and $10.",
+      "If the raise is unpaid, the player stays rostered and counts against the cap, but cannot be started until Week 9.",
       {
         bullets: [
-          "20% raise demanded, capped between $3M and $10M.",
-          "If unpaid: player stays rostered + cap-counts but cannot start until Week 9.",
+          "Eligibility: QB1s, RB1s/2s, and WR1s/2s/3s who are paid less than the median salary of the tier below them (e.g., a WR1 paid less than the WR2 median).",
         ],
       },
     ],
@@ -95,8 +108,23 @@ const SECTIONS: Section[] = [
     id: "auction",
     title: "Free Agency Auction",
     body: [
-      "Live, multi-user auction. Max 3 active nominations per owner at a time. Bids extend the lot timer to prevent sniping.",
-      "Submitting a bid requires both salary and years-on-contract. New bids must beat the current bid on total value ($ × years).",
+      "Qualifying bids are determined by the formula: (Years × 5) + Annual Salary.",
+      {
+        bullets: [
+          "$1 bids: Must be 1-year contracts.",
+          "$2–$19: Max 2-year contracts.",
+          "Under $35: Max 3-year contracts.",
+          "$35 or more: Up to 5-year contracts.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "penalties",
+    title: "League Penalties",
+    body: [
+      "Roster Compliance: Being over the cap or outside roster size limits results in a $5 weekly fine and a locked lineup.",
+      "Lineup Compliance: Starting a player who is OUT, on IR, or on a BYE (if alternatives exist) results in a $5 fine.",
     ],
   },
 ];
@@ -295,13 +323,15 @@ export const Rulebook = () => {
                 py: 0.75,
                 fontFamily: fontStacks.mono,
                 fontSize: 11,
-                color:
-                  active === s.id ? terminal.lime : terminal.textDim,
+                color: active === s.id ? terminal.lime : terminal.textDim,
                 borderLeft: `2px solid ${
                   active === s.id ? terminal.lime : "transparent"
                 }`,
                 cursor: "pointer",
-                "&:hover": { color: terminal.text, background: terminal.panel2 },
+                "&:hover": {
+                  color: terminal.text,
+                  background: terminal.panel2,
+                },
               }}
             >
               {s.title}

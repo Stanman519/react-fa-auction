@@ -6,7 +6,6 @@ import AuthCallback from "./app/components/AuthCallback";
 //import "./index.css"
 import {
   BrowserRouter,
-  Navigate,
   Route,
   Routes,
   useNavigate,
@@ -22,21 +21,13 @@ import OverUnderHome from "./app/components/games/OverUnders/OverUnderHome";
 import AuctionRosters from "./app/components/AuctionRosters";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useDispatch } from "react-redux";
-import {
-  synchronizeAuth0WithDbLogin,
-  updateLoginInfo,
-} from "./app/redux/actions/LoginActions";
+import { synchronizeAuth0WithDbLogin } from "./app/redux/actions/LoginActions";
 import { useAppSelector } from "./app/hooks";
 import ConfidenceHome from "./app/components/confidence/ConfidenceHome";
-import {
-  AMobileBottomNav,
-  MOBILE_BOTTOM_NAV_HEIGHT,
-} from "./app/components/nonAuction/terminal";
-import { useIsMobile } from "./app/components/nonAuction/terminal/useIsMobile";
+import { AuctionTeamSalaryCapsSlab } from "./app/components/AuctionTeamSalaryCapsSlab";
+import { OverUnderStandingsSlab } from "./app/components/games/OverUnders/OverUnderStandingsSlab";
 
 function App() {
-  const theme = useTheme();
-
   return (
     <BrowserRouter>
       <Auth0ProviderWithHistory>
@@ -50,7 +41,7 @@ function App() {
 
 function AppRoutes() {
   const theme = useTheme();
-  const { user, isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
+  const { user, isAuthenticated, isLoading } = useAuth0();
   const { authSynchronized } = useAppSelector((state) => state.profile);
   const dispatch = useDispatch();
 
@@ -73,15 +64,10 @@ function AppRoutes() {
     }
   }, [isLoading, isAuthenticated, user, authSynchronized, dispatch]);
 
-  const isMobile = useIsMobile();
-
   return (
     <div
       className="min-h-screen max-w-screen"
-      style={{
-        backgroundColor: theme.palette.background.default,
-        paddingBottom: isMobile ? MOBILE_BOTTOM_NAV_HEIGHT : 0,
-      }}
+      style={{ backgroundColor: theme.palette.background.default }}
     >
       <Routes>
         <Route path="/landing" element={<LandingPage />} />
@@ -122,7 +108,8 @@ function AppRoutes() {
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
-      <AMobileBottomNav />
+      <AuctionTeamSalaryCapsSlab />
+      <OverUnderStandingsSlab />
     </div>
   );
 }
@@ -130,15 +117,12 @@ function AppRoutes() {
 export default App;
 
 // Smart Home: redirects to the right place after auth sync.
-// - If a league is actively auctioning → /auction (skip the league-home middleman)
-// - If leagues exist but nothing is auctioning → /league-home
+// - Leagues exist → /league-home
 // - No leagues → /games
 const SmartHome: React.FC = () => {
-  const profileState = useAppSelector((state) => state.profile);
-  const { owner, authSynchronized, authUser, currentLeagueId } = profileState;
+  const { owner, authSynchronized } = useAppSelector((state) => state.profile);
   const { isLoading } = useAuth0();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (isLoading || !authSynchronized) return;
@@ -148,33 +132,8 @@ const SmartHome: React.FC = () => {
       return;
     }
 
-    // Prefer the stored/current league if it's auctioning, otherwise take any auctioning league
-    const currentLeague = owner.leagues.find(
-      (l) => l.league.leagueId === currentLeagueId,
-    );
-    const auctioningLeague =
-      (currentLeague?.league.isAuctioning ? currentLeague : null) ??
-      owner.leagues.find((l) => l.league.isAuctioning);
-
-    if (auctioningLeague) {
-      // Mark as redirected so HomeBase won't re-redirect if the user navigates back
-      const leagues = owner.leagues.map((l) =>
-        l.league.leagueId === auctioningLeague.league.leagueId
-          ? { ...l, redirected: "auction" as const }
-          : l,
-      );
-      dispatch(
-        updateLoginInfo({
-          ...profileState,
-          currentLeagueId: auctioningLeague.league.leagueId,
-          owner: { ...owner, leagues },
-        }),
-      );
-      navigate("/auction", { replace: true });
-    } else {
-      navigate("/league-home", { replace: true });
-    }
-  }, [isLoading, authSynchronized, owner, currentLeagueId, navigate, dispatch]);
+    navigate("/league-home", { replace: true });
+  }, [isLoading, authSynchronized, owner, navigate]);
 
   const logo = "./stanfan-color-logo.png";
   return (

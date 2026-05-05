@@ -25,7 +25,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { updateUI } from "../redux/actions/UiActions";
 import signalR from "../signalR/socketMiddleware";
-import { ChatClient } from "../services/ChatUtils";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 import { FreeAgentGridModal } from "./FreeAgentGridModal";
@@ -102,9 +101,6 @@ function AuctionHome() {
         dispatch(signalR());
       }
     }
-    return () => {
-      ChatClient.getInstance().chatInstance.disconnectUser();
-    };
   }, [isLoading, isAuthenticated, user, authSynchronized]);
 
   useEffect(() => {
@@ -346,9 +342,7 @@ function AuctionHome() {
         flexDirection: "column",
       }}
     >
-      <Box sx={{ height: 64, flexShrink: 0 }}>
-        <MenuBar />
-      </Box>
+      <MenuBar />
 
       {currentLeague && (
         <Box
@@ -362,7 +356,7 @@ function AuctionHome() {
             alignItems: "center",
             justifyContent: "space-between",
             position: "sticky",
-            top: 64,
+            top: isMobile ? 88 : 96,
             zIndex: 9,
             gap: 1,
           }}

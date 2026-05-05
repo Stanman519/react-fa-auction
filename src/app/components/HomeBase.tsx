@@ -142,40 +142,9 @@ const HomeBase = () => {
     }
   };
 
-  // --- One-time redirect to auction ---
-  useEffect(() => {
-    if (!currentLeague) return;
-
-    const alreadyRedirected = currentLeague.redirected === "auction";
-    if (currentLeague.league.isAuctioning && !alreadyRedirected) {
-      const leagues = [...(owner?.leagues ?? [])];
-      const idx = leagues.findIndex(
-        (l) => l.league.leagueId === currentLeagueId,
-      );
-      if (idx !== -1) {
-        leagues[idx] = { ...leagues[idx], redirected: "auction" };
-        dispatch(
-          updateLoginInfo({
-            ...profileState,
-            owner: { ...owner, leagues },
-          }),
-        );
-        setTimeout(() => {
-          nav("/auction", { replace: true });
-        }, 0);
-      }
-    }
-  }, [
-    currentLeague?.redirected,
-    currentLeague?.league.isAuctioning,
-    currentLeagueId,
-    owner?.ownerId,
-    dispatch,
-    nav,
-  ]);
 
   return (
-    <div className="pt-16">
+    <div>
       <MenuBar />
       {isLoading ? (
         <div className="flex-1 flex justify-center mt-8">

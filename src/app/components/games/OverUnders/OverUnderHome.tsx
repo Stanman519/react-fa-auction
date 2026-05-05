@@ -13,7 +13,6 @@ import { OverUnderRow } from "./OverUnderRow";
 import { MenuBar } from "../../menuBar";
 import { Rules } from "../../confidence/Rules";
 import { updateUI } from "../../../redux/actions/UiActions";
-import { ChatClient } from "../../../services/ChatUtils";
 import { RootState } from "../../../store";
 import SendIcon from "@mui/icons-material/Send";
 import InSeasonOUTeamRow from "./InSeasonOUTeamRow";
@@ -50,9 +49,6 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
       //TODO: store this in cookies because it is set once and saved?
       dispatch(fetchUserPicks());
     }
-    return () => {
-      ChatClient.getInstance().chatInstance.disconnectUser();
-    };
   }, [isLoading, isAuthenticated, user, authSynchronized]);
   useEffect(() => {
     const handleScroll = () => {

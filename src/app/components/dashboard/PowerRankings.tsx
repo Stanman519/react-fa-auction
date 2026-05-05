@@ -1,9 +1,4 @@
-import {
-  Box,
-  CircularProgress,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box, CircularProgress, useMediaQuery, useTheme } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -42,9 +37,7 @@ export default function PowerRankings() {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down("md"));
   const ownerList = useSelector((s: RootState) => s.deadCap.deadCap);
-  const leagueId = useSelector(
-    (s: RootState) => s.profile.currentLeagueId,
-  );
+  const leagueId = useSelector((s: RootState) => s.profile.currentLeagueId);
   const [standings, setStandings] = useState<FranchiseStandings[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const thisYear = lastYear + 1;
@@ -55,7 +48,7 @@ export default function PowerRankings() {
     setStandings([]);
     axios
       .get(
-        `${process.env.REACT_APP_BOT_API_URL || "https://capncrunch-api.azurewebsites.net"}/Mfl/leagues/${leagueId}/years/${thisYear}/standings`,
+        `${process.env.REACT_APP_BOT_API_URL}/Mfl/leagues/${leagueId}/years/${thisYear}/standings`,
       )
       .then((res) => setStandings(res.data ?? []))
       .catch(() => setStandings([]))
@@ -70,7 +63,14 @@ export default function PowerRankings() {
       const pointsFor = current?.pointsFor ?? 0;
       const team =
         ownerList.find((o) => o.franchiseId === s.franchiseId)?.team ?? "—";
-      return { franchiseId: s.franchiseId, team, wins, losses, pointsFor, current };
+      return {
+        franchiseId: s.franchiseId,
+        team,
+        wins,
+        losses,
+        pointsFor,
+        current,
+      };
     })
     .sort((a, b) => b.wins - a.wins || b.pointsFor - a.pointsFor);
 
@@ -176,13 +176,13 @@ export default function PowerRankings() {
               >
                 {i + 1}
               </Box>
-              <Box sx={{ color: terminal.text, fontWeight: 600 }}>
-                {r.team}
-              </Box>
+              <Box sx={{ color: terminal.text, fontWeight: 600 }}>{r.team}</Box>
               <Box sx={{ ...numSx, textAlign: "right" }}>
                 {r.wins}-{r.losses}
               </Box>
-              <Box sx={{ ...numSx, textAlign: "right", color: terminal.textDim }}>
+              <Box
+                sx={{ ...numSx, textAlign: "right", color: terminal.textDim }}
+              >
                 {r.pointsFor.toFixed(0)}
               </Box>
               <Box

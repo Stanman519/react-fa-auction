@@ -1,10 +1,11 @@
 import type { ThreadHeaderProps } from 'stream-chat-react';
+import type { StreamChatGenerics } from '../../chat';
 
 import './MessagingThread.css';
 
 import { CloseThreadIcon } from '../../../../assets';
 
-const MessagingThreadHeader: React.FC<ThreadHeaderProps> = ({ closeThread, thread }) => {
+const MessagingThreadHeader: React.FC<ThreadHeaderProps<StreamChatGenerics>> = ({ closeThread, thread }) => {
   const getReplyCount = () => {
     if (!thread?.reply_count) return '';
     if (thread.reply_count === 1) return '1 reply';

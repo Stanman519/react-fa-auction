@@ -201,7 +201,7 @@ const AdvancedContractTrades = () => {
 
   useEffect(() => {
     const fetchPendingTrades = () =>
-      axios
+      axiosInstance
         .get(
           `${URL}/dashboard/league/${currentLeague?.league.leagueId}/owners/${currentLeague?.leagueownerid}/mfl/${currentLeague?.mflfranchiseid}/pending-trades`,
           { headers: { contentType: "application/json" } },

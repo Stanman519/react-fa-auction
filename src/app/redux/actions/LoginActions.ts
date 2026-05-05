@@ -7,6 +7,8 @@ import GeneralApiSvc from "../../services/GeneralApiSvc";
 import { loadDashboardData } from "./TransactionActions";
 import { updateOverUnders } from "./OverUnderActions";
 import { LEAGUE_PREF_KEY } from "../../components/menu/LeagueSwitchMenu";
+import { ChatClient } from "../../services/ChatUtils";
+import { setChatConnected } from "../reducers/ChatReducer";
 
 export const UPDATE_LOGIN = "UPDATE_LOGIN";
 
@@ -55,6 +57,21 @@ export const synchronizeAuth0WithDbLogin =
 
       console.log("[synchronizeAuth0WithDbLogin] Dispatching updated profile:", updatedProfile);
       dispatch(updateLoginInfo(updatedProfile));
+
+      try {
+        await ChatClient.connect(
+          {
+            id: `${dbUser.ownerId}`,
+            name: dbUser.displayName,
+            role: "admin",
+            image: user?.picture,
+          },
+          dbUser.streamToken,
+        );
+        dispatch(setChatConnected(true));
+      } catch (chatErr: any) {
+        console.error("[synchronizeAuth0WithDbLogin] Chat connect failed:", chatErr);
+      }
     } catch (err: any) {
       // Render may be cold-starting (takes up to 45s) or API is down — surface so user sees retry UI instead of infinite spinner
       console.error("[synchronizeAuth0WithDbLogin] API failed:", err);

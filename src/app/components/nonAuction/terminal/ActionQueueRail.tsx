@@ -50,10 +50,20 @@ const ItemCard = ({ item, onReview }: { item: Item; onReview: () => void }) => {
       >
         {item.kind}
       </Box>
-      <Box sx={{ fontSize: dfs(13), fontWeight: 700, color: A.text, mb: "4px" }}>
+      <Box
+        sx={{ fontSize: dfs(13), fontWeight: 700, color: A.text, mb: "4px" }}
+      >
         {item.title}
       </Box>
-      <Box sx={{ fontSize: dfs(11), color: A.textDim, fontFamily: A.sans, mb: "10px", lineHeight: 1.4 }}>
+      <Box
+        sx={{
+          fontSize: dfs(11),
+          color: A.textDim,
+          fontFamily: A.sans,
+          mb: "10px",
+          lineHeight: 1.4,
+        }}
+      >
         {item.detail}
       </Box>
       <TActionButton variant="lime" dense onClick={onReview}>
@@ -65,7 +75,9 @@ const ItemCard = ({ item, onReview }: { item: Item; onReview: () => void }) => {
 
 export default function ActionQueueRail({ onNavigateTab }: Props) {
   const currentLeague = useSelector((s: RootState) =>
-    s.profile.owner.leagues.find((l) => l.league.leagueId === s.profile.currentLeagueId),
+    s.profile.owner.leagues.find(
+      (l) => l.league.leagueId === s.profile.currentLeagueId,
+    ),
   );
   const transactions = useSelector((s: RootState) => s.transactions);
   const ownerList = useSelector((s: RootState) => s.deadCap.deadCap);
@@ -89,7 +101,8 @@ export default function ActionQueueRail({ onNavigateTab }: Props) {
 
   const tagCount = currentLeague.tagCandidates?.length ?? 0;
   if (tagCount > 0) {
-    const sample = currentLeague.tagCandidates!.slice(0, 2)
+    const sample = currentLeague
+      .tagCandidates!.slice(0, 2)
       .map((t) => `${t.player.fullName} ($${t.tagAmount}M)`)
       .join(", ");
     items.push({
@@ -130,7 +143,8 @@ export default function ActionQueueRail({ onNavigateTab }: Props) {
     .slice(0, 6);
 
   const teamFor = (franchiseId: number) =>
-    ownerList.find((o) => o.franchiseId === franchiseId)?.team ?? `#${franchiseId}`;
+    ownerList.find((o) => o.franchiseId === franchiseId)?.team ??
+    `#${franchiseId}`;
 
   const moveText = (t: (typeof recentMoves)[number]) => {
     if (t.amount < 0) return `cut ${t.playerName}`;
@@ -150,8 +164,12 @@ export default function ActionQueueRail({ onNavigateTab }: Props) {
 
   return (
     <Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mb: "10px" }}>
-        <Box sx={{ width: 6, height: 6, background: A.lime, borderRadius: "50%" }} />
+      <Box
+        sx={{ display: "flex", alignItems: "center", gap: "8px", mb: "10px" }}
+      >
+        <Box
+          sx={{ width: 6, height: 6, background: A.lime, borderRadius: "50%" }}
+        />
         <TLabel size={10}>YOUR ACTION QUEUE</TLabel>
         <Box
           sx={{
@@ -200,17 +218,26 @@ export default function ActionQueueRail({ onNavigateTab }: Props) {
           }}
         >
           {recentMoves.length === 0 ? (
-            <Box sx={{ p: "12px 14px", fontFamily: A.mono, fontSize: dfs(11), color: A.textMute }}>
+            <Box
+              sx={{
+                p: "12px 14px",
+                fontFamily: A.mono,
+                fontSize: dfs(11),
+                color: A.textMute,
+              }}
+            >
               no recent activity
             </Box>
           ) : (
             recentMoves.map((t, i) => (
               <Box
-                key={t.transactionId + i}
+                key={`move-${i}-${t.transactionId}`}
                 sx={{
                   p: "10px 14px",
                   borderBottom:
-                    i === recentMoves.length - 1 ? "none" : `1px solid ${A.line}`,
+                    i === recentMoves.length - 1
+                      ? "none"
+                      : `1px solid ${A.line}`,
                   fontFamily: A.mono,
                   fontSize: dfs(11),
                   display: "flex",
@@ -233,7 +260,13 @@ export default function ActionQueueRail({ onNavigateTab }: Props) {
                     {moveText(t)}
                   </Box>
                 </Box>
-                <Box sx={{ color: A.textMute, fontSize: dfs(10), whiteSpace: "nowrap" }}>
+                <Box
+                  sx={{
+                    color: A.textMute,
+                    fontSize: dfs(10),
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {moveAge(t.timestamp)}
                 </Box>
               </Box>

@@ -15,6 +15,8 @@ import { headlinesReducer } from './HeadlinesReducer';
 import { quotesReducer } from './QuotesReducer';
 import { notificationsReducer } from './NotificationsReducer';
 import { rosterReducer } from './RosterReducer';
+import { triYearStandingsReducer } from './TriYearStandingsReducer';
+import { chatReducer } from './ChatReducer';
 
 
 export const RootReducer = combineReducers({
@@ -34,6 +36,8 @@ export const RootReducer = combineReducers({
     quotes: quotesReducer,
     notifications: notificationsReducer,
     rosters: rosterReducer,
+    triYearStandings: triYearStandingsReducer,
+    chat: chatReducer,
 });
 
 export type RootState = ReturnType<typeof RootReducer>

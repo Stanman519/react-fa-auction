@@ -28,13 +28,6 @@ import {
 
 const isPickId = (id: string) => id.startsWith("DP_") || id.startsWith("FP_");
 
-const assetValue = (a: TradeOfferAsset): number => {
-  if (isPickId(a.mflId)) return 8;
-  const apy = a.playerDetails?.salary ?? 0;
-  const yrs = a.playerDetails?.length ?? 1;
-  return apy * yrs;
-};
-
 function PartnerPill({
   franchise,
   active,
@@ -64,7 +57,9 @@ function PartnerPill({
         "&:hover": { borderColor: A.lineBold, color: A.text },
       }}
     >
-      <Box sx={{ width: 6, height: 6, background: active ? A.lime : A.textDim }} />
+      <Box
+        sx={{ width: 6, height: 6, background: active ? A.lime : A.textDim }}
+      />
       {franchise.name}
     </Box>
   );
@@ -109,8 +104,21 @@ function AssetRow({
       />
       {pos && <TPosBadge pos={pos} />}
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Box sx={{ fontSize: dfs(12), color: A.text, fontWeight: 500, lineHeight: 1.2 }}>{label}</Box>
-        {sub && <Box sx={{ fontSize: dfs(10), color: A.textDim, fontFamily: A.mono }}>{sub}</Box>}
+        <Box
+          sx={{
+            fontSize: dfs(12),
+            color: A.text,
+            fontWeight: 500,
+            lineHeight: 1.2,
+          }}
+        >
+          {label}
+        </Box>
+        {sub && (
+          <Box sx={{ fontSize: dfs(10), color: A.textDim, fontFamily: A.mono }}>
+            {sub}
+          </Box>
+        )}
       </Box>
     </Box>
   );
@@ -149,14 +157,32 @@ function SidePanel({
         minHeight: 320,
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mb: "10px" }}>
+      <Box
+        sx={{ display: "flex", alignItems: "center", gap: "8px", mb: "10px" }}
+      >
         <Box sx={{ width: 8, height: 8, background: accent }} />
         <TLabel>{title}</TLabel>
       </Box>
-      <Box sx={{ fontSize: mobile ? 14 : dfs(16), fontWeight: 700, color: A.text, mb: "10px" }}>
+      <Box
+        sx={{
+          fontSize: mobile ? 14 : dfs(16),
+          fontWeight: 700,
+          color: A.text,
+          mb: "10px",
+        }}
+      >
         {franchiseName || "—"}
       </Box>
-      <Box sx={{ flex: 1, overflowY: "auto", maxHeight: 360, display: "flex", flexDirection: "column", gap: "2px" }}>
+      <Box
+        sx={{
+          flex: 1,
+          overflowY: "auto",
+          maxHeight: 360,
+          display: "flex",
+          flexDirection: "column",
+          gap: "2px",
+        }}
+      >
         {players.map((p) => {
           const id = p.mflId.toString();
           return (
@@ -166,7 +192,9 @@ function SidePanel({
               label={p.fullName || `MFL #${id}`}
               sub={`${p.team ?? "—"} · $${p.salary ?? 0}M × ${p.length ?? 0}YR`}
               selected={!!selected.find((s) => s.mflId === id)}
-              onToggle={() => onToggle(id, !selected.find((s) => s.mflId === id))}
+              onToggle={() =>
+                onToggle(id, !selected.find((s) => s.mflId === id))
+              }
             />
           );
         })}
@@ -176,7 +204,9 @@ function SidePanel({
             pos="PICK"
             label={dp.description}
             selected={!!selected.find((s) => s.mflId === dp.pick)}
-            onToggle={() => onToggle(dp.pick, !selected.find((s) => s.mflId === dp.pick))}
+            onToggle={() =>
+              onToggle(dp.pick, !selected.find((s) => s.mflId === dp.pick))
+            }
           />
         ))}
       </Box>
@@ -190,8 +220,17 @@ function SidePanel({
           alignItems: "baseline",
         }}
       >
-        <TLabel>EST VALUE · {selected.length} ASSET{selected.length === 1 ? "" : "S"}</TLabel>
-        <Box sx={{ fontFamily: A.mono, fontWeight: 700, fontSize: dfs(13), color: A.text }}>
+        <TLabel>
+          EST VALUE · {selected.length} ASSET{selected.length === 1 ? "" : "S"}
+        </TLabel>
+        <Box
+          sx={{
+            fontFamily: A.mono,
+            fontWeight: 700,
+            fontSize: dfs(13),
+            color: A.text,
+          }}
+        >
           ${estValue.toFixed(0)}M
         </Box>
       </Box>
@@ -215,25 +254,64 @@ function CapEatsBlock({
   return (
     <TPanel sx={{ mb: "14px" }}>
       <TLabel>SALARY RETAINED BY {retainerLabel.toUpperCase()}</TLabel>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "12px", mt: "10px" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+          mt: "10px",
+        }}
+      >
         {assets.map((a, assetIdx) => {
           if (isPickId(a.mflId) || !a.capEats?.length) return null;
           const max = a.playerDetails?.salary ?? 0;
           return (
             <Box key={a.mflId}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mb: "6px" }}>
-                {a.playerDetails?.position && <TPosBadge pos={a.playerDetails.position} />}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  mb: "6px",
+                }}
+              >
+                {a.playerDetails?.position && (
+                  <TPosBadge pos={a.playerDetails.position} />
+                )}
                 <Box sx={{ fontSize: dfs(12), color: A.text, fontWeight: 600 }}>
                   {a.playerDetails?.fullName ?? a.mflId}
                 </Box>
-                <Box sx={{ fontSize: dfs(10), color: A.textDim, fontFamily: A.mono }}>
+                <Box
+                  sx={{
+                    fontSize: dfs(10),
+                    color: A.textDim,
+                    fontFamily: A.mono,
+                  }}
+                >
                   · max ${max}M
                 </Box>
               </Box>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: "8px", pl: "8px" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                  pl: "8px",
+                }}
+              >
                 {a.capEats.map((ce, capEatIdx) => (
-                  <Box key={ce.year} sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <Box sx={{ fontFamily: A.mono, fontSize: dfs(11), color: A.textDim, minWidth: 40 }}>
+                  <Box
+                    key={ce.year}
+                    sx={{ display: "flex", alignItems: "center", gap: "10px" }}
+                  >
+                    <Box
+                      sx={{
+                        fontFamily: A.mono,
+                        fontSize: dfs(11),
+                        color: A.textDim,
+                        minWidth: 40,
+                      }}
+                    >
                       {ce.year}
                     </Box>
                     <Slider
@@ -242,14 +320,24 @@ function CapEatsBlock({
                       max={max}
                       valueLabelDisplay="auto"
                       valueLabelFormat={(v) => `$${v}M`}
-                      onChange={(_, v) => onSliderChange(assetIdx, capEatIdx, v as number)}
+                      onChange={(_, v) =>
+                        onSliderChange(assetIdx, capEatIdx, v as number)
+                      }
                       sx={{
                         color: A.amber,
                         flex: 1,
                         "& .MuiSlider-thumb": { borderRadius: "2px" },
                       }}
                     />
-                    <Box sx={{ fontFamily: A.mono, fontSize: dfs(11), color: A.amber, minWidth: 40, textAlign: "right" }}>
+                    <Box
+                      sx={{
+                        fontFamily: A.mono,
+                        fontSize: dfs(11),
+                        color: A.amber,
+                        minWidth: 40,
+                        textAlign: "right",
+                      }}
+                    >
                       ${ce.amount}M
                     </Box>
                   </Box>
@@ -272,7 +360,9 @@ export default function AdvancedContractTradesTerminal() {
   );
   const { deadCap } = useSelector((s: RootState) => s.deadCap);
 
-  const [mflLeagueRoot, setMflLeagueRoot] = useState<DashboardTradeLeagueDTO | undefined>(undefined);
+  const [mflLeagueRoot, setMflLeagueRoot] = useState<
+    DashboardTradeLeagueDTO | undefined
+  >(undefined);
   const [franchises, setFranchises] = useState<MflFranchise[]>([]);
   const [tradeTeamId, setTradeTeamId] = useState<string>("");
   const [tradeBait, setTradeBait] = useState<TradeBaitDTO[]>([]);
@@ -281,7 +371,10 @@ export default function AdvancedContractTradesTerminal() {
   const [otherSelected, setOtherSelected] = useState<TradeOfferAsset[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const myFranchiseIdStr = `${currentLeague?.mflfranchiseid ?? ""}`.padStart(4, "0");
+  const myFranchiseIdStr = `${currentLeague?.mflfranchiseid ?? ""}`.padStart(
+    4,
+    "0",
+  );
 
   useEffect(() => {
     if (!currentLeague) return;
@@ -296,20 +389,26 @@ export default function AdvancedContractTradesTerminal() {
       })
       .catch((err) => console.error("Error fetching league:", err));
 
-    const fetchPending = axios
+    const fetchPending = axiosInstance
       .get(
         `${URL}/dashboard/league/${currentLeague.league.leagueId}/owners/${currentLeague.leagueownerid}/mfl/${currentLeague.mflfranchiseid}/pending-trades`,
         { headers: { contentType: "application/json" } },
       )
-      .then((res) => setPendingTrades((res.data as PendingTradeResponse).tradeRequests))
+      .then((res) =>
+        setPendingTrades((res.data as PendingTradeResponse).tradeRequests),
+      )
       .catch(() => undefined);
 
     const fetchBait = axiosInstance
-      .get<TradeBaitDTO[]>(`${URL}/dashboard/leagues/${currentLeague.league.leagueId}/trade-bait`)
+      .get<TradeBaitDTO[]>(
+        `${URL}/dashboard/leagues/${currentLeague.league.leagueId}/trade-bait`,
+      )
       .then((res) => setTradeBait(res.data))
       .catch(() => undefined);
 
-    Promise.all([fetchData, fetchPending, fetchBait]).finally(() => setIsLoading(false));
+    Promise.all([fetchData, fetchPending, fetchBait]).finally(() =>
+      setIsLoading(false),
+    );
   }, []);
 
   // Hydrate partner roster names on partner change
@@ -317,7 +416,10 @@ export default function AdvancedContractTradesTerminal() {
     if (!mflLeagueRoot || !tradeTeamId) return;
     const newTeam = mflLeagueRoot.franchises.find((t) => t.id === tradeTeamId);
     if (!newTeam) return;
-    if (!newTeam.assets.players || newTeam.assets.players.some((p) => !p.fullName)) {
+    if (
+      !newTeam.assets.players ||
+      newTeam.assets.players.some((p) => !p.fullName)
+    ) {
       const playerIds = newTeam.assets.players.map((p) => p.mflId).join(",");
       const year = new Date().getFullYear();
       axiosInstance
@@ -335,7 +437,9 @@ export default function AdvancedContractTradesTerminal() {
               a.team = fp.team;
             }
           });
-          const idx = mflLeagueRoot.franchises.findIndex((t) => t.id === tradeTeamId);
+          const idx = mflLeagueRoot.franchises.findIndex(
+            (t) => t.id === tradeTeamId,
+          );
           const newLeague = { ...mflLeagueRoot };
           if (idx >= 0) newLeague.franchises[idx] = newTeam;
           setMflLeagueRoot(newLeague);
@@ -384,8 +488,10 @@ export default function AdvancedContractTradesTerminal() {
     const sourceFranchiseId = side === "mine" ? myFranchiseIdStr : tradeTeamId;
     const sourceFranchise = franchises.find((f) => f.id === sourceFranchiseId);
     const setSelected = side === "mine" ? setMySelected : setOtherSelected;
-    const eaterId = side === "mine" ? currentLeague?.mflfranchiseid ?? 0 : +tradeTeamId;
-    const receiverId = side === "mine" ? +tradeTeamId : currentLeague?.mflfranchiseid ?? 0;
+    const eaterId =
+      side === "mine" ? (currentLeague?.mflfranchiseid ?? 0) : +tradeTeamId;
+    const receiverId =
+      side === "mine" ? +tradeTeamId : (currentLeague?.mflfranchiseid ?? 0);
 
     if (!checked) {
       setSelected((prev) => prev.filter((a) => a.mflId !== assetId));
@@ -441,14 +547,9 @@ export default function AdvancedContractTradesTerminal() {
     });
   };
 
-  const myValue = mySelected.reduce((s, a) => s + assetValue(a), 0);
-  const theirValue = otherSelected.reduce((s, a) => s + assetValue(a), 0);
-  const fairness = Math.min(100, Math.max(0, 50 + (theirValue - myValue) * 1.2));
-  const fairnessTone = fairness > 65 ? A.lime : fairness < 35 ? A.red : A.amber;
-  const fairnessLabel = fairness > 65 ? "FAVORS YOU" : fairness < 35 ? "FAVORS THEM" : "BALANCED";
-
-  // Cap impact (current year, simplified)
-  const myCapInfo = deadCap.find((d) => d.franchiseId === currentLeague?.mflfranchiseid);
+  const myCapInfo = deadCap.find(
+    (d) => d.franchiseId === currentLeague?.mflfranchiseid,
+  );
   const capRoom = myCapInfo?.capRoom ?? 0;
   const myOutgoingSalary = mySelected
     .filter((a) => !isPickId(a.mflId))
@@ -480,17 +581,34 @@ export default function AdvancedContractTradesTerminal() {
 
   if (isLoading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", py: 8, background: A.bg }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          py: 8,
+          background: A.bg,
+        }}
+      >
         <CircularProgress />
       </Box>
     );
   }
 
-  const tradablePartners = franchises.filter((f) => +f.id !== currentLeague?.mflfranchiseid);
-  const canSubmit = !!tradeTeamId && (mySelected.length > 0 || otherSelected.length > 0);
+  const tradablePartners = franchises.filter(
+    (f) => +f.id !== currentLeague?.mflfranchiseid,
+  );
+  const canSubmit =
+    !!tradeTeamId && (mySelected.length > 0 || otherSelected.length > 0);
 
   return (
-    <Box sx={{ background: A.bg, padding: mobile ? "12px" : "18px", color: A.text, minHeight: "100%" }}>
+    <Box
+      sx={{
+        background: A.bg,
+        padding: mobile ? "12px" : "18px",
+        color: A.text,
+        minHeight: "100%",
+      }}
+    >
       <Box
         sx={{
           mb: "14px",
@@ -503,7 +621,14 @@ export default function AdvancedContractTradesTerminal() {
       >
         <Box>
           <TLabel>NEW TRADE PROPOSAL</TLabel>
-          <Box sx={{ fontSize: mobile ? 20 : dfs(24), fontWeight: 800, color: A.text, letterSpacing: "-0.02em" }}>
+          <Box
+            sx={{
+              fontSize: mobile ? 20 : dfs(24),
+              fontWeight: 800,
+              color: A.text,
+              letterSpacing: "-0.02em",
+            }}
+          >
             Build a deal
           </Box>
         </Box>
@@ -516,7 +641,11 @@ export default function AdvancedContractTradesTerminal() {
         <TLabel>TRADE WITH</TLabel>
         <Box sx={{ display: "flex", gap: "4px", flexWrap: "wrap", mt: "8px" }}>
           {tradablePartners.length === 0 && (
-            <Box sx={{ color: A.textDim, fontFamily: A.mono, fontSize: dfs(11) }}>No partners available.</Box>
+            <Box
+              sx={{ color: A.textDim, fontFamily: A.mono, fontSize: dfs(11) }}
+            >
+              No partners available.
+            </Box>
           )}
           {tradablePartners.map((f) => (
             <PartnerPill
@@ -535,16 +664,30 @@ export default function AdvancedContractTradesTerminal() {
             const bait = tradeBait.find((tb) => tb.franchiseId === tradeTeamId);
             if (!bait) return null;
             return (
-              <Box sx={{ mt: "10px", fontFamily: A.mono, fontSize: dfs(11), color: A.textDim, display: "flex", flexDirection: "column", gap: "2px" }}>
+              <Box
+                sx={{
+                  mt: "10px",
+                  fontFamily: A.mono,
+                  fontSize: dfs(11),
+                  color: A.textDim,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "2px",
+                }}
+              >
                 {bait.willGiveUp && (
                   <Box>
-                    <Box component="span" sx={{ color: A.amber, mr: "6px" }}>OFFERING</Box>
+                    <Box component="span" sx={{ color: A.amber, mr: "6px" }}>
+                      OFFERING
+                    </Box>
                     {bait.willGiveUp}
                   </Box>
                 )}
                 {bait.inExchangeFor && (
                   <Box>
-                    <Box component="span" sx={{ color: A.lime, mr: "6px" }}>WANTS</Box>
+                    <Box component="span" sx={{ color: A.lime, mr: "6px" }}>
+                      WANTS
+                    </Box>
                     {bait.inExchangeFor}
                   </Box>
                 )}
@@ -553,7 +696,14 @@ export default function AdvancedContractTradesTerminal() {
           })()}
       </TPanel>
 
-      <Box sx={{ display: "flex", flexDirection: mobile ? "column" : "row", gap: "12px", mb: "14px" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: mobile ? "column" : "row",
+          gap: "12px",
+          mb: "14px",
+        }}
+      >
         <SidePanel
           title="YOU SEND"
           accent={A.amber}
@@ -562,7 +712,7 @@ export default function AdvancedContractTradesTerminal() {
           picks={myPicks}
           selected={mySelected}
           onToggle={(id, checked) => toggleAsset("mine", id, checked)}
-          estValue={myValue}
+          estValue={0}
           mobile={mobile}
         />
         <Box
@@ -586,47 +736,10 @@ export default function AdvancedContractTradesTerminal() {
           picks={partnerPicks}
           selected={otherSelected}
           onToggle={(id, checked) => toggleAsset("other", id, checked)}
-          estValue={theirValue}
+          estValue={0}
           mobile={mobile}
         />
       </Box>
-
-      <TPanel sx={{ mb: "14px" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: "8px" }}>
-          <TLabel>FAIRNESS METER</TLabel>
-          <Box sx={{ color: fairnessTone, fontWeight: 700, fontFamily: A.mono, fontSize: dfs(12) }}>
-            {fairnessLabel} · {fairness.toFixed(0)}%
-          </Box>
-        </Box>
-        <Box sx={{ height: 6, background: A.panel2, borderRadius: "3px", position: "relative", overflow: "hidden" }}>
-          <Box sx={{ position: "absolute", left: "50%", top: 0, bottom: 0, width: "1px", background: A.lineBold }} />
-          <Box
-            sx={{
-              position: "absolute",
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: `${fairness}%`,
-              background: `linear-gradient(90deg, ${A.red}, ${A.amber} 50%, ${A.lime})`,
-            }}
-          />
-          <Box
-            sx={{
-              position: "absolute",
-              top: "-2px",
-              bottom: "-2px",
-              width: "3px",
-              background: A.text,
-              left: `calc(${fairness}% - 1px)`,
-            }}
-          />
-        </Box>
-        <Box sx={{ display: "flex", justifyContent: "space-between", mt: "6px", fontFamily: A.mono, fontSize: dfs(9), color: A.textMute }}>
-          <span>YOUR SIDE WORSE</span>
-          <span>EVEN</span>
-          <span>YOUR SIDE BETTER</span>
-        </Box>
-      </TPanel>
 
       <TPanel sx={{ mb: "14px" }}>
         <TLabel>CAP IMPACT · YOU</TLabel>
@@ -649,7 +762,10 @@ export default function AdvancedContractTradesTerminal() {
             value={`${capDelta > 0 ? "+" : ""}$${capDelta.toFixed(1)}M`}
             tone={capDelta === 0 ? "text" : capDelta > 0 ? "amber" : "lime"}
           />
-          <TMathCell label="ROSTER Δ" value={`${otherSelected.filter((a) => !isPickId(a.mflId)).length - mySelected.filter((a) => !isPickId(a.mflId)).length}`} />
+          <TMathCell
+            label="ROSTER Δ"
+            value={`${otherSelected.filter((a) => !isPickId(a.mflId)).length - mySelected.filter((a) => !isPickId(a.mflId)).length}`}
+          />
         </Box>
       </TPanel>
 
@@ -703,20 +819,43 @@ export default function AdvancedContractTradesTerminal() {
                     gridTemplateColumns: mobile ? "1fr" : "1.2fr 1.5fr 1.5fr",
                     gap: "10px",
                     padding: "10px 12px",
-                    borderBottom: i === tradeBait.length - 1 ? "none" : `1px solid ${A.line}`,
+                    borderBottom:
+                      i === tradeBait.length - 1
+                        ? "none"
+                        : `1px solid ${A.line}`,
                     fontFamily: A.mono,
                     fontSize: dfs(11),
                     alignItems: "start",
                   }}
                 >
-                  <Box sx={{ color: A.text, fontWeight: 600 }}>{f?.name ?? `#${b.franchiseId}`}</Box>
+                  <Box sx={{ color: A.text, fontWeight: 600 }}>
+                    {f?.name ?? `#${b.franchiseId}`}
+                  </Box>
                   <Box>
-                    <Box sx={{ color: A.amber, fontSize: dfs(9), letterSpacing: "0.08em" }}>OFFERING</Box>
+                    <Box
+                      sx={{
+                        color: A.amber,
+                        fontSize: dfs(9),
+                        letterSpacing: "0.08em",
+                      }}
+                    >
+                      OFFERING
+                    </Box>
                     <Box sx={{ color: A.textDim }}>{b.willGiveUp || "—"}</Box>
                   </Box>
                   <Box>
-                    <Box sx={{ color: A.lime, fontSize: dfs(9), letterSpacing: "0.08em" }}>WANTS</Box>
-                    <Box sx={{ color: A.textDim }}>{b.inExchangeFor || "—"}</Box>
+                    <Box
+                      sx={{
+                        color: A.lime,
+                        fontSize: dfs(9),
+                        letterSpacing: "0.08em",
+                      }}
+                    >
+                      WANTS
+                    </Box>
+                    <Box sx={{ color: A.textDim }}>
+                      {b.inExchangeFor || "—"}
+                    </Box>
                   </Box>
                 </Box>
               );

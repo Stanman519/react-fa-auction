@@ -11,16 +11,7 @@ import {
 } from 'stream-chat-react';
 
 
-import {
-  AttachmentType,
-  ChannelType,
-  CommandType,
-  EventType,
-  GiphyContext,
-  MessageType,
-  ReactionType,
-  UserType,
-} from '../../chat';
+import { GiphyContext, StreamChatGenerics } from '../../chat';
 import MessagingChannelHeader from '../MessagingChannelHeader/MessagingChannelHeader';
 import MessagingInput from '../MessagingInput/MessagingInput';
 
@@ -33,15 +24,7 @@ export const ChannelInner: React.FC<ChannelInnerProps> = (props) => {
   const { theme, toggleMobile } = props;
   const { giphyState, setGiphyState } = useContext(GiphyContext);
 
-  const { sendMessage } = useChannelActionContext<
-    AttachmentType,
-    ChannelType,
-    CommandType,
-    EventType,
-    MessageType,
-    ReactionType,
-    UserType
-  >();
+  const { sendMessage } = useChannelActionContext<StreamChatGenerics>();
 
   const overrideSubmitHandler = (message: {
     attachments: Attachment[];

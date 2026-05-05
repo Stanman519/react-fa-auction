@@ -2,36 +2,12 @@ import { useChatContext, useTypingContext } from 'stream-chat-react';
 
 import './TypingIndicator.css';
 
-import type {
-  AttachmentType,
-  ChannelType,
-  CommandType,
-  EventType,
-  MessageType,
-  ReactionType,
-  UserType,
-} from '../../chat';
+import type { StreamChatGenerics } from '../../chat';
 
 export const TypingIndicator = () => {
-  const { client } = useChatContext<
-    AttachmentType,
-    ChannelType,
-    CommandType,
-    EventType,
-    MessageType,
-    ReactionType,
-    UserType
-  >();
+  const { client } = useChatContext<StreamChatGenerics>();
 
-  const { typing } = useTypingContext<
-    AttachmentType,
-    ChannelType,
-    CommandType,
-    EventType,
-    MessageType,
-    ReactionType,
-    UserType
-  >();
+  const { typing } = useTypingContext<StreamChatGenerics>();
 
   if (!client || !typing) return null;
 

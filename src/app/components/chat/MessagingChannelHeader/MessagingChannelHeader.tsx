@@ -9,15 +9,7 @@ import { TypingIndicator } from '../TypingIndicator/TypingIndicator';
 
 import type { ChannelMemberResponse } from 'stream-chat';
 
-import type {
-  AttachmentType,
-  ChannelType,
-  CommandType,
-  EventType,
-  MessageType,
-  ReactionType,
-  UserType,
-} from '../../chat';
+import type { StreamChatGenerics } from '../../chat';
 import { ChannelInfoIcon, ChannelSaveIcon, HamburgerIcon } from '../../../../assets';
 
 export const AvatarGroup = ({ members }: { members: ChannelMemberResponse[] }) => {
@@ -48,25 +40,9 @@ const MessagingChannelHeader: React.FC<Props> = (props) => {
   const { theme, toggleMobile } = props;
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { client } = useChatContext<
-    AttachmentType,
-    ChannelType,
-    CommandType,
-    EventType,
-    MessageType,
-    ReactionType,
-    UserType
-  >();
+  const { client } = useChatContext<StreamChatGenerics>();
 
-  const { channel } = useChannelStateContext<
-    AttachmentType,
-    ChannelType,
-    CommandType,
-    EventType,
-    MessageType,
-    ReactionType,
-    UserType
-  >();
+  const { channel } = useChannelStateContext<StreamChatGenerics>();
   const [channelName, setChannelName] = useState(channel.data?.name || '');
   const [title, setTitle] = useState('');
   const updateChannel = async () => {
