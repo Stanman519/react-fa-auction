@@ -3,6 +3,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { axiosInstance } from "./axiosInstance";
 import { HoldoutDTO, PlayerDTO } from "../redux/reducers/FreeAgentReducer";
 import Owner, {
+  FifthYearOptionCandidate,
   LeagueInfo,
   PoolUser,
   TagCandidate,
@@ -51,6 +52,12 @@ export interface FranchiseTagBody {
   mflPlayerId: number;
   mflFranchiseId: number;
   tagSalary: number;
+  leagueOwnerId: number;
+}
+export interface FifthYearOptionBody {
+  leagueId: number;
+  mflPlayerId: number;
+  mflFranchiseId: number;
   leagueOwnerId: number;
 }
 export interface CutRequestBody {
@@ -287,6 +294,28 @@ const getFranchiseTagCandidates = (
       return undefined;
     });
 };
+const getFifthYearOptionCandidates = (
+  leagueId: number,
+  leagueOwnerId: number,
+  mflFranchiseId: number,
+): Promise<FifthYearOptionCandidate[]> => {
+  return axiosInstance
+    .get(
+      `${URL}/dashboard/league/${leagueId}/owners/${leagueOwnerId}/mfl/${mflFranchiseId}/fifth-year-option-candidates`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    )
+    .then((res) => {
+      return res.data;
+    })
+    .catch(() => {
+      console.log("catch");
+      return undefined;
+    });
+};
 const getTaxiSquadPlayers = (
   leagueId: number,
   leagueOwnerId: number,
@@ -401,6 +430,17 @@ const setOwnersToPaid = (
 const postFranchiseTagPlayer = (body: FranchiseTagBody): Promise<Response> => {
   return axiosInstance
     .post(`${URL}/dashboard/tag-player`, body, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
+const postFifthYearOption = (body: FifthYearOptionBody): Promise<Response> => {
+  return axiosInstance
+    .post(`${URL}/dashboard/fifth-year-option`, body, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -784,6 +824,8 @@ export default {
   getNflTeams,
   getUnpaidOwners,
   getFranchiseTagCandidates,
+  getFifthYearOptionCandidates,
+  postFifthYearOption,
   setWinningProp,
   submitProp,
   getTaxiSquadPlayers,

@@ -14,6 +14,7 @@ import TaxiSquadTile from "./nonAuction/TaxiSquadTile";
 import { Alert, Box, CircularProgress, Snackbar, Typography } from "@mui/material";
 import {
   getBuyoutCandidates,
+  getFifthYearOptionCandidates,
   getFranchiseTagCandidates,
   getHoldoutCandidates,
   getTaxiSquadPlayers,
@@ -21,6 +22,7 @@ import {
   loadDashboardData,
 } from "../redux/actions/TransactionActions";
 import WaiverExtensions from "./nonAuction/WaiverExtensions";
+import FifthYearOptionTerminal from "./nonAuction/FifthYearOptionTerminal";
 import { updateUI } from "../redux/actions/UiActions";
 import AdvancedContractTrades from "./nonAuction/AdvancedContractTrades";
 import PendingTrades from "./nonAuction/PendingTrades";
@@ -70,6 +72,7 @@ const HomeBase = () => {
   const tagCount = currentLeague?.tagCandidates?.length ?? 0;
   const buyoutCount = currentLeague?.cutCandidates?.length ?? 0;
   const waiverCount = currentLeague?.waiverExtensionPlayers?.length ?? 0;
+  const fifthYearCount = currentLeague?.fifthYearOptionCandidates?.length ?? 0;
 
   const tabs: DashboardTab[] = [
     { label: "LEAGUE INFO", value: "league" },
@@ -88,6 +91,9 @@ const HomeBase = () => {
       : []),
     ...(currentLeague?.league.isFranchiseTagSzn || tagCount > 0
       ? [{ label: "FRANCHISE TAGS", value: "tags" }]
+      : []),
+    ...(currentLeague?.league.isFranchiseTagSzn || fifthYearCount > 0
+      ? [{ label: "5TH YR OPTION", value: "fifth-year", badge: fifthYearCount || undefined }]
       : []),
     ...(currentLeague?.league.isFranchiseTagSzn || waiverCount > 0
       ? [{ label: "WAIVER EXTENSION", value: "waiver", badge: waiverCount }]
@@ -132,6 +138,9 @@ const HomeBase = () => {
           break;
         case "tags":
           await dispatch(getFranchiseTagCandidates() as any);
+          break;
+        case "fifth-year":
+          await dispatch(getFifthYearOptionCandidates() as any);
           break;
         case "waiver":
           await dispatch(getWaiverExtensionCandidates() as any);
@@ -232,6 +241,7 @@ const HomeBase = () => {
                 {currentTab === "cap-outlook" && <CapOutlook />}
                 {currentTab === "rules" && <Rulebook />}
                 {currentTab === "tags" && (loadingTab === "tags" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <FranchiseTags />)}
+                {currentTab === "fifth-year" && (loadingTab === "fifth-year" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <FifthYearOptionTerminal />)}
                 {currentTab === "taxi" && (loadingTab === "taxi" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <TaxiSquadTile />)}
                 {currentTab === "buyouts" && (loadingTab === "buyouts" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <BuyoutTile />)}
                 {currentTab === "waiver" && (loadingTab === "waiver" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <WaiverExtensions />)}

@@ -45,6 +45,7 @@ export type Modals =
   | "waiver-confirm"
   | "buyout-confirm"
   | "tag-confirm"
+  | "fifth-year-confirm"
   | "bid-history-slab"
   | "team-caps-slab"
   | "free-agent-grid"

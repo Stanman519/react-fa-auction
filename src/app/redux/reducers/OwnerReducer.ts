@@ -55,6 +55,7 @@ export interface LeagueLoginInfo {
   cutCandidates: PlayerDTO[];
   holdoutCandidates: HoldoutDTO[];
   waiverExtensionPlayers: PlayerDTO[];
+  fifthYearOptionCandidates?: FifthYearOptionCandidate[];
   redirected?: string | null; // track if already redirected to auction/games for this league
 }
 
@@ -72,6 +73,14 @@ export interface TagCandidate {
   lastSeasonSalary: number;
   player: PlayerDTO;
   tagAmount: number;
+}
+
+export interface FifthYearOptionCandidate {
+  player: PlayerDTO;
+  originalRookieSalary: number;
+  optionSalary: number;
+  draftYear: number;
+  draftPick: number;
 }
 
 const defaultState = [] as OpposingFranchiseDTO[];

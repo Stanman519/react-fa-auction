@@ -1,6 +1,6 @@
 import { Transaction } from "../reducers/TransactionReducer";
 import { Action, current } from "@reduxjs/toolkit";
-import GeneralApiSvc, { FranchiseTagBody } from "../../services/GeneralApiSvc";
+import GeneralApiSvc, { FifthYearOptionBody, FranchiseTagBody } from "../../services/GeneralApiSvc";
 import { RootState } from "../reducers/RootReducer";
 import { updateDeadCapInfo } from "./DeadCapActions";
 import { updateUI } from "./UiActions";
@@ -120,6 +120,78 @@ export const getFranchiseTagCandidates =
         }),
       );
     } catch (e: any) {}
+  };
+
+export const getFifthYearOptionCandidates =
+  () =>
+  async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    const { profile } = getState();
+    const leagues = [...profile.owner.leagues];
+    const idx = leagues.findIndex(
+      (l) => l.league.leagueId === profile.currentLeagueId,
+    );
+    if (idx === -1) return;
+
+    try {
+      const res = await GeneralApiSvc.getFifthYearOptionCandidates(
+        leagues[idx].league.leagueId,
+        leagues[idx].leagueownerid,
+        leagues[idx].mflfranchiseid,
+      );
+      leagues[idx] = {
+        ...leagues[idx],
+        fifthYearOptionCandidates: res || [],
+      };
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: {
+            ...profile.owner,
+            leagues,
+          },
+        }),
+      );
+    } catch (e: any) {}
+  };
+
+export const submitFifthYearOption =
+  (leagueId: number, mflPlayerId: number, mflFranchiseId: number) =>
+  async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    const { profile } = getState();
+    const leagues = [...profile.owner.leagues];
+    const idx = leagues.findIndex(
+      (l) => l.league.leagueId === profile.currentLeagueId,
+    );
+    if (idx === -1) return;
+
+    const requestBody: FifthYearOptionBody = {
+      leagueId,
+      mflPlayerId,
+      mflFranchiseId,
+      leagueOwnerId: leagues[idx].leagueownerid,
+    };
+
+    try {
+      await GeneralApiSvc.postFifthYearOption(requestBody);
+      const remaining = (leagues[idx].fifthYearOptionCandidates || []).filter(
+        (c) => c.player.mflId !== mflPlayerId,
+      );
+      leagues[idx] = {
+        ...leagues[idx],
+        fifthYearOptionCandidates: remaining,
+      };
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: { ...profile.owner, leagues },
+        }),
+      );
+      dispatch(updateUI({ modal: "dashboard-success" }));
+    } catch (e: any) {
+      const friendly =
+        e?.response?.data?.friendlyMessage || e.message || "An error occurred.";
+      dispatch(updateUI({ modal: "error", errorText: friendly }));
+    }
   };
 
 export const getTaxiSquadPlayers =
