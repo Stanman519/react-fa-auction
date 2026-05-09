@@ -11,22 +11,22 @@ const Auth0ProviderWithHistory = ({ children }: { children: any }) => {
   const onRedirectCallback = (appState: any) => {
     // Always redirect to /auth-callback which will handle final routing
     // after profile sync completes
-    console.log(
-      "[Auth0ProviderWithHistory] onRedirectCallback triggered, redirecting to /auth-callback",
-      appState,
-    );
+    // console.log(
+    //   "[Auth0ProviderWithHistory] onRedirectCallback triggered, redirecting to /auth-callback",
+    //   appState,
+    // );
     navigate("/auth-callback", {
       state: { returnTo: appState?.returnTo || null },
       replace: true,
     });
   };
 
-  console.log(
-    "[Auth0ProviderWithHistory] Initializing with domain:",
-    domain,
-    "clientId:",
-    clientId,
-  );
+  // console.log(
+  //   "[Auth0ProviderWithHistory] Initializing with domain:",
+  //   domain,
+  //   "clientId:",
+  //   clientId,
+  // );
 
   return (
     <Auth0Provider

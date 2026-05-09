@@ -1,6 +1,7 @@
 import { Transaction } from "../reducers/TransactionReducer";
 import { Action, current } from "@reduxjs/toolkit";
 import GeneralApiSvc, { FifthYearOptionBody, FranchiseTagBody } from "../../services/GeneralApiSvc";
+import { loadRecentMoves } from "../reducers/RecentMovesReducer";
 import { RootState } from "../reducers/RootReducer";
 import { updateDeadCapInfo } from "./DeadCapActions";
 import { updateUI } from "./UiActions";
@@ -35,9 +36,10 @@ export const loadDashboardData =
 
     const currentLeague = leagues[idx];
     try {
-      const deadCap = await GeneralApiSvc.getDeadCapAndTransactions(
-        currentLeague.league.leagueId,
-      );
+      const [deadCap, recentMoves] = await Promise.all([
+        GeneralApiSvc.getDeadCapAndTransactions(currentLeague.league.leagueId),
+        GeneralApiSvc.getRecentMoves(currentLeague.league.leagueId),
+      ]);
 
       dispatch(
         updateLoginInfo({
@@ -49,6 +51,7 @@ export const loadDashboardData =
         }),
       );
       dispatch(loadTransactions(deadCap.leagueTransactions));
+      dispatch(loadRecentMoves(recentMoves ?? []));
       dispatch(
         updateDeadCapInfo({
           deadCap: deadCap.teamDeadCapData,

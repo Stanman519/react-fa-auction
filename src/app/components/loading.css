@@ -1,0 +1,99 @@
+/* loading.css — animations for LoadingScreen + FPLogo glow */
+
+.fp-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.015) 2px,
+    rgba(255, 255, 255, 0.015) 4px
+  );
+}
+
+.fp-scan-beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, oklch(0.85 0.18 130), transparent);
+  opacity: 0.15;
+  animation: fp-scan 3s linear infinite;
+}
+
+.fp-logo-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 60px;
+  background: radial-gradient(ellipse, oklch(0.85 0.18 130 / 0.18), transparent 70%);
+  animation: fp-glow 2s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.fp-fadein {
+  animation: fp-fadein 400ms both;
+}
+
+.fp-pulse-dot {
+  animation: fp-pulse-dot 1s infinite !important;
+}
+
+.fp-bar-grow {
+  animation: fp-bar-grow 3s ease-out forwards;
+}
+
+.fp-bar-dance {
+  animation: fp-bars-dance ease-in-out infinite;
+  opacity: 0.5;
+}
+
+@keyframes fp-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes fp-scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes fp-bar-grow {
+  0% { width: 0%; }
+  60% { width: 85%; }
+  90% { width: 92%; }
+  100% { width: 100%; }
+}
+
+@keyframes fp-fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fp-pulse-dot {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes fp-bars-dance {
+  0% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+  100% { transform: scaleY(0.3); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fp-scan-beam,
+  .fp-logo-glow,
+  .fp-bar-dance,
+  .fp-pulse-dot {
+    animation: none !important;
+  }
+  .fp-scan-beam { display: none; }
+  .fp-logo-glow { opacity: 0.4; }
+  .fp-bar-dance { opacity: 0.5; transform: scaleY(0.6); }
+}

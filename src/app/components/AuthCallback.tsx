@@ -1,10 +1,14 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../redux/reducers/RootReducer";
-import { CircularProgress } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { synchronizeAuth0WithDbLogin, updateLoginInfo } from "../redux/actions/LoginActions";
+import {
+  synchronizeAuth0WithDbLogin,
+  updateLoginInfo,
+} from "../redux/actions/LoginActions";
+import { LoadingScreen } from "./LoadingScreen";
+import { FPLogo } from "./FPLogo";
 
 /**
  * AuthCallback component.
@@ -36,24 +40,24 @@ const AuthCallback: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log("[AuthCallback] Render state:", {
-      authSynchronized,
-      ownerId: owner?.ownerId,
-      currentLeagueId,
-      returnTo,
-    });
+    // console.log("[AuthCallback] Render state:", {
+    //   authSynchronized,
+    //   ownerId: owner?.ownerId,
+    //   currentLeagueId,
+    //   returnTo,
+    // });
 
     // Still waiting for auth sync
     if (!authSynchronized) {
-      console.log("[AuthCallback] Waiting for authSynchronized...");
+      // console.log("[AuthCallback] Waiting for authSynchronized...");
       return;
     }
 
-    console.log("[AuthCallback] Auth synchronized, determining redirect...");
+    // console.log("[AuthCallback] Auth synchronized, determining redirect...");
 
     // If an explicit returnTo was provided by Auth0 and it's not root or auth-callback, honor it
     if (returnTo && returnTo !== "/" && returnTo !== "/auth-callback") {
-      console.log("[AuthCallback] Honoring returnTo:", returnTo);
+      // console.log("[AuthCallback] Honoring returnTo:", returnTo);
       navigate(returnTo, { replace: true });
       return;
     }
@@ -72,7 +76,7 @@ const AuthCallback: React.FC = () => {
 
     // Fallback: if no current league found, route to games
     if (!currentLeague) {
-      console.log("[AuthCallback] No current league found, routing to /games");
+      // console.log("[AuthCallback] No current league found, routing to /games");
       navigate("/games", { replace: true });
       return;
     }
@@ -87,16 +91,31 @@ const AuthCallback: React.FC = () => {
     }
   }, [authSynchronized, owner, currentLeagueId, navigate, returnTo]);
 
-  const logo = "./stanfan-color-logo.png";
-
   if (authError) {
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen gap-4 p-4">
-        <img className="max-w-xs" src={logo} />
-        <p style={{ fontSize: 16, color: "#f87171", textAlign: "center" }}>
+      <div
+        className="flex flex-col justify-center items-center min-h-screen gap-4 p-4"
+        style={{ background: "#0a0d10" }}
+      >
+        <FPLogo size="lg" variant="full" bg="dark" />
+        <p
+          style={{
+            fontSize: 16,
+            color: "#f87171",
+            textAlign: "center",
+            marginTop: 16,
+          }}
+        >
           Couldn't sign you in: {authError}
         </p>
-        <p style={{ fontSize: 13, color: "#ccc", textAlign: "center", maxWidth: 360 }}>
+        <p
+          style={{
+            fontSize: 13,
+            color: "#ccc",
+            textAlign: "center",
+            maxWidth: 360,
+          }}
+        >
           Server may be waking up (free tier). Wait a few seconds and retry.
         </p>
         <button
@@ -116,16 +135,7 @@ const AuthCallback: React.FC = () => {
     );
   }
 
-  return (
-    <div className="flex flex-row justify-center items-center max-w-screen-sm min-h-screen ">
-      <div className="flex-col justify-center items-center max-w-full p-4 m-4 ">
-        <img className="max-w-xs animate-pulse" src={logo} />
-        <p style={{ marginTop: 20, fontSize: 14, color: "#ccc" }}>
-          Authenticating...
-        </p>
-      </div>
-    </div>
-  );
+  return <LoadingScreen />;
 };
 
 export default AuthCallback;

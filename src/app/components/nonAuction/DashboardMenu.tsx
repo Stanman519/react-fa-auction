@@ -19,6 +19,7 @@ import { useSelector } from "react-redux";
 import { current } from "@reduxjs/toolkit";
 import Divider from "@mui/material/Divider";
 import { LeagueSwitchMenuItems } from "../menu/LeagueSwitchMenu";
+import { FPLogo } from "../FPLogo";
 
 const settings = ["logout"];
 
@@ -45,7 +46,6 @@ function ResponsiveAppBar() {
   const [picAnchorEl, setPicAnchorEl] = React.useState<null | HTMLElement>(
     null,
   );
-  const logo = process.env.PUBLIC_URL + "/stanfan-logo-white.png";
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -124,10 +124,9 @@ function ResponsiveAppBar() {
               ))}
             </Menu>
           </Box>
-          <img
-            src={logo}
-            style={{ maxHeight: 20, aspectRatio: "auto", marginRight: 20 }}
-          />
+          <Box sx={{ marginRight: "20px" }}>
+            <FPLogo size="sm" variant="full" bg="dark" />
+          </Box>
 
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (

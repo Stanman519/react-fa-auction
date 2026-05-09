@@ -161,6 +161,27 @@ const getDeadCapAndTransactions = (
     });
 };
 
+export interface RecentMove {
+  timestamp: string;
+  franchiseId: number;
+  action: "ADD" | "DROP";
+  mflPlayerId: number;
+  playerName: string;
+  position: string;
+  team: string;
+  salary?: number;
+  years?: number;
+}
+
+const getRecentMoves = (leagueId?: number): Promise<RecentMove[]> => {
+  return axiosInstance
+    .get(`${URL}/dashboard/leagues/${leagueId}/recent-moves`, {
+      headers: { "Content-Type": "application/json" },
+    })
+    .then((res) => res.data)
+    .catch(() => [] as RecentMove[]);
+};
+
 const synchronizeAuth = (authUser: User): Promise<Owner> => {
   return axiosInstance
     .post(`${URL}/dashboard/auth`, authUser, {
@@ -819,6 +840,7 @@ export default {
   setCurrentMatchup,
   setOwnersToPaid,
   getDeadCapAndTransactions,
+  getRecentMoves,
   getMatchups,
   lockAllMatchups,
   getNflTeams,

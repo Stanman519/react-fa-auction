@@ -13,16 +13,7 @@ import { terminal, fontStacks } from "../../../theme";
 import { PlayerDTO } from "../../redux/reducers/FreeAgentReducer";
 import { capHitForYear, deadCapIfCut, YEARS_SHOWN } from "./rosterMath";
 import { Transaction } from "../../redux/reducers/TransactionReducer";
-
-const POS_COLORS: Record<string, string> = {
-  QB: "#e8538a",
-  RB: "#2ca579",
-  WR: "#4a90e2",
-  TE: "#c47a2b",
-  K: "#8888aa",
-  DEF: "#6b6b6b",
-  PK: "#8888aa",
-};
+import { POS_COLORS } from "../../constants/positionColors";
 
 const label = {
   fontFamily: fontStacks.mono,
@@ -192,24 +183,27 @@ const SectionHeader = ({ label: text }: { label: string }) => (
 
 const SubtotalRow = ({
   players,
+  precomputed,
   rowLabel,
   sublabel,
   accent = terminal.lime,
   grand = false,
 }: {
-  players: PlayerDTO[];
+  players?: PlayerDTO[];
+  precomputed?: number[];
   rowLabel: string;
   sublabel?: string;
   accent?: string;
   grand?: boolean;
 }) => {
   const totals = useMemo(() => {
+    if (precomputed) return precomputed;
     const t = Array(YEARS_SHOWN).fill(0);
-    players.forEach((p) => {
+    (players ?? []).forEach((p) => {
       for (let i = 0; i < YEARS_SHOWN; i++) t[i] += capHitForYear(p, i);
     });
     return t;
-  }, [players]);
+  }, [players, precomputed]);
 
   return (
     <Box
@@ -463,6 +457,19 @@ export const RosterContracts = () => {
     );
   }, [transactions, selected, currentYear]);
 
+  const adjustmentTotals = useMemo(() => {
+    const t = Array(YEARS_SHOWN).fill(0);
+    myAdjustments.forEach((adj) => {
+      for (let i = 0; i < YEARS_SHOWN; i++) {
+        const year = currentYear + i;
+        if (adj.yearOfTransaction <= year && adj.yearOfTransaction + adj.years > year) {
+          t[i] += adj.amount;
+        }
+      }
+    });
+    return t;
+  }, [myAdjustments, currentYear]);
+
   return (
     <Box sx={{ background: terminal.bg, color: terminal.text, p: 2 }}>
       {/* Header */}
@@ -539,7 +546,10 @@ export const RosterContracts = () => {
             </Box>
             {Array.from({ length: YEARS_SHOWN }, (_, offset) => {
               const total =
-                activeTotals[offset] + taxiTotals[offset] + irTotals[offset];
+                activeTotals[offset] +
+                taxiTotals[offset] +
+                irTotals[offset] +
+                adjustmentTotals[offset];
               return (
                 <Box key={offset}>
                   <Box sx={label}>{currentYear + offset} COMMITTED</Box>
@@ -640,6 +650,11 @@ export const RosterContracts = () => {
                 {myAdjustments.map((t, i) => (
                   <AdjustmentRow key={i} t={t} currentYear={currentYear} />
                 ))}
+                <SubtotalRow
+                  precomputed={adjustmentTotals}
+                  rowLabel={`Adjustments subtotal · ${myAdjustments.length} entries`}
+                  accent={terminal.amber}
+                />
               </>
             )}
 
@@ -652,9 +667,19 @@ export const RosterContracts = () => {
             {/* Grand total row (desktop) */}
             {!mobile && (selected.players ?? []).length > 0 && (
               <SubtotalRow
-                players={selected.players ?? []}
+                precomputed={activeTotals.map(
+                  (_, i) =>
+                    activeTotals[i] +
+                    taxiTotals[i] +
+                    irTotals[i] +
+                    adjustmentTotals[i],
+                )}
                 rowLabel="Grand total"
-                sublabel={`${(selected.players ?? []).length} players`}
+                sublabel={
+                  myAdjustments.length > 0
+                    ? `${(selected.players ?? []).length} players + ${myAdjustments.length} adjustments`
+                    : `${(selected.players ?? []).length} players`
+                }
                 accent={terminal.lime}
                 grand
               />

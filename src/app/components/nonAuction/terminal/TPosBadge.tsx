@@ -1,17 +1,9 @@
 import { Box } from "@mui/material";
 import { A, dfs } from "./tokens";
-
-const POS_COLOR: Record<string, string> = {
-  QB: A.lime,
-  RB: A.amber,
-  WR: A.red,
-  TE: A.text,
-  K: A.textDim,
-  DEF: A.textDim,
-};
+import { POS_COLORS } from "../../../constants/positionColors";
 
 export default function TPosBadge({ pos, color }: { pos: string; color?: string }) {
-  const tone = color ?? POS_COLOR[pos.toUpperCase()] ?? A.text;
+  const tone = color ?? POS_COLORS[pos.toUpperCase()] ?? A.text;
   return (
     <Box
       component="span"

@@ -4,12 +4,7 @@ import AuctionHome from "./app/components/AuctionHome";
 import HomeBase from "./app/components/HomeBase";
 import AuthCallback from "./app/components/AuthCallback";
 //import "./index.css"
-import {
-  BrowserRouter,
-  Route,
-  Routes,
-  useNavigate,
-} from "react-router-dom";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import Auth0ProviderWithHistory from "./app/auth/auth0-provider-with-history";
 import AxiosAuthInterceptor from "./app/components/AxiosAuthInterceptor";
 import { LandingPage } from "./app/components/nonAuction/LandingPage";
@@ -26,6 +21,7 @@ import { useAppSelector } from "./app/hooks";
 import ConfidenceHome from "./app/components/confidence/ConfidenceHome";
 import { AuctionTeamSalaryCapsSlab } from "./app/components/AuctionTeamSalaryCapsSlab";
 import { OverUnderStandingsSlab } from "./app/components/games/OverUnders/OverUnderStandingsSlab";
+import { LoadingScreen } from "./app/components/LoadingScreen";
 
 function App() {
   return (
@@ -47,19 +43,19 @@ function AppRoutes() {
 
   // Trigger auth sync when user logs in
   useEffect(() => {
-    console.log("[AppRoutes] Auth state:", {
-      isLoading,
-      isAuthenticated,
-      userSub: user?.sub,
-      authSynchronized,
-    });
+    // console.log("[AppRoutes] Auth state:", {
+    //   isLoading,
+    //   isAuthenticated,
+    //   userSub: user?.sub,
+    //   authSynchronized,
+    // });
 
     // Only sync if authenticated and not yet synced
     if (isAuthenticated && user?.sub && !authSynchronized) {
-      console.log(
-        "[AppRoutes] Dispatching synchronizeAuth0WithDbLogin for user:",
-        user.sub,
-      );
+      // console.log(
+      //   "[AppRoutes] Dispatching synchronizeAuth0WithDbLogin for user:",
+      //   user.sub,
+      // );
       dispatch(synchronizeAuth0WithDbLogin(user));
     }
   }, [isLoading, isAuthenticated, user, authSynchronized, dispatch]);
@@ -135,14 +131,7 @@ const SmartHome: React.FC = () => {
     navigate("/league-home", { replace: true });
   }, [isLoading, authSynchronized, owner, navigate]);
 
-  const logo = "./stanfan-color-logo.png";
-  return (
-    <div className="flex flex-row justify-center items-center max-w-screen-sm min-h-screen">
-      <div className="flex-col justify-center items-center max-w-full p-4 m-4">
-        <img className="max-w-xs animate-pulse" src={logo} alt="StanFan Logo" />
-      </div>
-    </div>
-  );
+  return <LoadingScreen />;
 };
 
 const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({
@@ -150,51 +139,31 @@ const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({
 }) => {
   const { isAuthenticated, isLoading, loginWithRedirect, error } = useAuth0();
   const { authSynchronized } = useAppSelector((state) => state.profile);
-  const logo = "./stanfan-color-logo.png";
 
-  console.log("[PrivateRoute] Render state:", {
-    isLoading,
-    isAuthenticated,
-    authSynchronized,
-  });
+  // console.log("[PrivateRoute] Render state:", {
+  //   isLoading,
+  //   isAuthenticated,
+  //   authSynchronized,
+  // });
 
   if (error) {
     console.error("[PrivateRoute] Auth0 error:", error.message);
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-4">
-        <p className="text-red-500">Login error: {error.message}</p>
-        <button onClick={() => loginWithRedirect()}>Retry Login</button>
-      </div>
-    );
+    return <LoadingScreen variant="error" />;
   }
 
-  // Show loading spinner while Auth0 is checking session or profile is syncing
   if (isLoading || (isAuthenticated && !authSynchronized)) {
-    console.log("[PrivateRoute] Showing loading spinner...");
-    return (
-      <div className="flex flex-row justify-center items-center max-w-screen-sm min-h-screen ">
-        <div className="flex-col justify-center items-center max-w-full p-4 m-4 ">
-          <img className="max-w-xs animate-pulse" src={logo} alt="StanFan Logo" />
-        </div>
-      </div>
-    );
+    // console.log("[PrivateRoute] Showing loading spinner...");
+    return <LoadingScreen />;
   }
 
   if (!isAuthenticated) {
-    console.log("[PrivateRoute] Not authenticated, redirecting to Auth0 login");
+    // console.log("[PrivateRoute] Not authenticated, redirecting to Auth0 login");
     loginWithRedirect({
-      appState: { returnTo: window.location.pathname }
+      appState: { returnTo: window.location.pathname },
     });
-    // Show loading while redirect happens
-    return (
-      <div className="flex flex-row justify-center items-center max-w-screen-sm min-h-screen ">
-        <div className="flex-col justify-center items-center max-w-full p-4 m-4 ">
-          <img className="max-w-xs animate-pulse" src={logo} alt="StanFan Logo" />
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
-  console.log("[PrivateRoute] Rendering protected element");
+  // console.log("[PrivateRoute] Rendering protected element");
   return element;
 };

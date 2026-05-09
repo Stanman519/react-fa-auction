@@ -79,7 +79,7 @@ export default function ActionQueueRail({ onNavigateTab }: Props) {
       (l) => l.league.leagueId === s.profile.currentLeagueId,
     ),
   );
-  const transactions = useSelector((s: RootState) => s.transactions);
+  const recentMovesAll = useSelector((s: RootState) => s.recentMoves);
   const ownerList = useSelector((s: RootState) => s.deadCap.deadCap);
 
   if (!currentLeague) return null;
@@ -134,8 +134,7 @@ export default function ActionQueueRail({ onNavigateTab }: Props) {
     });
   });
 
-  const recentMoves = [...transactions]
-    .filter((t) => t.amount !== 0)
+  const recentMoves = [...recentMovesAll]
     .sort(
       (a, b) =>
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
@@ -147,11 +146,13 @@ export default function ActionQueueRail({ onNavigateTab }: Props) {
     `#${franchiseId}`;
 
   const moveText = (t: (typeof recentMoves)[number]) => {
-    if (t.amount < 0) return `cut ${t.playerName}`;
-    return `signed ${t.playerName} · $${t.salary}M × ${t.years}YR`;
+    if (t.action === "DROP") return `cut ${t.playerName}`;
+    const salary = t.salary != null ? `$${t.salary}M` : "—";
+    const yrs = t.years != null ? `${t.years}YR` : "—";
+    return `signed ${t.playerName} · ${salary} × ${yrs}`;
   };
 
-  const moveAge = (timestamp: Date) => {
+  const moveAge = (timestamp: Date | string) => {
     const ms = Date.now() - new Date(timestamp).getTime();
     const days = Math.floor(ms / 86400000);
     if (days < 1) {
@@ -231,7 +232,7 @@ export default function ActionQueueRail({ onNavigateTab }: Props) {
           ) : (
             recentMoves.map((t, i) => (
               <Box
-                key={`move-${i}-${t.transactionId}`}
+                key={`move-${i}-${t.mflPlayerId}-${t.timestamp}`}
                 sx={{
                   p: "10px 14px",
                   borderBottom:

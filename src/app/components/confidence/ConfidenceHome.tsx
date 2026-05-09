@@ -256,7 +256,7 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
   // Fetch results when switching to Results tab
   useEffect(() => {
     if (value === "2") {
-      console.log("[ConfidenceHome] Loading results for tab switch");
+      // console.log("[ConfidenceHome] Loading results for tab switch");
       dispatch(getConfidenceResults(isDemo ? -1 : new Date().getFullYear()));
     }
   }, [value, isDemo, dispatch]);

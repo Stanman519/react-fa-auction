@@ -17,6 +17,7 @@ import { notificationsReducer } from './NotificationsReducer';
 import { rosterReducer } from './RosterReducer';
 import { triYearStandingsReducer } from './TriYearStandingsReducer';
 import { chatReducer } from './ChatReducer';
+import { recentMovesReducer } from './RecentMovesReducer';
 
 
 export const RootReducer = combineReducers({
@@ -38,6 +39,7 @@ export const RootReducer = combineReducers({
     rosters: rosterReducer,
     triYearStandings: triYearStandingsReducer,
     chat: chatReducer,
+    recentMoves: recentMovesReducer,
 });
 
 export type RootState = ReturnType<typeof RootReducer>
