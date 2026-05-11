@@ -63,6 +63,26 @@
   100% { transform: translateY(100vh); }
 }
 
+/* Slow + infrequent sweep: sweeps over first ~25% of cycle, offscreen the rest. */
+@keyframes fp-scan-slow {
+  0%   { transform: translateY(-100%); }
+  25%  { transform: translateY(100vh); }
+  100% { transform: translateY(100vh); }
+}
+
+.fp-scan-beam-slow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, oklch(0.85 0.18 130), transparent);
+  animation: fp-scan-slow 12s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fp-scan-beam-slow { display: none; }
+}
+
 @keyframes fp-bar-grow {
   0% { width: 0%; }
   60% { width: 85%; }

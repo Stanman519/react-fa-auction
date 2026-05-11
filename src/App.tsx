@@ -4,7 +4,8 @@ import AuctionHome from "./app/components/AuctionHome";
 import HomeBase from "./app/components/HomeBase";
 import AuthCallback from "./app/components/AuthCallback";
 //import "./index.css"
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { CrtOverlay } from "./app/components/CrtOverlay";
 import Auth0ProviderWithHistory from "./app/auth/auth0-provider-with-history";
 import AxiosAuthInterceptor from "./app/components/AxiosAuthInterceptor";
 import { LandingPage } from "./app/components/nonAuction/LandingPage";
@@ -60,11 +61,16 @@ function AppRoutes() {
     }
   }, [isLoading, isAuthenticated, user, authSynchronized, dispatch]);
 
+  const location = useLocation();
+  const crtRoutes = ["/league-home", "/auction", "/rosters"];
+  const showCrt = crtRoutes.some((p) => location.pathname.startsWith(p));
+
   return (
     <div
       className="min-h-screen max-w-screen"
       style={{ backgroundColor: theme.palette.background.default }}
     >
+      {showCrt && <CrtOverlay />}
       <Routes>
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/auth-callback" element={<AuthCallback />} />

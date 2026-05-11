@@ -21,7 +21,7 @@ export default function TTabsHeader({
         gap: "2px",
         overflowX: "auto",
         position: "sticky",
-        top: 64,
+        top: { xs: 52, md: 56 },
         zIndex: 10,
         "&::-webkit-scrollbar": { height: 4 },
         "&::-webkit-scrollbar-thumb": { background: A.lineBold },
