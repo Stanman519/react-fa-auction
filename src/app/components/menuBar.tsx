@@ -82,17 +82,19 @@ function NavLink({
   label,
   sub,
   onClick,
+  disabled,
   children,
 }: {
   active: boolean;
   label: string;
   sub?: string | null;
   onClick: () => void;
+  disabled?: boolean;
   children?: React.ReactNode;
 }) {
   return (
     <div
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
       style={{
         position: "relative",
         padding: "0 16px",
@@ -100,8 +102,8 @@ function NavLink({
         display: "flex",
         alignItems: "center",
         gap: 8,
-        cursor: "pointer",
-        color: active ? T.text : T.textDim,
+        cursor: disabled ? "not-allowed" : "pointer",
+        color: active ? T.text : disabled ? T.textMute : T.textDim,
       }}
     >
       <span
@@ -540,6 +542,7 @@ export function MenuBar() {
                 active={page === "auction"}
                 label="Auction"
                 sub={liveAuction ? "LIVE" : null}
+                disabled={!liveAuction}
                 onClick={() => navigate("/auction")}
               />
               {liveAuction && (
@@ -1267,6 +1270,7 @@ function MobileDrawer({
               path: "/auction",
               sub: liveAuction ? "LIVE" : null,
               accent: liveAuction ? T.red : null,
+              disabled: !liveAuction,
             },
             {
               id: "games" as Page,
@@ -1284,7 +1288,7 @@ function MobileDrawer({
             return (
               <div
                 key={item.id}
-                onClick={() => onNavigate(item.path)}
+                onClick={item.disabled ? undefined : () => onNavigate(item.path)}
                 style={{
                   padding: "12px 16px",
                   display: "flex",
@@ -1292,14 +1296,14 @@ function MobileDrawer({
                   gap: 12,
                   background: active ? T.panel2 : "transparent",
                   borderLeft: `2px solid ${active ? T.lime : "transparent"}`,
-                  cursor: "pointer",
+                  cursor: item.disabled ? "not-allowed" : "pointer",
                 }}
               >
                 <span
                   style={{
                     fontFamily: fontStacks.mono,
                     fontSize: 16,
-                    color: active ? T.lime : T.textDim,
+                    color: item.disabled ? T.textMute : active ? T.lime : T.textDim,
                     width: 20,
                     textAlign: "center",
                   }}
@@ -1311,7 +1315,7 @@ function MobileDrawer({
                     flex: 1,
                     fontSize: 14,
                     fontWeight: active ? 700 : 500,
-                    color: active ? T.text : T.textDim,
+                    color: item.disabled ? T.textMute : active ? T.text : T.textDim,
                   }}
                 >
                   {item.label}
