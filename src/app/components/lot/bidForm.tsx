@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { forwardRef, useEffect, useMemo, useState } from "react";
+import { forwardRef, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { makeNewBid, makeNewNomination } from "../../redux/actions/LotActions";
 import { Lot } from "../../redux/reducers/LotReducer";
@@ -70,16 +70,11 @@ export const BidForm = ({ bidMode, lot }: BidFormProps): JSX.Element => {
       .reduce((prev, curr) => (prev ?? 0) + (curr ?? 0), 0),
   );
 
-  // Floors derived from current high bid
-  const minSalary = (lot.bid?.bidSalary ?? 0) + 1;
-  const minYears = lot.bid?.bidLength ?? 1;
+  const initialSalary = (lot.bid?.bidSalary ?? 0) + 1;
+  const initialYears = lot.bid?.bidLength ?? 1;
 
-  const [bidSalary, setBidSalary] = useState<number>(minSalary);
-  const [bidYears, setBidYears] = useState<number>(minYears);
-  useEffect(() => {
-    setBidSalary((s) => (s < minSalary ? minSalary : s));
-    setBidYears((y) => (y < minYears ? minYears : y));
-  }, [minSalary, minYears]);
+  const [bidSalary, setBidSalary] = useState<number>(initialSalary);
+  const [bidYears, setBidYears] = useState<number>(initialYears);
 
   const [isLoading, setIsLoading] = useState(false);
   const [confirmModal, setConfirmModal] = useState(false);
@@ -119,7 +114,7 @@ export const BidForm = ({ bidMode, lot }: BidFormProps): JSX.Element => {
       : 0;
   const rem = capRoom - (highBidsOnTheBoard ?? 0) + alreadyMine - bidSalary;
 
-  const onPickPill = (delta: number) => setBidSalary(minSalary + delta);
+  const onPickPill = (val: number) => setBidSalary(val);
   const onYearPill = (y: number) => setBidYears(y);
 
   const fauxButtonDisable = () => {
@@ -182,7 +177,7 @@ export const BidForm = ({ bidMode, lot }: BidFormProps): JSX.Element => {
             setBidSalary(Number.isNaN(v) ? 0 : v);
           }}
           type="number"
-          inputProps={{ min: minSalary, max: 500, inputMode: "numeric" }}
+          inputProps={{ min: 1, max: 500, inputMode: "numeric" }}
           sx={{
             flex: 1,
             color: terminal.text,
@@ -215,7 +210,7 @@ export const BidForm = ({ bidMode, lot }: BidFormProps): JSX.Element => {
           <Box
             key={d}
             component="button"
-            onClick={() => onPickPill(d - 1)}
+            onClick={() => onPickPill(d)}
             sx={{
               flex: 1,
               py: 0.75,
@@ -232,7 +227,7 @@ export const BidForm = ({ bidMode, lot }: BidFormProps): JSX.Element => {
               },
             }}
           >
-            +${d}
+            ${d}
           </Box>
         ))}
       </Box>
@@ -251,7 +246,7 @@ export const BidForm = ({ bidMode, lot }: BidFormProps): JSX.Element => {
         </Box>
         <Box sx={{ display: "flex", gap: 0.5 }}>
           {[1, 2, 3, 4, 5].map((y) => {
-            const locked = y < minYears;
+            const locked = false;
             const active = y === bidYears;
             return (
               <Box
