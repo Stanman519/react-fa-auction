@@ -114,7 +114,7 @@ export const BidForm = ({ bidMode, lot }: BidFormProps): JSX.Element => {
       : 0;
   const rem = capRoom - (highBidsOnTheBoard ?? 0) + alreadyMine - bidSalary;
 
-  const onPickPill = (val: number) => setBidSalary(val);
+  const onPickPill = (delta: number) => setBidSalary((s) => (s || 0) + delta);
   const onYearPill = (y: number) => setBidYears(y);
 
   const fauxButtonDisable = () => {
@@ -227,7 +227,7 @@ export const BidForm = ({ bidMode, lot }: BidFormProps): JSX.Element => {
               },
             }}
           >
-            ${d}
+            +${d}
           </Box>
         ))}
       </Box>
