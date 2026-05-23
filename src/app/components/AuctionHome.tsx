@@ -307,7 +307,11 @@ function AuctionHome() {
         overflow: "auto",
       }}
     >
-      <LotBody lot={selectedLot} />
+      <LotBody
+        lot={selectedLot}
+        starred={!!(selectedLot.bid?.player?.mflId && watch.has(selectedLot.bid.player.mflId))}
+        onToggleStar={watch.toggle}
+      />
     </Box>
   ) : (
     <Box
@@ -633,7 +637,13 @@ function AuctionHome() {
             <CloseIcon />
           </IconButton>
         </Box>
-        {selectedLot && <LotBody lot={selectedLot} />}
+        {selectedLot && (
+          <LotBody
+            lot={selectedLot}
+            starred={!!(selectedLot.bid?.player?.mflId && watch.has(selectedLot.bid.player.mflId))}
+            onToggleStar={watch.toggle}
+          />
+        )}
       </Dialog>
 
       {modal === "bid-history-slab" && <BidHistorySlab />}

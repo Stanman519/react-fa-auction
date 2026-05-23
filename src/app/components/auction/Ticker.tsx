@@ -1,10 +1,13 @@
 import { Box, useTheme } from "@mui/material";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { terminal, fontStacks } from "../../../theme";
 import { dfs } from "../nonAuction/terminal/tokens";
 import { Headline } from "../../redux/reducers/HeadlinesReducer";
 import { OwnerQuote } from "../../redux/reducers/QuotesReducer";
+
+const TICKER_PX_PER_SEC = 60;
 
 type TickerItem =
   | { kind: "headline"; data: Headline; createdAt: number; key: string }
@@ -21,7 +24,21 @@ const relTime = (ms: number): string => {
 export const Ticker = () => {
   const headlinesByKey = useSelector((s: RootState) => s.headlines.byKey);
   const quotesByKey = useSelector((s: RootState) => s.quotes.byKey);
+  const freeAgents = useSelector((s: RootState) => s.freeAgents);
+  const lots = useSelector((s: RootState) => s.lots);
   useTheme();
+
+  const playerLastNameById = useMemo(() => {
+    const m = new Map<number, string>();
+    for (const p of freeAgents) {
+      if (p.mflId && p.lastName) m.set(p.mflId, p.lastName);
+    }
+    for (const l of lots) {
+      const p = l.bid?.player;
+      if (p?.mflId && p.lastName && !m.has(p.mflId)) m.set(p.mflId, p.lastName);
+    }
+    return m;
+  }, [freeAgents, lots]);
 
   const items: TickerItem[] = [
     ...Object.values(headlinesByKey).map<TickerItem>((h) => ({
@@ -84,11 +101,15 @@ export const Ticker = () => {
         <Box component="span" sx={{ color: glyphColor, fontSize: dfs(10) }}>
           {glyph}
         </Box>
-        {isQuote && (
-          <Box component="span" sx={{ color: terminal.text, fontWeight: 600 }}>
-            @{(item.data as OwnerQuote).ownerName}:
-          </Box>
-        )}
+        {isQuote && (() => {
+          const q = item.data as OwnerQuote;
+          const last = playerLastNameById.get(q.playerMflId);
+          return (
+            <Box component="span" sx={{ color: terminal.text, fontWeight: 600 }}>
+              @{q.ownerName}{last ? ` on ${last}` : ""}:
+            </Box>
+          );
+        })()}
         <Box
           component="span"
           sx={{
@@ -106,6 +127,24 @@ export const Ticker = () => {
       </Box>
     );
   };
+
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [durationSec, setDurationSec] = useState(60);
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const measure = () => {
+      const half = el.scrollWidth / 2;
+      if (half > 0) {
+        setDurationSec(Math.max(20, half / TICKER_PX_PER_SEC));
+      }
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [display.length]);
 
   return (
     <Box
@@ -154,10 +193,11 @@ export const Ticker = () => {
         WIRE
       </Box>
       <Box
+        ref={scrollRef}
         sx={{
           pl: 10,
           whiteSpace: "nowrap",
-          animation: "tickerScroll 60s linear infinite",
+          animation: `tickerScroll ${durationSec}s linear infinite`,
           "@keyframes tickerScroll": {
             "0%": { transform: "translateX(0)" },
             "100%": { transform: "translateX(-50%)" },
