@@ -178,9 +178,9 @@ function AuctionHome() {
 
   const SORT_OPTIONS: { id: string; label: string }[] = [
     { id: "time", label: "TIME" },
-    { id: "bidCount", label: "BIDS" },
     { id: "salary", label: "$" },
-    { id: "myBids", label: "MY BIDS" },
+    { id: "position", label: "POS" },
+    { id: "bids", label: "MY BIDS" },
   ];
 
   const listNode = (

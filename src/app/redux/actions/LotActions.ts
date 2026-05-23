@@ -5,6 +5,7 @@ import { Lot, Bid } from "../reducers/LotReducer";
 import { RootState } from "../reducers/RootReducer";
 import { updateUI } from "./UiActions";
 import { recordActivity } from "./ActivityActions";
+import { playNotificationSound } from "../../services/SoundUtils";
 
 export const UPDATE_LOTS = "UPDATE_LOTS";
 
@@ -78,7 +79,7 @@ export const updateLotWithFreshBid =
       bid: reformattedBid,
       isFresh: true,
     } as Lot;
-    //TODO: how can i add animation or sound here to show new bid -- add a flag on client side only to say isHotChange
+    playNotificationSound();
     dispatch(updateLots(updated));
     dispatch(
       recordActivity({

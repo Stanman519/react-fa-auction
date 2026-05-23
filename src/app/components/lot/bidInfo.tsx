@@ -5,7 +5,6 @@ import { useDispatch } from "react-redux";
 import { makeThisLotStale } from "../../redux/actions/LotActions";
 import { Lot } from "../../redux/reducers/LotReducer";
 import "./styles/lot.css";
-import { playNotificationSound } from "../../services/SoundUtils";
 import { Timer } from "./timer";
 import { terminal, fontStacks } from "../../../theme";
 import { dfs } from "../nonAuction/terminal/tokens";
@@ -20,16 +19,11 @@ export const BidInfo = ({ lot }: BidInfoProps): JSX.Element => {
   const theme = useTheme();
 
   useEffect(() => {
-    let timer: any;
-    if (lot?.isFresh) {
-      playNotificationSound();
-      timer = setTimeout(() => {
-        dispatch(makeThisLotStale(lot?.lotId));
-      }, 10000);
-    }
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
+    if (!lot?.isFresh) return;
+    const timer = setTimeout(() => {
+      dispatch(makeThisLotStale(lot?.lotId));
+    }, 10000);
+    return () => clearTimeout(timer);
   }, [lot?.isFresh, dispatch, lot?.lotId]);
 
   const bid = lot.bid;
