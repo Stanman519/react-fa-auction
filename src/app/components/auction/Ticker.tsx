@@ -156,6 +156,7 @@ export const Ticker = () => {
         overflow: "hidden",
         display: "flex",
         alignItems: "center",
+        pl: 10,
       }}
     >
       <Box
@@ -195,7 +196,6 @@ export const Ticker = () => {
       <Box
         ref={scrollRef}
         sx={{
-          pl: 10,
           whiteSpace: "nowrap",
           animation: `tickerScroll ${durationSec}s linear infinite`,
           "@keyframes tickerScroll": {
