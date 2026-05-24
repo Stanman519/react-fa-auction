@@ -89,6 +89,7 @@ export const updateLotWithFreshBid =
         playerName: `${reformattedBid.player?.firstName ?? ""} ${reformattedBid.player?.lastName ?? ""}`.trim(),
         bidSalary: reformattedBid.bidSalary,
         bidLength: reformattedBid.bidLength,
+        bidId: reformattedBid.bidId,
       }),
     );
   };

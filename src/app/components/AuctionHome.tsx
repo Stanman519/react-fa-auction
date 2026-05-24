@@ -176,13 +176,6 @@ function AuctionHome() {
     />
   );
 
-  const SORT_OPTIONS: { id: string; label: string }[] = [
-    { id: "time", label: "TIME" },
-    { id: "salary", label: "$" },
-    { id: "position", label: "POS" },
-    { id: "bids", label: "MY BIDS" },
-  ];
-
   const listNode = (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
       {isMobile && antiSnipeAt && (
@@ -201,48 +194,6 @@ function AuctionHome() {
           }}
         >
           +1:00 ANTI-SNIPE · TIMER EXTENDED
-        </Box>
-      )}
-      {isMobile && (
-        <Box
-          sx={{
-            display: "flex",
-            gap: "4px",
-            px: 1.5,
-            py: 1,
-            overflowX: "auto",
-            background: terminal.panel,
-            borderBottom: `1px solid ${terminal.line}`,
-            flexShrink: 0,
-          }}
-        >
-          {SORT_OPTIONS.map((s) => {
-            const on = sortBy === s.id;
-            return (
-              <Box
-                key={s.id}
-                component="button"
-                onClick={() => setSortBy(s.id)}
-                sx={{
-                  px: "10px",
-                  py: "4px",
-                  fontFamily: fontStacks.mono,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: "0.08em",
-                  border: `1px solid ${on ? terminal.lime : terminal.line}`,
-                  color: on ? terminal.lime : terminal.textDim,
-                  background: on ? terminal.limeDim : "transparent",
-                  borderRadius: "2px",
-                  cursor: "pointer",
-                  flexShrink: 0,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {s.label}
-              </Box>
-            );
-          })}
         </Box>
       )}
       <LotRowHeader />
@@ -360,7 +311,7 @@ function AuctionHome() {
             alignItems: "center",
             justifyContent: "space-between",
             position: "sticky",
-            top: isMobile ? 88 : 96,
+            top: isMobile ? 52 : 96,
             zIndex: 9,
             gap: 1,
           }}
@@ -386,8 +337,33 @@ function AuctionHome() {
               whiteSpace: "nowrap",
             }}
           >
-            {currentLeague.league.name.toUpperCase()} · FREE AGENT AUCTION
+            {currentLeague.league.name.toUpperCase()}
+            {!isMobile && " · FREE AGENT AUCTION"}
           </Box>
+          {isMobile && (
+            <Box
+              component="button"
+              onClick={() =>
+                dispatch(updateUI({ modal: "free-agent-grid" }))
+              }
+              sx={{
+                px: "8px",
+                py: "4px",
+                fontFamily: fontStacks.mono,
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                border: `1px solid ${terminal.line}`,
+                color: terminal.textDim,
+                background: "transparent",
+                borderRadius: "2px",
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              FREE AGENTS
+            </Box>
+          )}
           {isMobile && (
             <Box
               component="button"

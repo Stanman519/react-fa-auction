@@ -14,6 +14,7 @@ export interface ActivityItem {
   playerName?: string;
   bidSalary?: number;
   bidLength?: number;
+  bidId?: number;
   at: number; // epoch ms
 }
 
@@ -63,10 +64,14 @@ export const activityReducer = (
       return { items, leagueId };
     }
     case RECORD_ACTIVITY: {
-      const next = [(action as ActivityAction).payload, ...state.items].slice(
-        0,
-        MAX_ACTIVITY,
-      );
+      const incoming = (action as ActivityAction).payload;
+      if (
+        incoming.bidId != null &&
+        state.items.some((i) => i.bidId === incoming.bidId)
+      ) {
+        return state;
+      }
+      const next = [incoming, ...state.items].slice(0, MAX_ACTIVITY);
       if (state.leagueId != null) persist(state.leagueId, next);
       return { ...state, items: next };
     }

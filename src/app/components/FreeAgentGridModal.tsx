@@ -102,7 +102,6 @@ export const FreeAgentGridModal = ({
 
   const [search, setSearch] = useState("");
   const [posFil, setPosFil] = useState<string[]>([]);
-  const [hideFA, setHideFA] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>("adp");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
@@ -130,10 +129,6 @@ export const FreeAgentGridModal = ({
 
     if (posFil.length > 0) {
       list = list.filter((p) => posFil.includes(p.position));
-    }
-
-    if (hideFA) {
-      list = list.filter((p) => p.team !== "FA");
     }
 
     list.sort((a, b) => {
@@ -166,7 +161,7 @@ export const FreeAgentGridModal = ({
     });
 
     return list;
-  }, [freeAgents, search, posFil, hideFA, sortKey, sortDir]);
+  }, [freeAgents, search, posFil, sortKey, sortDir]);
 
   const close = () => dispatch(updateUI({ modal: undefined }));
 
@@ -302,9 +297,6 @@ export const FreeAgentGridModal = ({
           ))}
         </Box>
 
-        <Box sx={pillSx(hideFA)} onClick={() => setHideFA((v) => !v)}>
-          HIDE FA
-        </Box>
       </Box>
 
       {/* Table */}
