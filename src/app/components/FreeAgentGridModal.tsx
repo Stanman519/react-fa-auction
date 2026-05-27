@@ -31,7 +31,7 @@ const POS_COLORS: Record<string, string> = {
 
 const POSITIONS = ["QB", "RB", "WR", "TE"] as const;
 
-type SortKey = "fullName" | "position" | "team" | "age" | "adp";
+type SortKey = "fullName" | "position" | "team" | "age" | "adp" | "lastSeasonPts";
 type SortDir = "asc" | "desc";
 
 const hCell = {
@@ -102,8 +102,8 @@ export const FreeAgentGridModal = ({
 
   const [search, setSearch] = useState("");
   const [posFil, setPosFil] = useState<string[]>([]);
-  const [sortKey, setSortKey] = useState<SortKey>("adp");
-  const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [sortKey, setSortKey] = useState<SortKey>("lastSeasonPts");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   const togglePos = (pos: string) =>
     setPosFil((prev) =>
@@ -115,7 +115,7 @@ export const FreeAgentGridModal = ({
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
       setSortKey(key);
-      setSortDir("asc");
+      setSortDir(key === "lastSeasonPts" ? "desc" : "asc");
     }
   };
 
@@ -153,6 +153,10 @@ export const FreeAgentGridModal = ({
         case "adp":
           av = +(a.adp ?? 0) || 9999;
           bv = +(b.adp ?? 0) || 9999;
+          break;
+        case "lastSeasonPts":
+          av = +(a.lastSeasonPts ?? -1);
+          bv = +(b.lastSeasonPts ?? -1);
           break;
       }
       if (av < bv) return sortDir === "asc" ? -1 : 1;
@@ -318,6 +322,9 @@ export const FreeAgentGridModal = ({
                   <SortHeader label="AGE" col="age" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} />
                 </TableCell>
               )}
+              <TableCell sx={{ ...hCell, width: 72 }}>
+                <SortHeader label="'25 PTS" col="lastSeasonPts" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} />
+              </TableCell>
               <TableCell sx={{ ...hCell, width: 64 }}>
                 <SortHeader label="ADP" col="adp" sortKey={sortKey} sortDir={sortDir} onSort={handleSort} />
               </TableCell>
@@ -375,6 +382,15 @@ export const FreeAgentGridModal = ({
                     {p.age ?? "—"}
                   </TableCell>
                 )}
+                <TableCell
+                  sx={{
+                    ...dCell,
+                    fontFamily: fontStacks.mono,
+                    color: terminal.text,
+                  }}
+                >
+                  {p.lastSeasonPts != null ? Math.round(p.lastSeasonPts) : "—"}
+                </TableCell>
                 <TableCell
                   sx={{
                     ...dCell,

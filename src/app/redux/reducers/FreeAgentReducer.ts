@@ -11,6 +11,7 @@ export interface PlayerDTO {
   team: string;
   age?: number;
   adp?: number;
+  lastSeasonPts?: number;
   height?: number;
   weight?: number;
   headshot?: string;

@@ -29,7 +29,6 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 import { FreeAgentGridModal } from "./FreeAgentGridModal";
 import { BidHistorySlab } from "./lot/bioAndHistory";
-import { sortLots } from "../redux/actions/LotActions";
 import { updateCurrentLeague } from "../redux/actions/LoginActions";
 import { Ticker } from "./auction/Ticker";
 import { Sidebar } from "./auction/Sidebar";
@@ -114,15 +113,40 @@ function AuctionHome() {
     }
   }, [hasReconnected]);
 
-  useEffect(() => {
-    if (!sortBy) return;
-    dispatch(sortLots(sortBy));
-  }, [sortBy]);
-
   const activeLots = useMemo(
     () => lots.filter((l) => l.bid && !l.newNom),
     [lots],
   );
+
+  const myLeagueOwnerId = currentLeague?.leagueownerid ?? -1;
+  const sortedLots = useMemo(() => {
+    const arr = [...activeLots];
+    if (sortBy === "time") {
+      arr.sort((a, b) => {
+        const da = a?.bid?.expires ? new Date(a.bid.expires).getTime() : 0;
+        const db = b?.bid?.expires ? new Date(b.bid.expires).getTime() : 0;
+        return da - db;
+      });
+    } else if (sortBy === "salary") {
+      arr.sort(
+        (a, b) =>
+          (b?.bid?.bidSalary ?? -Infinity) - (a?.bid?.bidSalary ?? -Infinity),
+      );
+    } else if (sortBy === "position") {
+      arr.sort((a, b) =>
+        (a?.bid?.player?.position ?? "").localeCompare(
+          b?.bid?.player?.position ?? "",
+        ),
+      );
+    } else if (sortBy === "bids") {
+      arr.sort(
+        (a, b) =>
+          ((b?.bid?.ownerId ?? 0) === myLeagueOwnerId ? 1 : 0) -
+          ((a?.bid?.ownerId ?? 0) === myLeagueOwnerId ? 1 : 0),
+      );
+    }
+    return arr;
+  }, [activeLots, sortBy, myLeagueOwnerId]);
 
   // Anti-snipe detection: any lot's expires extended forward → flash banner.
   useEffect(() => {
@@ -145,14 +169,14 @@ function AuctionHome() {
 
   // Watchlist pins starred lots to the top.
   const displayLots = useMemo(() => {
-    const starred: typeof activeLots = [];
-    const rest: typeof activeLots = [];
-    for (const l of activeLots) {
+    const starred: typeof sortedLots = [];
+    const rest: typeof sortedLots = [];
+    for (const l of sortedLots) {
       if (l.bid?.player?.mflId && watch.has(l.bid.player.mflId)) starred.push(l);
       else rest.push(l);
     }
     return [...starred, ...rest];
-  }, [activeLots, watch]);
+  }, [sortedLots, watch]);
 
   // Select first lot by default on desktop.
   useEffect(() => {

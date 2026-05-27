@@ -142,7 +142,7 @@ export const LotRow = ({
           fontVariantNumeric: "tabular-nums",
         }}
       >
-        {bid?.bidSalary != null ? `$${bid.bidSalary}` : "—"}
+        {bid?.bidSalary != null ? `${bid.bidLength ?? 0}/$${bid.bidSalary}` : "—"}
       </Box>
       <Box
         sx={{
