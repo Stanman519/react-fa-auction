@@ -49,8 +49,6 @@ function AuctionHome() {
   const [selectedLotId, setSelectedLotId] = useState<number | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [watchlistOpen, setWatchlistOpen] = useState(false);
-  const [antiSnipeAt, setAntiSnipeAt] = useState<number | null>(null);
-  const expiresRef = useRef<Map<number, number>>(new Map());
 
   const { user, isAuthenticated, isLoading } = useAuth0();
   const newNom = useSelector((s: RootState) =>
@@ -148,24 +146,6 @@ function AuctionHome() {
     return arr;
   }, [activeLots, sortBy, myLeagueOwnerId]);
 
-  // Anti-snipe detection: any lot's expires extended forward → flash banner.
-  useEffect(() => {
-    let extended = false;
-    for (const l of activeLots) {
-      const exp = l.bid?.expires
-        ? new Date(l.bid.expires as unknown as string).getTime()
-        : 0;
-      if (!exp) continue;
-      const prev = expiresRef.current.get(l.lotId);
-      if (prev != null && exp - prev > 15_000) extended = true;
-      expiresRef.current.set(l.lotId, exp);
-    }
-    if (extended) {
-      setAntiSnipeAt(Date.now());
-      const id = setTimeout(() => setAntiSnipeAt(null), 3000);
-      return () => clearTimeout(id);
-    }
-  }, [activeLots]);
 
   // Watchlist pins starred lots to the top.
   const displayLots = useMemo(() => {
@@ -202,24 +182,6 @@ function AuctionHome() {
 
   const listNode = (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
-      {isMobile && antiSnipeAt && (
-        <Box
-          sx={{
-            px: 1.5,
-            py: 0.75,
-            background: terminal.redDim,
-            borderBottom: `1px solid ${terminal.lineBold}`,
-            color: terminal.red,
-            fontFamily: fontStacks.mono,
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: "0.08em",
-            textAlign: "center",
-          }}
-        >
-          +1:00 ANTI-SNIPE · TIMER EXTENDED
-        </Box>
-      )}
       <LotRowHeader />
       <Box sx={{ flex: 1, overflow: "auto" }}>
         {displayLots.map((l) => (

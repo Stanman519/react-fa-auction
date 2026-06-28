@@ -9,6 +9,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { OwnerPaymentManagement } from "./OwnerPaymentManagement";
 import { FranchiseTagAdmin } from "./FranchiseTagAdmin";
 import { SalaryCapTrueUpAdmin } from "./SalaryCapTrueUpAdmin";
+import { AuctionPauseAdmin } from "./AuctionPauseAdmin";
 import { MenuBar } from "../../menuBar";
 
 export function ConfidenceAdminHome() {
@@ -20,12 +21,13 @@ export function ConfidenceAdminHome() {
   }, []);
 
   return (
-    <div className="flex flex-col justify-center p-5">
+    <div className="flex flex-col justify-center p-5" style={{ backgroundColor: "#fff", color: "#000", minHeight: "100vh" }}>
       <MenuBar />
       <DecideMatchups />
       <AddMatchups />
       <PropManagement />
       <OwnerPaymentManagement />
+      <AuctionPauseAdmin />
       <FranchiseTagAdmin />
       <SalaryCapTrueUpAdmin />
     </div>

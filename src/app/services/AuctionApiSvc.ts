@@ -214,6 +214,15 @@ const getLots = async (leagueId: number = 0): Promise<Lot[]> => {
   return rest.data;
 };
 
+const extendBids = async (leagueId: number, hours: number): Promise<{ count: number }> => {
+  const res = await axiosInstance
+    .post(`${URL}/free-agency/admin/leagues/${leagueId}/extend-bids?hours=${hours}`)
+    .catch((error) => {
+      throw new Error(error.response?.data?.error ?? "Service unreachable.");
+    });
+  return res.data;
+};
+
 export default {
   getLots,
   pageLoad,
@@ -228,4 +237,5 @@ export default {
   sendWin,
   askCapn,
   getBundledConfidenceLoadData,
+  extendBids,
 };

@@ -36,7 +36,7 @@ export function SalaryCapTrueUpAdmin() {
   return (
     <div className="p-4 border rounded mt-6">
       <h2 className="text-lg font-bold mb-3">Salary Cap True-Up</h2>
-      <p className="text-sm text-gray-600 mb-3">
+      <p className="text-sm mb-3" style={{ color: "#555" }}>
         Pulls cap room from MFL and writes to DB for all franchises in the league.
       </p>
       <div className="flex flex-col gap-3">
