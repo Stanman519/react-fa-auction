@@ -1,44 +1,33 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
+# FanPools — Web App
 
-## Available Scripts
+React / TypeScript frontend for **FanPools**, a dynasty fantasy-football platform for two leagues (~50 users). Year-round salary-cap management and a real-time free-agent auction, plus seasonal prediction games (NFL Playoff Confidence Pool and Over/Under).
 
-In the project directory, you can run:
+## Highlights
 
-### `yarn start`
+- **Real-time auction UI** — multi-user shared countdown and live bid updates over **SignalR**; nominate players, bid, and watch lots resolve in real time.
+- **Drag-to-rank confidence pool** — users rank every playoff matchup by confidence; a seasonal event that scales to ~50 users.
+- **Multi-league** — league switching with a persisted preference and smart post-login routing based on league state (auction vs. dashboard vs. games).
+- **Auth0 SPA auth** — token-injecting axios interceptor; private routes gated on both Auth0 and a backend profile sync.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Stack
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+React 18 · TypeScript · Redux (thunk) · React Router v6 · MUI v5 + Tailwind CSS · SignalR (`@microsoft/signalr`) · Auth0
 
-### `yarn test`
+## Architecture
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+src/App.tsx              # routes; Auth0 + axios-interceptor wrappers
+src/app/redux/           # thunk actions + reducers (profile, lots, signalR, confidence, …)
+src/app/services/        # axios API layers (general + auction)
+src/app/signalR/         # SignalR context + socket middleware
+```
 
-### `yarn build`
+## Run
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+npm install
+npm start      # CRA dev server + Tailwind/postcss watch (concurrent)
+npm run build
+```
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/)..
+Backend is the [Free Agency Auction API](https://github.com/Stanman519/free-agency-auction-api). Configuration via `REACT_APP_*` env vars (see `.env.example`). Deployed on Cloudflare Pages.
