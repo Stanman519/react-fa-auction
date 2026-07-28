@@ -36,7 +36,7 @@ import TLeagueBar from "./nonAuction/terminal/TLeagueBar";
 import LeagueInfoTerminal from "./nonAuction/terminal/LeagueInfoTerminal";
 import { fetchRosters, clearRosters } from "../redux/actions/RosterActions";
 
-const HomeBase = () => {
+const HomeBase = ({ isDemo = false }: { isDemo?: boolean }) => {
   const profileState = useSelector((state: RootState) => state.profile);
   const { currentLeagueId, authSynchronized, owner } = profileState;
   const { modal, errorText, successText } = useSelector((state: RootState) => state.ui);
@@ -47,7 +47,8 @@ const HomeBase = () => {
   const nav = useNavigate();
   const location = useLocation();
 
-  const [currentTab, setCurrentTab] = useState("league");
+  // Demo shows the read-only contract/cap surface only.
+  const [currentTab, setCurrentTab] = useState(isDemo ? "roster" : "league");
 
   useEffect(() => {
     const tabState = (location.state as any)?.tab;
@@ -74,7 +75,7 @@ const HomeBase = () => {
   const waiverCount = currentLeague?.waiverExtensionPlayers?.length ?? 0;
   const fifthYearCount = currentLeague?.fifthYearOptionCandidates?.length ?? 0;
 
-  const tabs: DashboardTab[] = [
+  const allTabs: DashboardTab[] = [
     { label: "LEAGUE INFO", value: "league" },
     { label: "ROSTER", value: "roster" },
     { label: "CAP OUTLOOK", value: "cap-outlook" },
@@ -101,10 +102,32 @@ const HomeBase = () => {
     { label: "RULES", value: "rules" },
   ];
 
+  // Demo exposes only the read-only contract/cap surface.
+  const tabs: DashboardTab[] = isDemo
+    ? [
+        { label: "ROSTER", value: "roster" },
+        { label: "CAP OUTLOOK", value: "cap-outlook" },
+      ]
+    : allTabs;
+
+  // All open transaction windows, collapsed into one "ACTIVE WINDOWS" stat
+  // (franchise-tag season opens both the tag and waiver windows).
+  const activeWindows: string[] = [
+    ...(currentLeague?.league.isFranchiseTagSzn ? ["FRANCHISE TAG", "WAIVER"] : []),
+    ...(currentLeague?.league.isBuyoutSzn ? ["BUYOUT"] : []),
+    ...(currentLeague?.league.isTaxiCutSzn ? ["TAXI CUTS"] : []),
+  ];
+
   // --- Data loading ---
   // On mount / league change: load dead cap (LEAGUE INFO tab only)
   useEffect(() => {
     if (authSynchronized && currentLeagueId) {
+      if (isDemo) {
+        // Demo: only rosters (dead cap / rankings hit token-gated endpoints).
+        dispatch(clearRosters() as any);
+        dispatch(fetchRosters(currentLeagueId) as any);
+        return;
+      }
       fetchedTabs.current = new Set(["league", "roster"]);
       dispatch(loadDashboardData());
       dispatch(clearRosters() as any);
@@ -155,7 +178,7 @@ const HomeBase = () => {
 
   return (
     <div>
-      <MenuBar />
+      {!isDemo && <MenuBar />}
       {isLoading ? (
         <div className="flex-1 flex justify-center mt-8">
           <CircularProgress />
@@ -170,16 +193,10 @@ const HomeBase = () => {
                   teamName={currentLeague.teamName}
                   stats={[
                     ...(currentLeague.league.isAuctioning
-                      ? [{ label: "STATUS", value: <Link to="/auction" style={{ color: "inherit", textDecoration: "underline" }}>AUCTION LIVE</Link>, tone: "lime" as const }]
+                      ? [{ label: "STATUS", value: <Link to={isDemo ? "/demo/auction" : "/auction"} style={{ color: "inherit", textDecoration: "underline" }}>AUCTION LIVE</Link>, tone: "lime" as const }]
                       : []),
-                    ...(currentLeague.league.isFranchiseTagSzn
-                      ? [{ label: "WINDOW", value: "TAG · WAIVER", tone: "amber" as const }]
-                      : []),
-                    ...(currentLeague.league.isBuyoutSzn
-                      ? [{ label: "WINDOW", value: "BUYOUT", tone: "amber" as const }]
-                      : []),
-                    ...(currentLeague.league.isTaxiCutSzn
-                      ? [{ label: "WINDOW", value: "TAXI CUTS", tone: "amber" as const }]
+                    ...(activeWindows.length > 0
+                      ? [{ label: "ACTIVE WINDOWS", value: activeWindows.join(" · "), tone: "amber" as const }]
                       : []),
                   ]}
                 />

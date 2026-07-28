@@ -182,9 +182,13 @@ export const ConfidenceMatchup = ({
       id={`matchup${index}`}
       style={{
         height: getLogoSize() * 1.33,
+        width: "100%",
         padding: 0,
         backgroundColor: matchup.chosenTeamLocal?.secondary,
         userSelect: "none",
+        borderRadius: 8,
+        marginBottom: 6,
+        boxShadow: "0 1px 4px rgba(0,0,0,0.5)",
       }}
       className="flex flex-row overflow-hidden"
     >
@@ -337,6 +341,22 @@ export const ConfidenceMatchup = ({
               </Zoom>
             );
           })}
+        {matchup.chosenTeamLocal?.tricode === matchup.left.tricode &&
+          displayType === "my-picks" && (
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                bottom: 0,
+                width: "100%",
+                height: "62%",
+                background:
+                  "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0) 100%)",
+                pointerEvents: "none",
+                zIndex: 1,
+              }}
+            />
+          )}
         {matchup.chosenTeamLocal?.tricode != matchup.right.tricode && (
           <div
             style={{
@@ -344,21 +364,21 @@ export const ConfidenceMatchup = ({
               width: "100%",
               textAlign: "center",
               fontStyle: "italic",
+              zIndex: 2,
               left:
                 matchup.chosenTeamLocal?.tricode === matchup.left.tricode &&
                 displayType === "my-picks"
                   ? 0
                   : -300,
-              bottom: longList && isMobile ? 0 : 8,
-              filter: matchup.left.tertiary
-                ? `drop-shadow(2px 1px 0px ${matchup.left.tertiary})`
-                : "drop-shadow(0px 0px 0px rgba(22, 22, 22, 0.8)",
-              //WebkitTextStroke: '0.25px white',
+              bottom: longList && isMobile ? 4 : 10,
+              textShadow:
+                "0 1px 3px rgba(0,0,0,0.95), 0 0 2px rgba(0,0,0,0.85)",
               transition: "ease-in",
               transitionDuration: "0.5s",
               fontSize: isMobile ? 24 : 32,
               fontFamily: "'Anton', sans-serif",
-              color: matchup.left.secondary,
+              letterSpacing: "0.03em",
+              color: "#ffffff",
               textTransform: "uppercase",
             }}
           >
@@ -512,6 +532,22 @@ export const ConfidenceMatchup = ({
             })}
           </>
         )}
+        {matchup.chosenTeamLocal?.tricode === matchup.right.tricode &&
+          displayType === "my-picks" && (
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                bottom: 0,
+                width: "100%",
+                height: "62%",
+                background:
+                  "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0) 100%)",
+                pointerEvents: "none",
+                zIndex: 1,
+              }}
+            />
+          )}
         {matchup.chosenTeamLocal?.tricode != matchup.left.tricode && (
           <div
             style={{
@@ -519,21 +555,21 @@ export const ConfidenceMatchup = ({
               width: "100%",
               textAlign: "center",
               fontStyle: "italic",
+              zIndex: 2,
               left:
                 matchup.chosenTeamLocal?.tricode === matchup.right.tricode &&
                 displayType === "my-picks"
                   ? 0
                   : 300,
-              bottom: longList && isMobile ? 0 : 8,
+              bottom: longList && isMobile ? 4 : 10,
               transition: "ease-in",
-              filter: matchup.right.tertiary
-                ? `drop-shadow(2px 1px 0px ${matchup.right.tertiary})`
-                : "drop-shadow(0px 0px 0px rgba(22, 22, 22, 0.8)",
-              //WebkitTextStroke: '0.25px silver',
+              textShadow:
+                "0 1px 3px rgba(0,0,0,0.95), 0 0 2px rgba(0,0,0,0.85)",
               transitionDuration: "0.5s",
               fontSize: isMobile ? 24 : 32,
               fontFamily: "'Anton', sans-serif",
-              color: matchup.right.secondary,
+              letterSpacing: "0.03em",
+              color: "#ffffff",
               textTransform: "uppercase",
             }}
           >

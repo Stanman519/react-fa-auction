@@ -31,6 +31,7 @@ import { updateUI } from "../../redux/actions/UiActions";
 import { useNavigate } from "react-router-dom";
 import { getConfidenceResults } from "../../redux/actions/ConfidenceActions";
 import { ConfidencePlayerResult } from "../../models/ConfidenceDTOs";
+import { terminal } from "../../../theme";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -291,17 +292,27 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
       className="flex flex-col justify-start items-center"
       style={{ overflowX: "hidden", overflowY: "hidden", minHeight: "100vh" }}
     >
-      <MenuBar />
+      {!isDemo && <MenuBar />}
 
       {/* Rules component handles its own modal via Redux */}
       <Rules />
 
       <TabContext value={value}>
-        <div className="flex flex-row w-full justify-center ">
+        <div
+          className="flex flex-row w-full justify-center"
+          style={{
+            background: terminal.panel,
+            borderBottom: `1px solid ${terminal.lineBold}`,
+          }}
+        >
           <TabList
             onChange={handleChange}
             indicatorColor="primary"
             textColor="inherit"
+            sx={{
+              "& .MuiTab-root": { color: terminal.textDim, fontWeight: 600 },
+              "& .Mui-selected": { color: terminal.text },
+            }}
           >
             <Tab label="My Picks" value={"1"} />
             <Tab ref={testRef} label="Results" value={"2"} />
@@ -312,7 +323,7 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
                 value={"4"}
               />
             )}
-            {isDemo && <Tab label="EXIT DEMO" value={"5"} />}
+            {/* Demo navigation/exit is handled by DemoLayout's nav + banner. */}
           </TabList>
         </div>
         {isDemo && (
@@ -329,57 +340,6 @@ function ConfidenceHome({ isDemo = false }: { isDemo?: boolean }) {
               </Button>
             )}
           </div>
-        )}
-        {isDemo && (
-          <Box
-            sx={{
-              width: "100%",
-              // backgroundColor: '#ff9800',
-              color: "white",
-              overflow: "hidden",
-              position: "relative",
-              height: "48px",
-              display: "flex",
-              alignItems: "center",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-              // borderBottom: '3px solid #f57c00',
-            }}
-          >
-            <Box
-              sx={{
-                marginTop: "4px",
-                display: "flex",
-                alignItems: "center",
-
-                animation: "scroll-left 60s linear infinite",
-                whiteSpace: "nowrap",
-                "@keyframes scroll-left": {
-                  "0%": {
-                    transform: "translateX(20%)",
-                  },
-                  "100%": {
-                    transform: "translateX(-100%)",
-                  },
-                },
-              }}
-            >
-              {[...Array(10)].map((_, i) => (
-                <Box key={i} sx={{ display: "flex", alignItems: "center" }}>
-                  <div
-                    style={{
-                      fontSize: "1.2rem",
-                      fontWeight: "bold",
-                      color: "#ff9800",
-                    }}
-                  >
-                    DEMO MODE
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  </div>
-                </Box>
-              ))}
-            </Box>
-          </Box>
         )}
         {value === "1" && (
           <TabPanel

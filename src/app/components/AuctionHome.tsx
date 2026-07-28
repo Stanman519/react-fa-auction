@@ -2,7 +2,7 @@ import { LotBody } from "../components/lot/lot";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getInitialAuctionData } from "../redux/actions/FreeAgentActions";
 import { seedActivity } from "../redux/actions/ActivityActions";
-import { fetchHeadlines } from "../redux/actions/HeadlineActions";
+import { fetchHeadlines, seedDemoHeadlines } from "../redux/actions/HeadlineActions";
 import { fetchQuotes } from "../redux/actions/QuoteActions";
 import { loadPersistedActivity } from "../redux/reducers/ActivityReducer";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,9 +37,10 @@ import { useWatchlist } from "./auction/useWatchlist";
 import { NominateModal } from "./auction/NominateModal";
 import { NominateBottomButton } from "./auction/NominateBottomButton";
 import { SoldMoment } from "./auction/SoldMoment";
+import { DEMO_HEADER_HEIGHT } from "./demo/DemoLayout";
 import { terminal, fontStacks } from "../../theme";
 
-function AuctionHome() {
+function AuctionHome({ isDemo = false }: { isDemo?: boolean }) {
   const theme = useTheme();
   const dispatch = useDispatch();
   const [reconSign, setReconSign] = useState(false);
@@ -84,13 +85,26 @@ function AuctionHome() {
     }
     if (currentLeagueId) {
       dispatch(seedActivity(loadPersistedActivity(currentLeagueId), currentLeagueId));
-      dispatch(fetchHeadlines(currentLeagueId) as any);
-      dispatch(fetchQuotes(currentLeagueId) as any);
+      // Headlines/quotes are token-gated; skip in the anonymous demo.
+      if (!isDemo) {
+        dispatch(fetchHeadlines(currentLeagueId) as any);
+        dispatch(fetchQuotes(currentLeagueId) as any);
+      }
     }
   }, [currentLeagueId]);
 
   const signalRInitialized = useRef(false);
   useEffect(() => {
+    // Demo: no Auth0 and no SignalR — load the demo auction bundle once synced.
+    if (isDemo) {
+      if (!signalRInitialized.current && authSynchronized) {
+        signalRInitialized.current = true;
+        // Load the demo bundle, then fabricate a wire feed from the lots it returned.
+        (dispatch(getInitialAuctionData("") as any) as unknown as Promise<void>)
+          ?.then?.(() => dispatch(seedDemoHeadlines() as any));
+      }
+      return;
+    }
     if (!isLoading && isAuthenticated && user?.sub && authSynchronized) {
       if (!signalRInitialized.current) {
         signalRInitialized.current = true;
@@ -98,7 +112,7 @@ function AuctionHome() {
         dispatch(signalR());
       }
     }
-  }, [isLoading, isAuthenticated, user, authSynchronized]);
+  }, [isLoading, isAuthenticated, user, authSynchronized, isDemo]);
 
   useEffect(() => {
     if (lots.length > 0) setSortBy("time");
@@ -283,7 +297,7 @@ function AuctionHome() {
         flexDirection: "column",
       }}
     >
-      <MenuBar />
+      {!isDemo && <MenuBar />}
 
       {currentLeague && (
         <Box
@@ -297,7 +311,8 @@ function AuctionHome() {
             alignItems: "center",
             justifyContent: "space-between",
             position: "sticky",
-            top: isMobile ? 52 : 96,
+            // Demo has no production MenuBar; stick just below DemoLayout's header.
+            top: isDemo ? DEMO_HEADER_HEIGHT : isMobile ? 52 : 96,
             zIndex: 9,
             gap: 1,
           }}

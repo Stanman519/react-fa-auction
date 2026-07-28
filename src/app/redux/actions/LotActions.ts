@@ -6,8 +6,22 @@ import { RootState } from "../reducers/RootReducer";
 import { updateUI } from "./UiActions";
 import { recordActivity } from "./ActivityActions";
 import { playNotificationSound } from "../../services/SoundUtils";
+import { isDemoMode } from "../../services/demoMode";
 
 export const UPDATE_LOTS = "UPDATE_LOTS";
+
+/**
+ * Countdown applied to a simulated demo bid/nomination. Mirrors the real auction,
+ * where a bid resets the lot clock to ~10 hours — so demo lots never race to zero.
+ */
+const DEMO_BID_DURATION_SECONDS = 10 * 60 * 60;
+
+/** Builds a locally-simulated bid (synthetic id + fresh expiry) for demo mode. */
+const buildSimulatedBid = (bid: Bid): Bid => ({
+  ...bid,
+  bidId: Date.now(),
+  expires: new Date(Date.now() + DEMO_BID_DURATION_SECONDS * 1000),
+});
 
 export interface LotAction extends Action {
   payload: Lot[];
@@ -134,34 +148,50 @@ export const makeThisLotStale =
 export const makeNewBid =
   (bid: Bid) =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    if (isDemoMode()) {
+      // No backend in demo: land the bid locally exactly as a SignalR FreshBid would.
+      dispatch(updateLotWithFreshBid(buildSimulatedBid(bid)));
+      return;
+    }
     const res = await AuctionApiSvc.makeNewBid(bid);
     const bidBody = await AuctionApiSvc.handleErrorResponse(res);
   };
 
-export const makeNewNomination = (bid: Bid) => async (): Promise<any> => {
-  await AuctionApiSvc.makeNewNom(bid);
-};
+export const makeNewNomination =
+  (bid: Bid) =>
+  async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    if (isDemoMode()) {
+      // Finalize the nomination locally as an opening bid on the lot.
+      dispatch(updateLotWithFreshBid(buildSimulatedBid(bid)));
+      return;
+    }
+    await AuctionApiSvc.makeNewNom(bid);
+  };
 
 export const submitWin =
   (bid: Bid) =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
-    const { isConnected } = getState().signalR;
     const oldLots = getState().lots;
     let lots = [...oldLots];
-    if (!isConnected) {
-      dispatch(
-        updateUI({
-          error: "snackbar",
-          errorText:
-            "Cancelling win submission because you may not have the latest bids currently. Site will reload when possible.",
-        }),
-      );
-      return;
-    }
-    try {
-      await AuctionApiSvc.sendWin(bid);
-    } catch (e: any) {
-      dispatch(updateUI({ error: "snackbar", errorText: e.message }));
+    // Demo: no SignalR and no backend — skip the connection guard and the
+    // network win call, and just run the local "sold" cleanup below.
+    if (!isDemoMode()) {
+      const { isConnected } = getState().signalR;
+      if (!isConnected) {
+        dispatch(
+          updateUI({
+            error: "snackbar",
+            errorText:
+              "Cancelling win submission because you may not have the latest bids currently. Site will reload when possible.",
+          }),
+        );
+        return;
+      }
+      try {
+        await AuctionApiSvc.sendWin(bid);
+      } catch (e: any) {
+        dispatch(updateUI({ error: "snackbar", errorText: e.message }));
+      }
     }
 
     const lotToCleanIndex = lots.findIndex((lot) => lot.lotId === bid.lotId);

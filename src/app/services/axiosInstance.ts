@@ -1,4 +1,10 @@
 import axios from "axios";
+import {
+  isDemoMode,
+  isBlockedInDemo,
+  notifyDemoBlocked,
+  DemoWriteBlockedError,
+} from "./demoMode";
 
 /**
  * Shared axios instance used by all API services.
@@ -19,6 +25,13 @@ export const setTokenGetter = (fn: GetTokenFn) => {
 };
 
 axiosInstance.interceptors.request.use(async (config) => {
+  // Demo safety net: never let a state-mutating request reach the backend in
+  // demo mode. Normal demo flows simulate writes locally, so this should rarely
+  // fire — it guarantees a regression can't silently mutate production.
+  if (isDemoMode() && isBlockedInDemo(config.method, config.url)) {
+    notifyDemoBlocked();
+    return Promise.reject(new DemoWriteBlockedError());
+  }
   if (getTokenFn) {
     try {
       const token = await getTokenFn();

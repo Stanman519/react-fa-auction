@@ -4,7 +4,14 @@ import AuctionHome from "./app/components/AuctionHome";
 import HomeBase from "./app/components/HomeBase";
 import AuthCallback from "./app/components/AuthCallback";
 //import "./index.css"
-import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { CrtOverlay } from "./app/components/CrtOverlay";
 import Auth0ProviderWithHistory from "./app/auth/auth0-provider-with-history";
 import AxiosAuthInterceptor from "./app/components/AxiosAuthInterceptor";
@@ -23,6 +30,8 @@ import ConfidenceHome from "./app/components/confidence/ConfidenceHome";
 import { AuctionTeamSalaryCapsSlab } from "./app/components/AuctionTeamSalaryCapsSlab";
 import { OverUnderStandingsSlab } from "./app/components/games/OverUnders/OverUnderStandingsSlab";
 import { LoadingScreen } from "./app/components/LoadingScreen";
+import { DemoGate } from "./app/components/demo/DemoGate";
+import { DemoLayout } from "./app/components/demo/DemoLayout";
 
 function App() {
   return (
@@ -44,19 +53,7 @@ function AppRoutes() {
 
   // Trigger auth sync when user logs in
   useEffect(() => {
-    // console.log("[AppRoutes] Auth state:", {
-    //   isLoading,
-    //   isAuthenticated,
-    //   userSub: user?.sub,
-    //   authSynchronized,
-    // });
-
-    // Only sync if authenticated and not yet synced
     if (isAuthenticated && user?.sub && !authSynchronized) {
-      // console.log(
-      //   "[AppRoutes] Dispatching synchronizeAuth0WithDbLogin for user:",
-      //   user.sub,
-      // );
       dispatch(synchronizeAuth0WithDbLogin(user));
     }
   }, [isLoading, isAuthenticated, user, authSynchronized, dispatch]);
@@ -91,10 +88,20 @@ function AppRoutes() {
           path="/games"
           element={<PrivateRoute element={<GamesHome />} />}
         />
+        {/* Public read-only demo — no Auth0. DemoGate seeds a synthetic identity. */}
         <Route
           path="/demo"
-          element={<PrivateRoute element={<ConfidenceHome isDemo />} />}
-        />
+          element={
+            <DemoGate>
+              <DemoLayout />
+            </DemoGate>
+          }
+        >
+          <Route index element={<Navigate to="auction" replace />} />
+          <Route path="auction" element={<AuctionHome isDemo />} />
+          <Route path="confidence" element={<ConfidenceHome isDemo />} />
+          <Route path="dashboard" element={<HomeBase isDemo />} />
+        </Route>
         <Route
           path="/admin"
           element={<PrivateRoute element={<ConfidenceAdminHome />} />}
@@ -146,12 +153,6 @@ const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({
   const { isAuthenticated, isLoading, loginWithRedirect, error } = useAuth0();
   const { authSynchronized } = useAppSelector((state) => state.profile);
 
-  // console.log("[PrivateRoute] Render state:", {
-  //   isLoading,
-  //   isAuthenticated,
-  //   authSynchronized,
-  // });
-
   if (error) {
     console.error("[PrivateRoute] Auth0 error:", error.message);
     return <LoadingScreen variant="error" />;
@@ -163,13 +164,11 @@ const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({
   }
 
   if (!isAuthenticated) {
-    // console.log("[PrivateRoute] Not authenticated, redirecting to Auth0 login");
     loginWithRedirect({
       appState: { returnTo: window.location.pathname },
     });
     return <LoadingScreen />;
   }
 
-  // console.log("[PrivateRoute] Rendering protected element");
   return element;
 };

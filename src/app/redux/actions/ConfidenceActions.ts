@@ -131,9 +131,9 @@ export const getConfidenceResults =
     }
     // Calculate scores for all players in demo mode (both fake players and user)
     if (year === -1) {
-      console.log("[getConfidenceResults] Calculating demo scores...");
+
       response.forEach((r) => {
-        console.log(`[getConfidenceResults] Processing player: ${r.displayName}`);
+
         var totalPoints = 0;
         r.weeklyResults.forEach((w) => {
           var pts = 0;
@@ -156,7 +156,7 @@ export const getConfidenceResults =
           totalPoints = pts;
         });
         r.totalPoints = totalPoints;
-        console.log(`  Final score: ${totalPoints}`);
+
       });
     }
     if (year === -1) {

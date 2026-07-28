@@ -40,22 +40,11 @@ const AuthCallback: React.FC = () => {
   };
 
   useEffect(() => {
-    // console.log("[AuthCallback] Render state:", {
-    //   authSynchronized,
-    //   ownerId: owner?.ownerId,
-    //   currentLeagueId,
-    //   returnTo,
-    // });
-
     // Still waiting for auth sync
     if (!authSynchronized) {
-      // console.log("[AuthCallback] Waiting for authSynchronized...");
       return;
     }
 
-    // console.log("[AuthCallback] Auth synchronized, determining redirect...");
-
-    // If an explicit returnTo was provided by Auth0 and it's not root or auth-callback, honor it
     if (returnTo && returnTo !== "/" && returnTo !== "/auth-callback") {
       // console.log("[AuthCallback] Honoring returnTo:", returnTo);
       navigate(returnTo, { replace: true });

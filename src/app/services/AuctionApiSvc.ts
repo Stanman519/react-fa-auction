@@ -8,8 +8,19 @@ import Owner, {
   OpposingFranchiseDTO,
 } from "../redux/reducers/OwnerReducer";
 import { ConfidenceHomeResponse } from "../models/ConfidenceDTOs";
+import { isDemoMode, notifyDemoBlocked } from "./demoMode";
 
 export const URL = process.env.REACT_APP_AUCTION_API_URL;
+
+/**
+ * Demo safety net for raw fetch() callers (which bypass the axios interceptor).
+ * Returns a benign no-op Response so callers don't crash; the real demo flows
+ * simulate these locally and never call the network.
+ */
+const demoBlockedResponse = (): Response => {
+  notifyDemoBlocked();
+  return new Response(null, { status: 204, statusText: "OK" });
+};
 //const env = process.env.NODE_ENV;
 
 export interface PageLoad {
@@ -47,6 +58,7 @@ export interface RosterOwner extends OpposingFranchiseDTO {
 }
 
 const makeNewBid = async (bid: Bid): Promise<Response> => {
+  if (isDemoMode()) return demoBlockedResponse();
   return await fetch(`${URL}/free-agency/bid`, {
     method: "POST",
     headers: {
@@ -73,11 +85,11 @@ const getBundledConfidenceLoadData = async (
 };
 
 const getRosters = async (leagueId: number): Promise<RosterOwner[]> => {
+  const path = isDemoMode()
+    ? `${URL}/demo/rosters`
+    : `${process.env.REACT_APP_AUCTION_API_URL}/free-agency/leagues/${leagueId}/rosters`;
   const rest = await axiosInstance
-    .get(
-      `${process.env.REACT_APP_AUCTION_API_URL}/free-agency/leagues/${leagueId}/rosters`,
-      {},
-    )
+    .get(path, {})
     .catch((error) => {
       throw new Error(error.response.data.friendlyMessage);
     });
@@ -133,6 +145,7 @@ const register = async (
   username: string,
   password: string,
 ): Promise<Response> => {
+  if (isDemoMode()) return demoBlockedResponse();
   const res = await fetch(`${URL}/free-agency/register`, {
     method: "POST",
     headers: {
@@ -197,6 +210,7 @@ const sendWin = async (bid: Bid): Promise<void> => {
 const askCapn = async (
   PlayerTipRequest: PlayerTipRequest,
 ): Promise<Response> => {
+  if (isDemoMode()) return demoBlockedResponse();
   const json = JSON.stringify(PlayerTipRequest);
   const res = await fetch(`${URL}/free-agency/tip`, {
     method: "POST",
@@ -205,6 +219,16 @@ const askCapn = async (
   });
   return res;
 };
+/** Anonymous demo auction data (lively in-memory auction from the backend). */
+const demoAuctionBundle = async (): Promise<PageLoad> => {
+  const rest = await axiosInstance
+    .get(`${URL}/demo/auction-bundle`)
+    .catch((error) => {
+      throw new Error(error.response?.data?.friendlyMessage ?? "Service unreachable.");
+    });
+  return rest.data;
+};
+
 const getLots = async (leagueId: number = 0): Promise<Lot[]> => {
   const rest = await axiosInstance
     .get(`${URL}/free-agency/leagues/${leagueId}/lots`, {})
@@ -238,4 +262,5 @@ export default {
   askCapn,
   getBundledConfidenceLoadData,
   extendBids,
+  demoAuctionBundle,
 };

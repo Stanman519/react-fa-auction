@@ -17,6 +17,7 @@ import { getRankStringSuffix } from "../../services/Common";
 import { getConfidenceResults } from "../../redux/actions/ConfidenceActions";
 import Icon from "@mdi/react";
 import { mdiCashRemove } from "@mdi/js";
+import { terminal } from "../../../theme";
 
 export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
   const { owner } = useSelector((state: RootState) => state.profile);
@@ -87,8 +88,12 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
                   sx={{
                     backgroundColor:
                       r.displayName === "YOU" || r.ownerId === owner.ownerId
-                        ? "lightyellow"
-                        : "white",
+                        ? terminal.limeDim
+                        : terminal.panel,
+                    borderLeft:
+                      r.displayName === "YOU" || r.ownerId === owner.ownerId
+                        ? `3px solid ${terminal.lime}`
+                        : "3px solid transparent",
                   }}
                   expandIcon={
                     r.weeklyResults.length > 0 ? <ExpandMoreIcon /> : <> </>
@@ -154,8 +159,8 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
 
                       {r.pickSubmitted && (
                         <div
-                          style={{ lineHeight: 1 }}
-                          className="italic text-xs sm:text-sm text-red-900"
+                          style={{ lineHeight: 1, color: terminal.lime }}
+                          className="italic text-xs sm:text-sm"
                         >
                           Picks submitted
                         </div>
@@ -253,7 +258,7 @@ export function ConfidenceResultsAccordian({ isDemo }: { isDemo: boolean }) {
                               {!gm.pickTeam?.name && (
                                 <div
                                   style={{
-                                    color: "darkgray",
+                                    color: terminal.textMute,
                                     fontStyle: "italic",
                                     marginLeft: 4,
                                   }}

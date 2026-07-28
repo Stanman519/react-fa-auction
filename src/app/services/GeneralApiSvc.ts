@@ -182,6 +182,11 @@ const getRecentMoves = (leagueId?: number): Promise<RecentMove[]> => {
     .catch(() => [] as RecentMove[]);
 };
 
+/** Anonymous synthetic identity for the public read-only demo (no Auth0). */
+const getDemoBootstrap = (): Promise<Owner> => {
+  return axiosInstance.get(`${URL}/demo/bootstrap`).then((res) => res.data);
+};
+
 const synchronizeAuth = (authUser: User): Promise<Owner> => {
   return axiosInstance
     .post(`${URL}/dashboard/auth`, authUser, {
@@ -826,6 +831,7 @@ const trueUpSalaryCaps = (leagueId: number) =>
 
 export default {
   synchronizeAuth,
+  getDemoBootstrap,
   getCommunityStats,
   getConfidenceResults,
   submitPicks,

@@ -1,5 +1,6 @@
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
-import { Skeleton, Button, Zoom, useTheme } from "@mui/material";
+import { Skeleton, Button, Zoom } from "@mui/material";
+import { terminal, fontStacks } from "../../../theme";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { MatchupList } from "./MatchupList";
@@ -43,7 +44,6 @@ export function DragableMatchups({
   const [editMode, setEditMode] = useState<boolean>(
     matchups.some((m) => m.pickable) && !picks?.savedPicks,
   ); // (matchups are pickable AND user has NOT made picks)  ----- can be set to true by edit button (only shown if pickable and user made picks)
-  const theme = useTheme();
   const [stamp, setStamp] = useState<StampAnim>({
     showStamp: false,
     fadeStamp: false,
@@ -217,16 +217,32 @@ export function DragableMatchups({
           )}
           {props.length > 0 && (
             <div
-              className="border w-full"
-              style={{ borderColor: theme.palette.primary.main }}
+              className="w-full"
+              style={{
+                border: `1px solid ${terminal.lineBold}`,
+                borderRadius: 8,
+                overflow: "hidden",
+                marginTop: 8,
+                background: terminal.panel,
+              }}
             >
-              <div>
-                <div
-                  className="text-center font-bold text-lg text-white"
-                  style={{ backgroundColor: theme.palette.primary.main }}
-                >
-                  THE EXTRA POINT TIEBREAKER
-                </div>
+              <div
+                style={{
+                  height: 36,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: fontStacks.mono,
+                  fontWeight: 700,
+                  fontSize: 12,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: terminal.text,
+                  background: terminal.panel2,
+                  borderBottom: `2px solid ${terminal.lime}`,
+                }}
+              >
+                THE EXTRA POINT TIEBREAKER
               </div>
               {props.map((p, i) => (
                 <PropPicker key={i} prop={p} index={i} canEdit={editMode} />

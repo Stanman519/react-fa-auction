@@ -79,6 +79,40 @@ export const synchronizeAuth0WithDbLogin =
     }
   };
 
+/**
+ * Seeds a synthetic demo identity for the public read-only demo — the Auth0-free
+ * equivalent of synchronizeAuth0WithDbLogin. Fetches the demo owner/league from the
+ * anonymous /demo/bootstrap endpoint and marks the profile synchronized so the demo
+ * screens render. No Stream chat (demo has no real user).
+ */
+export const bootstrapDemoSession =
+  () => async (dispatch: Function, getState: () => RootState) => {
+    const { profile } = getState();
+    try {
+      const dbUser = await GeneralApiSvc.getDemoBootstrap();
+      const currentLeagueId =
+        dbUser.leagues.length > 0 ? dbUser.leagues[0].league.leagueId : undefined;
+
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          owner: dbUser,
+          currentLeagueId,
+          authSynchronized: true,
+          authUser: { sub: "demo|fanpools" } as User,
+          authError: undefined,
+        }),
+      );
+    } catch (err: any) {
+      dispatch(
+        updateLoginInfo({
+          ...profile,
+          authError: err?.message ?? "Demo failed to load.",
+        }),
+      );
+    }
+  };
+
 export const updateCurrentLeague =
   (leagueId: number, currentRoute: string, user: User) =>
   async (dispatch: Function, getState: () => RootState) => {

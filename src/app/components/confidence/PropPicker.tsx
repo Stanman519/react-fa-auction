@@ -7,6 +7,7 @@ import { RootState } from "../../redux/reducers/RootReducer"
 import { makePropChoice } from "../../redux/actions/ConfidenceActions"
 import ThumbUpOffAltIcon from '@mui/icons-material/CheckCircleOutline';
 import CloseOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import { terminal } from "../../../theme";
 
 export const PropPicker = ({ prop, index, canEdit }: { prop: Prop, index: number, canEdit: boolean}) => {
     const dispatch = useDispatch()
@@ -25,8 +26,8 @@ export const PropPicker = ({ prop, index, canEdit }: { prop: Prop, index: number
     }
 
     return (
-        <div id={'prop-container'}>
-            <div className='px-2'>{prop.prompt}</div>
+        <div id={'prop-container'} style={{ color: terminal.text, padding: 12 }}>
+            <div className='px-2' style={{ color: terminal.text, fontSize: 14, marginBottom: 8 }}>{prop.prompt}</div>
              {canEdit ?
              <FormControl fullWidth>
                 <InputLabel id="demo-simple-select-label">Choose</InputLabel>

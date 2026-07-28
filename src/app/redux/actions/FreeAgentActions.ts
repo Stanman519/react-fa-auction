@@ -6,6 +6,7 @@ import { updateLots } from "./LotActions";
 import { updateOwners } from "./OwnerActions";
 import { updateUI } from "./UiActions";
 import { RootState } from "../reducers/RootReducer";
+import { isDemoMode } from "../../services/demoMode";
 
 export const UPDATE_FREE_AGENTS = "UPDATE_FREE_AGENTS";
 
@@ -27,27 +28,28 @@ export const getInitialAuctionData =
       const { currentLeagueId, owner } = getState().profile;
       if (!silent) dispatch(updateUI({ isLoading: "full-screen" }));
       const leagueId = currentLeagueId ?? 0;
-      console.log(
-        "profile before fetch init auction data",
-        getState().profile.owner.leagues[0],
-      );
-      const initData = await AuctionApiSvc.pageLoad(userSub, leagueId);
+      // Demo: pull the lively in-memory auction from the anonymous demo endpoint.
+      const initData = isDemoMode()
+        ? await AuctionApiSvc.demoAuctionBundle()
+        : await AuctionApiSvc.pageLoad(userSub, leagueId);
 
       initData.lots.forEach((l) => {
-        if (
-          typeof l.bid?.expires === "string" &&
+        if (typeof l.bid?.expires === "string") {
+          // DB values arrive without a zone (assume UTC → append Z); the demo
+          // endpoint already emits a UTC DateTime with a trailing Z. Either way,
+          // parse to a Date so <Timer> can call its getUTC* methods.
           //@ts-ignore
-          !l.bid.expires.endsWith("Z")
-        ) {
+          const raw = l.bid.expires.endsWith("Z")
+            ? l.bid.expires
+            : l.bid.expires + "Z";
           //@ts-ignore
-          l.bid.expires = new Date((l.bid.expires += "Z")); //TODO: proabbly a database issue, these are actually coming in as strings, maybe need to use datetime offset on api
+          l.bid.expires = new Date(raw);
         }
       });
 
       dispatch(updateFreeAgents(initData.freeAgents));
       dispatch(updateLots(initData.lots));
       dispatch(updateOwners(initData.owners));
-      console.log("initData", initData);
 
       if (initData.profile) {
         // Find the league to update
@@ -59,8 +61,6 @@ export const getInitialAuctionData =
 
         const idx = leagues.findIndex((l) => l.league.leagueId === leagueId);
         if (idx !== -1 && newLeagueInfo) {
-          console.log("idx", idx);
-          console.log("league", leagueId);
           leagues[idx] = {
             ...leagues[idx],
             capRoom: newLeagueInfo.capRoom ?? 0,
