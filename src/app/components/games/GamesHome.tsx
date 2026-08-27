@@ -3,14 +3,18 @@ import { useNavigate } from "react-router-dom";
 import GamesTile, { GamesTileProps } from "./GamesTile";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/reducers/RootReducer";
+import { terminal as T, fontStacks } from "../../../theme";
 
 function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
   const navigate = useNavigate();
   const { profile } = useSelector((state: RootState) => state);
+  const hasActiveOverUnderPool = profile.owner?.pools?.some(
+    (p) => p.type === "over-under-wins",
+  );
   const THA_GAMES: GamesTileProps[] = [
     {
       altTitle: "Over/Unders Game",
-      disabled: true,
+      disabled: !hasActiveOverUnderPool,
       onClick: () => navigate(`/over-unders`),
       tooltip:
         "Available in the pre-season. Choose if teams will beat their expectations.",
@@ -27,11 +31,25 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
   ];
   return (
     <div
-      className="flex flex-col justify-start items-center "
-      style={{ overflowX: "hidden", overflowY: "hidden", minHeight: "100vh" }}
+      className="flex flex-col justify-start items-center"
+      style={{
+        overflowX: "hidden",
+        minHeight: "100vh",
+        background: T.bg,
+        fontFamily: fontStacks.sans,
+      }}
     >
       <MenuBar />
-      <div className="flex flex-col lg:flex-row w-full items-center justify-center">
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 420px))",
+          gap: 16,
+          justifyContent: "center",
+          width: "100%",
+          padding: 16,
+        }}
+      >
         {THA_GAMES.map((g, i) => {
           return <GamesTile key={i} {...g} />;
         })}

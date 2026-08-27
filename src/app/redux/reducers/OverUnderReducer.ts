@@ -21,7 +21,10 @@ export const UPDATE_OUS = "UPDATE_OUS";
 const defaultState: OverUnderState = {
   franchiseWinTotals: [],
   userPicks: [],
-  selectedLine: 12,
+  // No hardcoded default — fetchFranchiseWinTotals selects the first real line
+  // once the data lands. A fixed id here pointed at whatever team happened to
+  // be row 12 of some season.
+  selectedLine: undefined,
   otherUsers: [],
   currentPool: undefined,
 };

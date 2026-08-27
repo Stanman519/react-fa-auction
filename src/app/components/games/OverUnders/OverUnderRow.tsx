@@ -4,14 +4,13 @@ import { useDispatch } from "react-redux";
 import { FranchiseWinTotal } from "../../../redux/reducers/OverUnderReducer";
 import {
   Box,
-  Paper,
   ToggleButton,
   ToggleButtonGroup,
   ToggleButtonProps,
   Typography,
-  useTheme,
 } from "@mui/material";
 import styled from "@emotion/styled";
+import { terminal as T, fontStacks } from "../../../../theme";
 
 export const OverUnderRow = ({
   prop,
@@ -21,7 +20,7 @@ export const OverUnderRow = ({
   const dispatch = useDispatch();
   const [startTime, setStartTime] = useState<number | undefined>(undefined);
   const { userPick } = prop;
-  const {} = useTheme();
+  const isDouble = userPick.lineAdjustment !== 0;
 
   const onChange = (
     e: React.MouseEvent<HTMLElement>,
@@ -124,24 +123,23 @@ export const OverUnderRow = ({
     }
   };
   return (
-    <Paper
-      elevation={3}
+    <Box
       sx={{
-        width: 330,
-        height: 120, // Fixed height for consistency
-        p: 1,
+        background: T.panel,
+        border: `1px solid ${isDouble ? T.amber : T.line}`,
+        minHeight: 96,
+        p: 1.25,
         display: "flex",
-        transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-        "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: 6,
-        },
+        alignItems: "center",
+        gap: 1.5,
+        "&:hover": { background: T.panel2 },
       }}
     >
       <Box
         sx={{
-          width: "28%",
-          mr: 2,
+          width: 44,
+          height: 44,
+          flexShrink: 0,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -150,32 +148,64 @@ export const OverUnderRow = ({
         <img
           src={prop.franchise.logo}
           alt={`${prop.franchise.city} ${prop.franchise.name} logo`}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-          }}
+          style={{ width: "100%", height: "100%", objectFit: "contain" }}
           loading="lazy"
         />
       </Box>
       <Box
         sx={{
-          width: "72%",
+          flex: 1,
+          minWidth: 0,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
+          gap: 0.75,
         }}
       >
-        <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: "bold" }}>
-          {prop.franchise.city} {prop.franchise.name}
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "baseline",
+            justifyContent: "space-between",
+            gap: 1,
+          }}
+        >
+          <Typography
+            sx={{
+              fontFamily: fontStacks.sans,
+              fontSize: 13,
+              fontWeight: 600,
+              color: T.text,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {prop.franchise.city} {prop.franchise.name}
+          </Typography>
+          {isDouble && (
+            <Box
+              component="span"
+              sx={{
+                fontFamily: fontStacks.mono,
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                background: T.amber,
+                color: "#000",
+                px: 0.5,
+                flexShrink: 0,
+              }}
+            >
+              2X
+            </Box>
+          )}
+        </Box>
         <ToggleButtonGroup
-          color="info"
           onChange={onChange}
           exclusive
           defaultValue={undefined}
           value={userPick.isOver ?? ""}
+          sx={{ width: "100%" }}
         >
           <MyToggleButton
             themecolor="salmon"
@@ -187,17 +217,26 @@ export const OverUnderRow = ({
             onTouchEnd={handleTouchEnd}
             value={false}
           >
-            {userPick.lineAdjustment === -1 ? "Under -1" : "Under"}
+            {userPick.lineAdjustment === -1 ? "UNDER -1" : "UNDER"}
           </MyToggleButton>
           <ToggleButton
-            style={{
-              padding: 8,
-              fontSize: 18,
-              fontWeight:
-                prop.userPick.lineAdjustment !== 0 ? "bolder" : undefined,
-              backgroundColor:
-                prop.userPick.lineAdjustment !== 0 ? "gold" : undefined,
-              color: prop.userPick.lineAdjustment !== 0 ? "black" : undefined,
+            disableRipple
+            sx={{
+              px: 1.5,
+              py: 0.5,
+              flexShrink: 0,
+              fontFamily: fontStacks.mono,
+              fontSize: 15,
+              fontWeight: 700,
+              lineHeight: 1.2,
+              border: `1px solid ${isDouble ? T.amber : T.line}`,
+              borderRadius: 0,
+              cursor: "default",
+              background: isDouble ? T.amber : "transparent",
+              color: isDouble ? "#000" : T.text,
+              "&.Mui-selected, &:hover": {
+                background: isDouble ? T.amber : "transparent",
+              },
             }}
             value={""}
           >
@@ -213,11 +252,11 @@ export const OverUnderRow = ({
             onTouchEnd={handleTouchEnd}
             value={true}
           >
-            {userPick.lineAdjustment === 1 ? "Over +1" : "Over"}
+            {userPick.lineAdjustment === 1 ? "OVER +1" : "OVER"}
           </MyToggleButton>
         </ToggleButtonGroup>
       </Box>
-    </Paper>
+    </Box>
   );
 };
 
@@ -233,16 +272,16 @@ const ProgressBar = styled("div")<{ themecolor: "salmon" | "green" }>(
     top: 0,
     left: 0,
     height: "100%",
-    backgroundColor:
-      themecolor === "salmon" ? "rgba(155, 0, 0, 0.3)" : "rgba(0, 155, 0, 0.3)",
+    backgroundColor: themecolor === "salmon" ? T.redDim : T.limeDim,
     transition: "width 0.1s linear",
+    pointerEvents: "none",
   }),
 );
 
-const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
+const CustomToggleButton = styled(ToggleButton)({
   position: "relative",
   overflow: "hidden",
-}));
+});
 
 interface MyToggButtProps extends ToggleButtonProps {
   selected: boolean;
@@ -253,7 +292,6 @@ const MyToggleButton = (props: MyToggButtProps): JSX.Element => {
   const [progress, setProgress] = useState(0);
   const intervalRef = useRef<number | null>(null);
   const timeoutRef = useRef<number | null>(null);
-  const theme = useTheme();
   const startProgress = () => {
     intervalRef.current = window.setInterval(() => {
       setProgress((prev) => Math.min(prev + 10, 100));
@@ -305,15 +343,39 @@ const MyToggleButton = (props: MyToggButtProps): JSX.Element => {
     }
   };
 
+  const accent = props.themecolor === "salmon" ? T.red : T.lime;
+  const accentDim = props.themecolor === "salmon" ? T.redDim : T.limeDim;
+
   return (
     <CustomToggleButton
       {...props}
-      color={props.themecolor}
       onMouseDown={handleMouseDown}
       onTouchStart={handleMouseDown}
       onTouchEnd={handleMouseUp}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp} // To handle case when mouse leaves the button
+      sx={{
+        flex: 1,
+        py: 0.5,
+        px: 1,
+        borderRadius: 0,
+        fontFamily: fontStacks.mono,
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: "0.08em",
+        border: `1px solid ${props.selected ? accent : T.line}`,
+        color: props.selected ? accent : T.textDim,
+        background: props.selected ? accentDim : "transparent",
+        "&.Mui-selected": {
+          color: accent,
+          background: accentDim,
+          "&:hover": { background: accentDim },
+        },
+        "&:hover": {
+          background: props.selected ? accentDim : T.panel2,
+          borderColor: props.selected ? accent : T.lineBold,
+        },
+      }}
     >
       {props.children}
       <ProgressBar

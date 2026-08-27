@@ -39,9 +39,50 @@ export const fetchFranchiseWinTotals =
       if (r.userPick.isOver === null) r.userPick.isOver = undefined;
     });
     const { overUnders } = getState();
+    // Default the distribution chart to the first team, otherwise the results
+    // page opens with an empty header and nothing hints that teams are
+    // clickable. Only fills in when there's no valid selection already — so a
+    // user's own choice survives, and an id left over from another season
+    // (SeasonWins ids are per-year) gets replaced rather than rendering blank.
+    const keepSelection =
+      overUnders.selectedLine !== undefined &&
+      res.winLines.some((l) => l.id === overUnders.selectedLine);
     dispatch(
-      updateOverUnders({ ...overUnders, franchiseWinTotals: res.winLines }),
+      updateOverUnders({
+        ...overUnders,
+        franchiseWinTotals: res.winLines,
+        selectedLine: keepSelection
+          ? overUnders.selectedLine
+          : res.winLines[0]?.id,
+      }),
     );
+  };
+
+/**
+ * Switch which season is being viewed. Everything else in this slice is scoped
+ * to a single pool — PoolUser ids and SeasonWins ids differ per year — so it
+ * all has to be cleared together or last season's ids leak into this one's
+ * render. Both fetches read currentPool at call time, so they pick up the new
+ * pool without needing it passed in.
+ */
+export const switchOverUnderPool =
+  (pool: Pool) =>
+  async (dispatch: Function, getState: () => RootState): Promise<any> => {
+    const { overUnders } = getState();
+    if (overUnders.currentPool?.id === pool.id) return;
+    dispatch(
+      updateOverUnders({
+        ...overUnders,
+        currentPool: pool,
+        franchiseWinTotals: [],
+        userPicks: [],
+        otherUsers: [],
+        selectedUser: undefined,
+        selectedLine: undefined,
+      }),
+    );
+    await dispatch(fetchFranchiseWinTotals());
+    await dispatch(fetchUserPicks());
   };
 
 export const fetchUserPicks =

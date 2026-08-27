@@ -1,15 +1,15 @@
-import { Box, Drawer, List, Paper, Typography, useTheme } from "@mui/material";
+import { Box, Drawer } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
+import { useMemo } from "react";
 import { updateUI } from "../../../redux/actions/UiActions";
 import { RootState } from "../../../redux/reducers/RootReducer";
-import StandingsRow from "./StandingsRow";
-import { PoolUser } from "../../../redux/reducers/OwnerReducer";
+import StandingsRow, { STANDINGS_COLUMNS } from "./StandingsRow";
+import { buildLineSides, PickTally, tallyPicks } from "./pickStatus";
+import { terminal as T, fontStacks } from "../../../../theme";
 
 export const OverUnderStandingsSlab = (): JSX.Element => {
   const users = useSelector((state: RootState) => state.overUnders.otherUsers);
   const dispatch = useDispatch();
-  const { palette } = useTheme();
-  const { currentPool } = useSelector((state: RootState) => state.overUnders);
   const openSlab = useSelector(
     (state: RootState) => state.ui.modal === "ou-standings",
   );
@@ -17,72 +17,149 @@ export const OverUnderStandingsSlab = (): JSX.Element => {
     (state: RootState) => state.overUnders,
   );
 
-  const getPointsForUser = (user: PoolUser): number => {
-    const scoringLines = user.picks.filter((p) => {
-      const foundLine = franchiseWinTotals.find((f) => f.id == p.lineId);
-      // console.log(
-      //   `franchise: ${foundLine?.franchise.name} ${user.owner.displayName} pick: ${p.isOver} ${p.lineAdjustment}`,
-      // );
-      return (
-        (p.isOver &&
-          (foundLine?.realWins ?? 0) >
-            (foundLine?.overUnder ?? 0 + p.lineAdjustment)) ||
-        //  const sliderValue = currValue > targetVal ? targetVal : currValue;
-        //  const currValue =  17 - (franchise.gamesRemaining + franchise.realWins);
-        (p.isOver === false &&
-          17 -
-            ((foundLine?.gamesRemaining ?? 0) + (foundLine?.realWins ?? 0)) >=
-            17.5 - ((foundLine?.overUnder ?? 0) + p.lineAdjustment))
-      );
-    });
-    {
-      return scoringLines.reduce(
-        (prev, curr) => prev + (curr.lineAdjustment === 0 ? 1 : 2),
-        0,
-      );
-    }
-  };
+  const close = () => dispatch(updateUI({ modal: undefined }));
 
-  const scoredAndSorted = users
-    .map((u) => {
-      if (!u.score) u.score = getPointsForUser(u);
-      return u;
-    })
-    .sort(
-      (a, b) =>
-        (b?.score ?? 0) - (a?.score ?? 0) ||
-        a.owner.displayName.localeCompare(b.owner.displayName),
-    );
+  const ranked = useMemo(() => {
+    const lines = franchiseWinTotals.map((f) => ({
+      id: f.id,
+      overUnder: f.overUnder,
+      realWins: f.realWins,
+      gamesRemaining: f.gamesRemaining,
+    }));
+    const sides = buildLineSides(users.flatMap((u) => u.picks ?? []));
+    return users
+      .map((u) => ({
+        user: u,
+        tally: tallyPicks(u.picks ?? [], lines, sides, users.length),
+      }))
+      .sort(
+        (a, b) =>
+          // wins are implied by pts − doublesHit, so they add nothing here
+          b.tally.pts - a.tally.pts ||
+          b.tally.doublesHit - a.tally.doublesHit ||
+          b.tally.contrarian - a.tally.contrarian ||
+          a.user.owner.displayName.localeCompare(b.user.owner.displayName),
+      );
+  }, [users, franchiseWinTotals]);
+
+  const header = (text: string, align: "left" | "right" = "left") => (
+    <span
+      style={{
+        fontFamily: fontStacks.mono,
+        fontSize: 9,
+        letterSpacing: "0.08em",
+        color: T.textMute,
+        display: "block",
+        width: "100%",
+        textAlign: align,
+      }}
+    >
+      {text}
+    </span>
+  );
 
   return (
     <Drawer
-      anchor={"left"}
+      anchor="left"
       open={openSlab}
-      onClose={() => dispatch(updateUI({ modal: undefined }))}
+      onClose={close}
+      PaperProps={{
+        sx: {
+          background: T.bg,
+          borderRight: `1px solid ${T.lineBold}`,
+          backgroundImage: "none",
+        },
+      }}
     >
-      <Box
-        sx={{ width: 250, height: "100%" }}
-        role="presentation"
-        onClick={() => dispatch(updateUI({ modal: undefined }))}
-        bgcolor={palette.background.default}
-      >
-        {/* <Paper>
-          <Box className="flex flex-row justify-end">
-            <Typography>Pts</Typography>
-            <Typography>Misses</Typography>
-          </Box>
-        </Paper> */}
+      {/* No onClick here — it used to swallow every row click and close the drawer. */}
+      <Box sx={{ width: { xs: "100vw", sm: 420 }, height: "100%" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            px: 1.25,
+            height: 40,
+            borderBottom: `1px solid ${T.lineBold}`,
+            background: T.panel,
+          }}
+        >
+          <span
+            style={{
+              fontFamily: fontStacks.mono,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              color: T.text,
+            }}
+          >
+            STANDINGS
+          </span>
+          <span
+            onClick={close}
+            style={{
+              fontFamily: fontStacks.mono,
+              fontSize: 13,
+              color: T.textDim,
+              cursor: "pointer",
+              padding: "0 4px",
+            }}
+          >
+            ✕
+          </span>
+        </Box>
 
-        <List>
-          {scoredAndSorted.map((o, index) => (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: STANDINGS_COLUMNS,
+            alignItems: "center",
+            gap: 1,
+            px: 1.25,
+            py: 0.5,
+            borderBottom: `1px solid ${T.line}`,
+            background: T.panel,
+          }}
+        >
+          {header("#")}
+          <span />
+          {header("OWNER")}
+          {header("W-L-TBD")}
+          {header("2X", "right")}
+          {header("EDGE", "right")}
+        </Box>
+
+        <Box sx={{ overflowY: "auto", height: "calc(100% - 92px)" }}>
+          {ranked.map(({ user, tally }, i) => (
             <StandingsRow
-              key={o.id}
-              user={o}
-              currentPool={currentPool?.id}
-              score={o.score ?? 0}
+              key={user.id}
+              user={user}
+              rank={i + 1}
+              tally={tally as PickTally}
             />
           ))}
-        </List>
+        </Box>
+
+        <Box
+          sx={{
+            px: 1.25,
+            height: 24,
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+            borderTop: `1px solid ${T.line}`,
+            background: T.panel,
+            fontFamily: fontStacks.mono,
+            fontSize: 8,
+            letterSpacing: "0.06em",
+            color: T.textMute,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+          }}
+        >
+          <span>TIEBREAK — 2X: DOUBLES HIT</span>
+          <span>EDGE: WINS THE POOL FADED</span>
+        </Box>
       </Box>
     </Drawer>
   );

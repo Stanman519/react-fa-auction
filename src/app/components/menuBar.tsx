@@ -200,7 +200,17 @@ export function MenuBar() {
   if (isMobile) {
     return (
       <Fragment>
-        <div style={{ position: "sticky", top: 0, zIndex: 20, flexShrink: 0 }}>
+        {/* width:100% — parents that use `items-center` would otherwise shrink
+            this to content width and let page content show through beside it. */}
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 20,
+            flexShrink: 0,
+            width: "100%",
+          }}
+        >
           <div
             style={{
               height: 52,
@@ -396,7 +406,16 @@ export function MenuBar() {
 
   return (
     <Fragment>
-      <div style={{ position: "sticky", top: 0, zIndex: 20, flexShrink: 0 }}>
+      {/* width:100% — see note in the mobile branch above. */}
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 20,
+          flexShrink: 0,
+          width: "100%",
+        }}
+      >
         <div
           style={{
             height: 56,

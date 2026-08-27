@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import { Alert, Box, Card, Fab, Snackbar, Typography } from "@mui/material";
+import { useEffect, useRef } from "react";
+import { Alert, Box, Fab, Snackbar } from "@mui/material";
 import "boarding.js/styles/main.css";
 import "boarding.js/styles/themes/basic.css";
 import {
@@ -11,26 +11,23 @@ import {
 } from "../../../redux/actions/OverUnderActions";
 import { OverUnderRow } from "./OverUnderRow";
 import { MenuBar } from "../../menuBar";
-import { Rules } from "../../confidence/Rules";
+import OverUnderRules from "./OverUnderRules";
 import { updateUI } from "../../../redux/actions/UiActions";
 import { RootState } from "../../../store";
 import SendIcon from "@mui/icons-material/Send";
 import InSeasonOUTeamRow from "./InSeasonOUTeamRow";
 import { OverUnderPick } from "../../../services/GeneralApiSvc";
-import UserPickChartForTeam from "./UserPickChartForTeam";
+import OverUnderStickyBar from "./OverUnderStickyBar";
+import { terminal as T, fontStacks } from "../../../../theme";
+import { REQUIRED_DOUBLES, REQUIRED_PICKS } from "./pickStatus";
 
 function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
   const dispatch = useDispatch();
   const { user, isAuthenticated, isLoading } = useAuth0();
   const { modal, errorText } = useSelector((state: RootState) => state.ui);
   const { authSynchronized } = useSelector((state: RootState) => state.profile);
-  const {
-    franchiseWinTotals,
-    userPicks,
-    currentPool,
-    selectedUser,
-    selectedLine,
-  } = useSelector((state: RootState) => state.overUnders);
+  const { franchiseWinTotals, userPicks, currentPool, selectedUser, selectedLine } =
+    useSelector((state: RootState) => state.overUnders);
   const rightNow = new Date();
   const isPreseason =
     rightNow < new Date(currentPool?.startDate ?? +new Date() + 100000);
@@ -42,7 +39,7 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
   const totalDoubles = franchiseWinTotals.filter(
     (p) => p.userPick.lineAdjustment !== 0,
   ).length;
-  const [translateY, setTranslateY] = useState(64); // Initial translateY to match the menu bar height
+
   useEffect(() => {
     if (!isLoading && isAuthenticated && user?.sub && authSynchronized) {
       dispatch(fetchFranchiseWinTotals());
@@ -50,30 +47,21 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
       dispatch(fetchUserPicks());
     }
   }, [isLoading, isAuthenticated, user, authSynchronized]);
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setTranslateY(0);
-      } else {
-        setTranslateY(64); // Adjust this value based on the height of your menu bar
-      }
-    };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
+  // Show the rules once for someone who hasn't picked yet — but only once per
+  // visit, or switching seasons would pop it again on the way back.
+  const rulesShown = useRef(false);
   useEffect(() => {
     if (
+      !rulesShown.current &&
       franchiseWinTotals.length > 0 &&
       isPreseason &&
       franchiseWinTotals
         .map((f) => f.userPick)
         .every((p) => p.isOver === null || p.isOver === undefined)
     ) {
-      dispatch(updateUI({ modal: "confidence-rules" }));
+      rulesShown.current = true;
+      dispatch(updateUI({ modal: "ou-rules" }));
     }
   }, [franchiseWinTotals.length]);
 
@@ -91,95 +79,33 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
     }
     return pick;
   };
+
   return (
     <div
       className="flex flex-col justify-start items-center"
-      style={{ overflowX: "hidden", overflowY: "hidden", minHeight: "100vh" }}
+      style={{
+        minHeight: "100vh",
+        background: T.bg,
+        fontFamily: fontStacks.sans,
+      }}
     >
       <MenuBar />
-      <Rules />
+      <OverUnderRules />
+      <OverUnderStickyBar isPreseason={isPreseason} />
 
-      {isPreseason ? (
-        <Card
-          className={`fixed left-0  p-4 shadow-lg rounded-md bg-white flex items-center transition-opacity ease-in-out hover:opacity-100 ${translateY === 0 ? "opacity-50" : "opacity-100"}`}
-          sx={{
-            zIndex: 3,
-            transform: `translateY(${translateY}px)`,
-            transition: "transform 0.2s ease-in-out, opacity 0.3s ease-in-out", // Smooth transition for both properties
-            border: "1px solid #ddd",
-          }}
-        >
-          <div className="flex flex-row justify-between items-start">
-            <div
-              className={`text-center px-4 py-2 rounded  mr-1  ${
-                totalPicks === 24 ? "bg-green-100" : "bg-red-100"
-              }`}
-            >
-              <Typography variant="h6" className="text-gray-700">
-                Picks: <span className="font-bold">{totalPicks}</span>
-              </Typography>
-              <Typography variant="caption" className="text-gray-600">
-                {totalPicks > 24 ? "Max" : "Required"}: 24
-              </Typography>
-            </div>
-            <div
-              className={`text-center px-4 py-2 rounded ${
-                totalDoubles === 2 ? "bg-green-100" : "bg-red-100"
-              }`}
-            >
-              <Typography variant="h6" className="text-gray-700">
-                Double Downs: <span className="font-bold">{totalDoubles}</span>
-              </Typography>
-              <Typography variant="caption" className="text-gray-600">
-                {totalDoubles > 2 ? "Max" : "Required"}: 2 (Hold down on
-                selection)
-              </Typography>
-            </div>
-          </div>
-        </Card>
-      ) : (
-        <>
-          {selectedLine && (
-            <Card
-              className={`w-full p-4 flex flex-col justify-center fixed left-0 transition-opacity ease-in-out hover:opacity-100 ${translateY === 0 ? "opacity-50" : "opacity-100"}`}
-              sx={{
-                zIndex: 2,
-                transform: `translateY(${translateY}px)`,
-                transition:
-                  "transform 0.2s ease-in-out, opacity 0.3s ease-in-out", // Smooth transition for both properties
-              }}
-            >
-              <Typography
-                variant="h5"
-                className="text-center font-bold mb-2 flex-grow"
-              >
-                {
-                  franchiseWinTotals.find((f) => f.id === selectedLine)
-                    ?.franchise.name
-                }{" "}
-                Pick Distribution
-              </Typography>
-              <UserPickChartForTeam />
-            </Card>
-          )}
-        </>
-      )}
-      <div
-        style={{ marginTop: isPreseason ? "100px" : 175, width: "100%" }}
-      ></div>
-      {selectedUser && !isPreseason && (
-        <Typography variant="h3">
-          {selectedUser?.owner.displayName}'s Picks
-        </Typography>
-      )}
       <Box
         sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 2,
-          justifyContent: "center",
-          p: 2,
-          pb: 8,
+          width: "100%",
+          maxWidth: 1280,
+          display: "grid",
+          // auto-fill + minmax kills the ragged last row the fixed-width
+          // flex cards used to leave. The 1px gap reads as hairline rules.
+          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+          gap: "1px",
+          background: T.line,
+          border: `1px solid ${T.line}`,
+          mt: 2,
+          mb: 10,
         }}
       >
         {isPreseason
@@ -189,29 +115,40 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
                 key={f.id}
                 franchise={f}
                 userPick={getRelevantUserPick(f.id)}
+                isSelected={f.id === selectedLine}
               />
             ))}
       </Box>
+
       {isPreseason && (
-        <Box
-          sx={{
-            position: "fixed",
-            bottom: 24,
-            right: 24,
-            zIndex: 1,
-          }}
-        >
+        <Box sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 20 }}>
           <Fab
             variant="extended"
-            color="primary"
-            disabled={totalPicks !== 24 || totalDoubles !== 2}
+            disabled={
+              totalPicks !== REQUIRED_PICKS || totalDoubles !== REQUIRED_DOUBLES
+            }
             onClick={() => dispatch(submitOverUnderPicks())}
+            sx={{
+              fontFamily: fontStacks.mono,
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              background: T.lime,
+              color: "#000",
+              "&:hover": { background: T.lime },
+              "&.Mui-disabled": {
+                background: T.panel2,
+                color: T.textMute,
+                border: `1px solid ${T.line}`,
+              },
+            }}
           >
-            <SendIcon className="mr-2" />
-            Save Picks
+            <SendIcon className="mr-2" sx={{ fontSize: 16 }} />
+            SAVE PICKS
           </Fab>
         </Box>
       )}
+
       <Snackbar
         open={modal === "confidence-submit-success"}
         autoHideDuration={6000}

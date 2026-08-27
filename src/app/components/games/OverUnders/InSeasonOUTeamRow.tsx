@@ -1,89 +1,89 @@
-import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { FranchiseWinTotal } from "../../../redux/reducers/OverUnderReducer";
-import { Box, Paper, Typography, useTheme } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { OverUnderPick } from "../../../services/GeneralApiSvc";
-import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
-import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
 import { selectALine } from "../../../redux/actions/OverUnderActions";
 import OverUnderProgressBar from "./OverUnderProgressBar";
+import { getPickProgress } from "./pickStatus";
+import { terminal as T, fontStacks } from "../../../../theme";
+
+const microLabel = {
+  fontFamily: fontStacks.mono,
+  fontSize: 9,
+  letterSpacing: "0.08em",
+  color: T.textMute,
+} as const;
+
+const statValue = {
+  fontFamily: fontStacks.mono,
+  fontSize: 13,
+  fontWeight: 700,
+  color: T.text,
+  fontVariantNumeric: "tabular-nums",
+} as const;
+
 export const InSeasonOUTeamRow = ({
   franchise,
   userPick,
+  isSelected = false,
 }: {
   franchise: FranchiseWinTotal;
   userPick: OverUnderPick;
+  isSelected?: boolean;
 }): JSX.Element => {
   const dispatch = useDispatch();
-  const [startTime, setStartTime] = useState<number | undefined>(undefined);
-  const targetVal = userPick.isOver
-    ? franchise.overUnder + userPick.lineAdjustment
-    : 17.5 - (franchise.overUnder + userPick.lineAdjustment);
+  const isPass = userPick.isOver !== true && userPick.isOver !== false;
 
-  const currValue = userPick.isOver
-    ? franchise.realWins
-    : 17 - (franchise.gamesRemaining + franchise.realWins);
-  const sliderValue = currValue > targetVal ? targetVal : currValue;
-  const hasFailed =
-    (userPick.isOver == false &&
-      17 -
-        franchise.gamesRemaining -
-        franchise.realWins +
-        franchise.gamesRemaining <=
-        targetVal) ||
-    (userPick.isOver &&
-      franchise.realWins + franchise.gamesRemaining <= targetVal);
-  const getPace = () => {
-    const ouWinPct = franchise.overUnder / 17;
-    const realWinPct = franchise.realWins / (17 - franchise.gamesRemaining);
-    if (userPick.isOver) {
-      // find out if real wins is a better win pct than over under win pct.
-      if (realWinPct > ouWinPct) {
-        return realWinPct - ouWinPct > 0.1 ? true : undefined;
-      }
-      if (realWinPct < ouWinPct) {
-        return ouWinPct - realWinPct > 0.1 ? false : undefined;
-      }
-      return undefined;
-    } else {
-      if (realWinPct > ouWinPct)
-        return realWinPct - ouWinPct > 0.1 ? false : undefined;
-      if (realWinPct < ouWinPct)
-        return ouWinPct - realWinPct > 0.1 ? true : undefined;
-      return undefined;
-    }
-  };
-  const {} = useTheme();
+  const progress = getPickProgress({
+    overUnder: franchise.overUnder,
+    lineAdjustment: userPick.lineAdjustment,
+    isOver: userPick.isOver,
+    realWins: franchise.realWins,
+    gamesRemaining: franchise.gamesRemaining,
+  });
+  const { status, effLine, isDouble } = progress;
+
+  const accent = isPass
+    ? "transparent"
+    : status === "WIN"
+      ? T.lime
+      : status === "LOSS"
+        ? T.red
+        : isDouble
+          ? T.amber
+          : "transparent";
 
   return (
-    <Paper
+    <Box
       onClick={() => dispatch(selectALine(franchise.id))}
-      elevation={3}
       sx={{
-        borderColor: hasFailed
-          ? "crimson"
-          : userPick.isOver === null
-            ? "transparent"
-            : sliderValue >= targetVal
-              ? "darkgreen"
-              : "transparent",
-        borderWidth: 3,
-        cursor: "pointer",
-        width: 360,
-        height: 120, // Fixed height for consistency
-        p: 1,
+        background: isSelected ? T.panel2 : T.panel,
+        borderLeft: `2px solid ${accent}`,
+        // Selection is a UI state, not a result — so it deliberately avoids the
+        // semantic colours (lime hit / red miss / amber double-down) and uses a
+        // neutral outline. The faint hover outline doubles as the hint that
+        // these cards are clickable at all.
+        outline: `1px solid ${isSelected ? T.text : "transparent"}`,
+        outlineOffset: "-1px",
+        minHeight: 96,
+        p: 1.25,
         display: "flex",
-        transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+        alignItems: "center",
+        gap: 1.5,
+        cursor: "pointer",
+        position: "relative",
+        transition: "outline-color 0.15s ease, background 0.15s ease",
         "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: 6,
+          background: T.panel2,
+          outlineColor: isSelected ? T.text : T.lineBold,
         },
       }}
     >
       <Box
         sx={{
-          width: "25%",
-          mr: 2,
+          width: 44,
+          height: 44,
+          flexShrink: 0,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -93,8 +93,8 @@ export const InSeasonOUTeamRow = ({
           src={franchise.franchise.logo}
           alt={`${franchise.franchise.city} ${franchise.franchise.name} logo`}
           style={{
-            filter: `saturate(${userPick.isOver === null ? "20%" : "100%"})`,
-            opacity: userPick.isOver === null ? "50%" : "100%",
+            // Dim passed teams, but keep them legible — desaturating made them ghosts.
+            opacity: isPass ? 0.45 : 1,
             width: "100%",
             height: "100%",
             objectFit: "contain",
@@ -102,125 +102,110 @@ export const InSeasonOUTeamRow = ({
           loading="lazy"
         />
       </Box>
+
       <Box
         sx={{
-          width: "85%",
+          flex: 1,
+          minWidth: 0,
           display: "flex",
-          flexGrow: "grow",
-          alignItems: "center",
+          flexDirection: "column",
+          gap: 0.75,
         }}
       >
-        <Box
+        <Typography
           sx={{
-            width: "100%",
-            display: "flex",
-            flex: 1,
-            paddingRight: 1,
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
+            fontFamily: fontStacks.sans,
+            fontSize: 13,
+            fontWeight: 600,
+            color: isPass ? T.textDim : T.text,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
           }}
         >
-          <Typography
-            variant="subtitle1"
-            sx={{
-              mb: 1,
-              display: "inline-block",
-              flexGrow: "grow",
-              fontWeight: "bold",
-              textAlign: "center",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-            }}
-          >
-            {franchise.franchise.city} {franchise.franchise.name}
-          </Typography>
-          <div
-            style={{
-              backgroundColor: userPick.lineAdjustment === 0 ? "" : "yellow",
-            }}
-            className="flex flex-row content-center w-full justify-center"
-          >
-            {userPick.lineAdjustment > 0 && (
-              <KeyboardDoubleArrowUpIcon color="error" />
-            )}
-            {userPick.lineAdjustment < 0 && (
-              <KeyboardDoubleArrowDownIcon color="error" />
-            )}
-            <Typography
+          {franchise.franchise.city} {franchise.franchise.name}
+        </Typography>
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+          {isDouble && !isPass && (
+            <Box
+              component="span"
               sx={{
-                flexWrap: "nowrap",
-                textAlign: "center",
+                fontFamily: fontStacks.mono,
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                background: T.amber,
+                color: "#000",
+                px: 0.5,
+                flexShrink: 0,
               }}
             >
-              {userPick.isOver === null
-                ? "PASS"
-                : userPick.isOver
-                  ? `OVER ${franchise.overUnder + userPick.lineAdjustment}`
-                  : `UNDER ${franchise.overUnder + userPick.lineAdjustment}`}
-            </Typography>
-            {userPick.lineAdjustment > 0 && (
-              <KeyboardDoubleArrowUpIcon color="error" />
-            )}
-            {userPick.lineAdjustment < 0 && (
-              <KeyboardDoubleArrowDownIcon color="error" />
-            )}
-          </div>
-          {userPick.isOver !== null && userPick.isOver !== undefined && (
-            <OverUnderProgressBar
-              hasFailed={hasFailed ?? false}
-              //losses + gamesremaining <= targetVal || wins + games remaining <= target
-              currentValue={sliderValue}
-              isOnTrack={getPace()}
-              targetValue={targetVal}
-              isOver={userPick.isOver}
-              marker={
-                userPick.isOver
-                  ? franchise.overUnder + userPick.lineAdjustment
-                  : 17 - (franchise.overUnder + userPick.lineAdjustment)
-              }
-            />
+              2X
+            </Box>
           )}
+          <Typography
+            sx={{
+              fontFamily: fontStacks.mono,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.06em",
+              // In-season, lime/red mean won/lost — not over/under. Direction is
+              // carried by the word and the arrow so one colour has one meaning.
+              color: isPass
+                ? T.textMute
+                : status === "WIN"
+                  ? T.lime
+                  : status === "LOSS"
+                    ? T.red
+                    : T.textDim,
+            }}
+          >
+            {isPass
+              ? "PASS"
+              : `${userPick.isOver ? "▲ OVER" : "▼ UNDER"} ${effLine}`}
+          </Typography>
         </Box>
-        <Box
-          sx={{
-            borderLeft: 1,
-            height: "100%",
-            width: "22%",
-            borderLeftStyle: "solid",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <div className="flex flex-col justify-center">
-            <div>W-L</div>
-            <div style={{ textAlign: "center", fontWeight: "700" }}>
-              {franchise.realWins}-
-              {17 - (franchise.gamesRemaining + franchise.realWins)}
-            </div>
-          </div>
-          <div>
-            <div
-              style={{
-                fontSize: 13,
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                flexWrap: "nowrap",
-              }}
-            >
-              Gms Left
-            </div>
-            <div style={{ textAlign: "center", fontWeight: "700" }}>
-              {franchise.gamesRemaining}
-            </div>
-          </div>
+
+        {!isPass && (
+          <OverUnderProgressBar
+            status={status}
+            pct={progress.pct}
+            current={progress.current}
+            target={progress.target}
+            isOver={userPick.isOver === true}
+            isDouble={isDouble}
+            onPace={progress.onPace}
+          />
+        )}
+      </Box>
+
+      {/* Fixed width so the meter can never collide with these numbers. */}
+      <Box
+        sx={{
+          width: 64,
+          flexShrink: 0,
+          alignSelf: "stretch",
+          borderLeft: `1px solid ${T.line}`,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <Box sx={{ textAlign: "center" }}>
+          <Box sx={microLabel}>W-L</Box>
+          <Box sx={statValue}>
+            {franchise.realWins}-{progress.losses}
+          </Box>
+        </Box>
+        <Box sx={{ textAlign: "center" }}>
+          <Box sx={microLabel}>GMS</Box>
+          <Box sx={statValue}>{franchise.gamesRemaining}</Box>
         </Box>
       </Box>
-    </Paper>
+    </Box>
   );
 };
 

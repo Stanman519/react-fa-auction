@@ -68,28 +68,32 @@ Tailwind (primary utilities/spacing) + MUI v5 components. Tailwind is compiled b
 
 Use Playwright MCP tools proactively after any UI changes to verify layout, responsiveness, and polish. Dev server: `http://localhost:3000`.
 
-### Auth — session save/restore
+### Auth — session
 
-The entire app requires Auth0 login except `/landing` and `/demo`. Auth0 SPA SDK caches tokens in `localStorage` under `@@auth0spajs@@` keys.
+The entire app requires Auth0 login except `/landing` and `/demo`.
 
-**Log in once (do this at the start of a session or when session expires, ~7 days):**
-```
-1. browser_navigate http://localhost:3000
-2. Auth0 redirects to login page — use browser_type to fill credentials, browser_click to submit
-3. Wait for app to load (authSynchronized)
-4. browser_evaluate → extract tokens:
-   JSON.stringify(Object.fromEntries(Object.entries(localStorage).filter(([k]) => k.startsWith('@@auth0spajs@@'))))
-5. Save the JSON output below in this file under "## Auth Session Cache"
-```
+**Auth0 here uses the default in-memory cache, NOT localStorage.** `localStorage` and
+`sessionStorage` are both empty — only two `auth0.*.is.authenticated` cookies exist. There is
+no token JSON to export and re-inject, so a saved "session cache" is not possible without
+switching the SDK to `cacheLocation="localstorage"`.
 
-**Restore session before each visual test:**
+**To get an authenticated browser:** ask the user to log in via the Playwright window once.
+Then **do not call `browser_navigate` again** — a fresh navigation restarts the Auth0 redirect
+dance and can loop. Drive the already-loaded SPA in place (scroll/click/evaluate) instead.
+
+**Reaching app internals without a code change** — useful for rendering states that depend on
+data you don't have (e.g. the in-season Over/Under view out of season). Walk the React fiber
+from `#root` to grab the Redux store and the Auth0 context, then dispatch directly:
+
+```js
+// find store (memoizedProps.store) and auth0 (memoizedProps.value.getAccessTokenSilently)
+// by walking f.child / f.sibling from root[Object.keys(root).find(k => k.startsWith('__reactContainer$'))]
+const token = await auth0.getAccessTokenSilently();
+await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+store.dispatch({ type: 'UPDATE_OUS', payload: { ...prev, /* ... */ } });
 ```
-1. browser_navigate http://localhost:3000/landing   (public — avoids immediate loginWithRedirect)
-2. browser_evaluate → inject saved tokens:
-   Object.assign(localStorage, <paste saved JSON here>)
-3. browser_navigate http://localhost:3000/<target route>
-   SDK finds cached tokens, skips redirect. Expired access tokens auto-refresh silently.
-```
+Stash the previous slice first and dispatch it back when done. Re-acquire the store after hot
+reloads — the old reference goes stale.
 
 ### Visual verification workflow
 
@@ -122,6 +126,5 @@ After any UI change:
 
 **Limitations:** SignalR multi-user auction state can't be simulated with one browser instance. For auction UI, test with static/mock lot states if backend isn't live.
 
-## Auth Session Cache
-
-_(Paste saved `@@auth0spajs@@` localStorage JSON here after logging in via Playwright — update when expired)_
+_(No auth session cache — see "Auth — session" above. Auth0 caches tokens in memory, so they
+cannot be exported and replayed across browser sessions.)_

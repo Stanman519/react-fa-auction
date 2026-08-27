@@ -1,4 +1,5 @@
-import { Box, Paper, Tooltip } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
+import { terminal as T, fontStacks } from "../../../theme";
 
 export interface GamesTileProps {
   imgFile: string;
@@ -17,50 +18,85 @@ export const GamesTile = ({
 }: GamesTileProps): JSX.Element => {
   return (
     <Tooltip title={tooltip} arrow>
-      <Paper
-        className="mr-2 mt-2 md:mr-8 md:mt-8"
-        elevation={3}
+      <Box
+        onClick={!disabled ? onClick : undefined}
         sx={{
-          maxWidth: 500,
-          aspectRatio: "1 / 1", // Maintain square aspect ratio
+          background: T.panel,
+          border: `1px solid ${T.line}`,
           cursor: disabled ? "not-allowed" : "pointer",
-          opacity: disabled ? 0.5 : 1,
-          position: "relative",
-          transition: "transform 0.3s ease, box-shadow 0.3s ease",
-          overflow: "visible", // Ensure border effect is visible
+          display: "flex",
+          flexDirection: "column",
+          transition: "background 0.2s ease, border-color 0.2s ease",
           "&:hover": {
-            transform: disabled ? "none" : "scale(1.05)",
-            boxShadow: disabled ? "none" : "0px 4px 20px rgba(0, 0, 0, 0.9)",
-          },
-          "&:hover::before": {
-            opacity: disabled ? 0 : 1,
-            transform: "scale(1.2)",
-            boxShadow: `0 0 20px rgba(63, 81, 181, 0.9)`, // Increased glow on hover
+            background: disabled ? T.panel : T.panel2,
+            borderColor: disabled ? T.line : T.lineBold,
           },
         }}
-        onClick={!disabled ? onClick : undefined}
       >
         <Box
           sx={{
-            width: "100%",
-            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1,
+            px: 1.25,
+            height: 32,
+            borderBottom: `1px solid ${T.line}`,
+          }}
+        >
+          <span
+            style={{
+              fontFamily: fontStacks.mono,
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              color: disabled ? T.textMute : T.text,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {altTitle.replace(/ Game$/, "").toUpperCase()}
+          </span>
+          <span
+            style={{
+              fontFamily: fontStacks.mono,
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              color: disabled ? T.textMute : "#000",
+              background: disabled ? "transparent" : T.lime,
+              border: `1px solid ${disabled ? T.line : T.lime}`,
+              padding: "0 4px",
+              flexShrink: 0,
+            }}
+          >
+            {disabled ? "CLOSED" : "OPEN"}
+          </span>
+        </Box>
+
+        <Box
+          sx={{
+            aspectRatio: "1 / 1",
+            p: 2,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
           <img
-            className="w-60 md:w-96 lg:w-full"
             src={imgFile}
             alt={altTitle}
             style={{
+              maxWidth: "100%",
+              maxHeight: "100%",
               objectFit: "contain",
-              filter: `saturate(${disabled ? "20%" : "100%"})`,
+              opacity: disabled ? 0.35 : 1,
             }}
             loading="lazy"
           />
         </Box>
-      </Paper>
+      </Box>
     </Tooltip>
   );
 };

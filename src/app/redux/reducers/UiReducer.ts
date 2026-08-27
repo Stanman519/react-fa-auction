@@ -55,6 +55,7 @@ export type Modals =
   | "error"
   | "holdout-confirm"
   | "confidence-rules"
+  | "ou-rules"
   | undefined;
 
 export type LoadingStates = "full-screen" | "button" | "slab" | undefined;
