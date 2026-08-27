@@ -126,8 +126,10 @@ export const OverUnderStickyBar = ({
     (u) => u.owner.ownerId === owner?.ownerId,
   )?.id;
 
+  // Test for an actual side rather than "not undefined" — a pass arrives as
+  // null from the API, and null !== undefined, so the loose check counted it.
   const totalPicks = franchiseWinTotals.filter(
-    (p) => p.userPick.isOver !== undefined,
+    (p) => p.userPick.isOver === true || p.userPick.isOver === false,
   ).length;
   const totalDoubles = franchiseWinTotals.filter(
     (p) => p.userPick.lineAdjustment !== 0,

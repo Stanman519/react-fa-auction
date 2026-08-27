@@ -33,8 +33,9 @@ function OverUnderHome({ isDemo = false }: { isDemo?: boolean }) {
     rightNow < new Date(currentPool?.startDate ?? +new Date() + 100000);
 
   const selectedPoolUserId = selectedUser?.id;
+  // Must match the sticky bar's counter exactly — this one gates SAVE PICKS.
   const totalPicks = franchiseWinTotals.filter(
-    (p) => p.userPick.isOver !== undefined,
+    (p) => p.userPick.isOver === true || p.userPick.isOver === false,
   ).length;
   const totalDoubles = franchiseWinTotals.filter(
     (p) => p.userPick.lineAdjustment !== 0,

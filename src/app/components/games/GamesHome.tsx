@@ -22,6 +22,7 @@ function GamesHome({ isDemo = false }: { isDemo?: boolean }) {
     },
     {
       altTitle: "Playoff Confidence Game",
+      // Intentionally always open — lets owners revisit last year's results.
       disabled: false,
       onClick: () => navigate(`/confidence`),
       tooltip:

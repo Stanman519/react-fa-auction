@@ -22,6 +22,15 @@ export const updateOverUnders = (state: OverUnderState): OverUnderAction => {
   return { type: UPDATE_OUS, payload: state };
 };
 
+/**
+ * The API represents a pass as `isOver: null`; the UI's "no pick" is
+ * `undefined`. They are not interchangeable — `null !== undefined` is true, so
+ * an unnormalised pass gets counted as a pick and the header reads 32/25.
+ * Every inbound pick has to come through here.
+ */
+const normalizeIsOver = (pick: OverUnderPick): OverUnderPick =>
+  pick.isOver === null ? { ...pick, isOver: undefined } : pick;
+
 export const fetchFranchiseWinTotals =
   () =>
   async (dispatch: Function, getState: () => RootState): Promise<any> => {
@@ -36,7 +45,7 @@ export const fetchFranchiseWinTotals =
       owner.ownerId,
     );
     res.winLines.forEach((r) => {
-      if (r.userPick.isOver === null) r.userPick.isOver = undefined;
+      r.userPick = normalizeIsOver(r.userPick);
     });
     const { overUnders } = getState();
     // Default the distribution chart to the first team, otherwise the results
@@ -139,7 +148,9 @@ export const submitOverUnderPicks =
       newWinTotals.forEach((f) => {
         const foundPick = newPicks.find((p) => p.lineId == f.id);
         if (foundPick) {
-          f.userPick = foundPick;
+          // Was assigned raw, which is what made the counter read 32/25 right
+          // after a first save — every pass came back as null and got counted.
+          f.userPick = normalizeIsOver(foundPick);
         }
       });
       const { overUnders } = getState();

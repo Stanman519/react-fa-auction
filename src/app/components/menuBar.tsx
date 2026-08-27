@@ -174,6 +174,11 @@ export function MenuBar() {
   const [chatOpen, setChatOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  // The Over/Under page has its own chat button wired to that pool's channel.
+  // This one opens the league channel, so showing both is two chats side by
+  // side pointing at different rooms.
+  const hideChat = location.pathname === "/over-unders";
+
   const hasLeague = !!owner?.leagues && owner.leagues.length > 0;
   const multiLeague = hasLeague && owner.leagues.length > 1;
   const leagueName = currentLeague?.league.name || "League";
@@ -384,10 +389,14 @@ export function MenuBar() {
               setDrawerOpen(false);
               navigate(p);
             }}
-            onOpenChat={() => {
-              setDrawerOpen(false);
-              setChatOpen(true);
-            }}
+            onOpenChat={
+              hideChat
+                ? undefined
+                : () => {
+                    setDrawerOpen(false);
+                    setChatOpen(true);
+                  }
+            }
             onSwitchLeague={(id) => {
               switchLeague(id);
               setDrawerOpen(false);
@@ -527,27 +536,29 @@ export function MenuBar() {
               padding: "0 12px",
             }}
           >
-            <div
-              onClick={() => setChatOpen((v) => !v)}
-              style={{
-                padding: "6px 12px",
-                borderRadius: 2,
-                border: `1px solid ${chatOpen ? T.lime : T.line}`,
-                background: chatOpen ? T.limeDim : "transparent",
-                color: chatOpen ? T.lime : T.textDim,
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontFamily: fontStacks.mono,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: "0.04em",
-                cursor: "pointer",
-              }}
-            >
-              <span>◎</span>
-              <span>{chatOpen ? "CLOSE CHAT" : "CHAT"}</span>
-            </div>
+            {!hideChat && (
+              <div
+                onClick={() => setChatOpen((v) => !v)}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: 2,
+                  border: `1px solid ${chatOpen ? T.lime : T.line}`,
+                  background: chatOpen ? T.limeDim : "transparent",
+                  color: chatOpen ? T.lime : T.textDim,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontFamily: fontStacks.mono,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.04em",
+                  cursor: "pointer",
+                }}
+              >
+                <span>◎</span>
+                <span>{chatOpen ? "CLOSE CHAT" : "CHAT"}</span>
+              </div>
+            )}
 
             <div
               onClick={() => setShowAvatarMenu((v) => !v)}
@@ -991,7 +1002,8 @@ function MobileDrawer({
   user: any;
   onClose: () => void;
   onNavigate: (path: string) => void;
-  onOpenChat: () => void;
+  /** Omitted on pages that provide their own chat entry point. */
+  onOpenChat?: () => void;
   onSwitchLeague: (id: number) => void;
   onLogout: () => void;
 }) {
@@ -1300,33 +1312,40 @@ function MobileDrawer({
         >
           QUICK ACTIONS
         </div>
-        <div
-          onClick={onOpenChat}
-          style={{
-            padding: "12px 16px",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            cursor: "pointer",
-          }}
-        >
-          <span
+        {onOpenChat && (
+          <div
+            onClick={onOpenChat}
             style={{
-              fontFamily: fontStacks.mono,
-              fontSize: 16,
-              color: T.textDim,
-              width: 20,
-              textAlign: "center",
+              padding: "12px 16px",
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              cursor: "pointer",
             }}
           >
-            ◎
-          </span>
-          <span
-            style={{ flex: 1, fontSize: 14, color: T.textDim, fontWeight: 500 }}
-          >
-            Open chat
-          </span>
-        </div>
+            <span
+              style={{
+                fontFamily: fontStacks.mono,
+                fontSize: 16,
+                color: T.textDim,
+                width: 20,
+                textAlign: "center",
+              }}
+            >
+              ◎
+            </span>
+            <span
+              style={{
+                flex: 1,
+                fontSize: 14,
+                color: T.textDim,
+                fontWeight: 500,
+              }}
+            >
+              Open chat
+            </span>
+          </div>
+        )}
 
         <div
           style={{
