@@ -237,6 +237,13 @@ export const OverUnderRow = ({
               "&.Mui-selected, &:hover": {
                 background: isDouble ? T.amber : "transparent",
               },
+              // ToggleButtonGroup's own CSS forces middle/last buttons'
+              // border-left to transparent (to fake a shared 1px divider) at
+              // higher specificity than this sx's `border` shorthand — the
+              // `&&` here matches that specificity so our color actually wins.
+              "&&": {
+                borderLeftColor: isDouble ? T.amber : T.line,
+              },
             }}
             value={""}
           >
@@ -374,6 +381,13 @@ const MyToggleButton = (props: MyToggButtProps): JSX.Element => {
         "&:hover": {
           background: props.selected ? accentDim : T.panel2,
           borderColor: props.selected ? accent : T.lineBold,
+        },
+        // ToggleButtonGroup's own CSS forces the last button's border-left to
+        // transparent (to fake a shared 1px divider) at higher specificity
+        // than this sx's `border` shorthand — `&&` matches that specificity
+        // so the accent color actually renders on the OVER button's left edge.
+        "&&": {
+          borderLeftColor: props.selected ? accent : T.line,
         },
       }}
     >

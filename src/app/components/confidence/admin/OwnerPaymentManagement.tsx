@@ -3,6 +3,7 @@ import { Button, Checkbox, FormControl, FormControlLabel } from "@mui/material";
 import GeneralApiSvc from "../../../services/GeneralApiSvc";
 import Owner from "../../../redux/reducers/OwnerReducer";
 import { useAuth0 } from "@auth0/auth0-react";
+import { AdminPanel } from "./AdminPanel";
 
 export const OwnerPaymentManagement = (): JSX.Element => {
   const [owners, setOwners] = useState<Owner[]>([]);
@@ -24,7 +25,7 @@ export const OwnerPaymentManagement = (): JSX.Element => {
     }
   };
   return (
-    <div className="border rounded border-black flex flex-col">
+    <AdminPanel title="Confidence Pool — Mark Owners Paid">
       <FormControl>
         {owners.map((o) => (
           <FormControlLabel
@@ -36,6 +37,7 @@ export const OwnerPaymentManagement = (): JSX.Element => {
         ))}
       </FormControl>
       <Button
+        variant="contained"
         onClick={async () => {
           if (!user?.sub) {
             alert("Please log in to mark owners as paid");
@@ -48,6 +50,6 @@ export const OwnerPaymentManagement = (): JSX.Element => {
       >
         SAVE
       </Button>
-    </div>
+    </AdminPanel>
   );
 };

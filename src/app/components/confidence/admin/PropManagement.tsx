@@ -2,8 +2,9 @@ import { RootState, useAppSelector } from "../../../hooks";
 import GeneralApiSvc from "../../../services/GeneralApiSvc";
 import { Prop } from "../../../models/ConfidenceDTOs";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Button, FormControlLabel, Radio, RadioGroup, TextField } from "@mui/material";
+import { Box, Button, FormControlLabel, Radio, RadioGroup, TextField } from "@mui/material";
 import { useState } from "react";
+import { AdminPanel } from "./AdminPanel";
 
 
 
@@ -51,8 +52,8 @@ export function PropManagement() {
 
 
   return (
-    <div  className="flex flex-col justify-center m-5 border border-black">
-        <TextField id="filled-basic" label="PROMPT" variant="filled" 
+    <AdminPanel title="Prop Management">
+        <TextField id="filled-basic" label="PROMPT" variant="filled"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setEntries({...entries, prompt: event.target.value});
           }}
@@ -92,10 +93,9 @@ export function PropManagement() {
         <Button disabled={(!entries.left || !entries.right || !entries.prompt)} onClick={async () => await uploadProp()}>Upload Prop</Button>
 
 
-        <div className="flex flex-col border border-black m-6">
-        <div>DECIDE PROPS</div>
-        {props?.filter((m: any) => !m.pickable && m.id !== undefined)?.map((m: any, i: number) => 
-            <div key={m.id} className="rounded-sm border border-black m-1">
+        <AdminPanel title="Decide Props" sx={{ mx: 0 }}>
+        {props?.filter((m: any) => !m.pickable && m.id !== undefined)?.map((m: any, i: number) =>
+            <Box key={m.id} className="m-1" sx={{ border: 1, borderColor: "divider", borderRadius: 1 }}>
                 <RadioGroup
 
                     aria-labelledby="demo-controlled-radio-buttons-group"
@@ -107,9 +107,9 @@ export function PropManagement() {
                     <FormControlLabel value={"B"} control={<Radio />} label={m.optionB} />
                 </RadioGroup>
                 <Button onClick={async () => await submitWinner(m.id!)}>SUBMIT</Button>
-            </div>
+            </Box>
             )}
-      </div>
-    </div>
+      </AdminPanel>
+    </AdminPanel>
   );
 }

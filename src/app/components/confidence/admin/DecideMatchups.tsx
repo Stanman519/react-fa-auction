@@ -1,6 +1,7 @@
 import { Draggable } from "@hello-pangea/dnd";
 import React, { useEffect, useRef } from "react";
 import {
+  Box,
   Button,
   Card,
   FormControlLabel,
@@ -15,6 +16,7 @@ import { NflTeam } from "../../../models/ConfidenceDTOs";
 import { useAppSelector } from "../../../hooks";
 import GeneralApiSvc from "../../../services/GeneralApiSvc";
 import { useAuth0 } from "@auth0/auth0-react";
+import { AdminPanel } from "./AdminPanel";
 
 interface stateRadio {
   id?: number;
@@ -62,12 +64,15 @@ export const DecideMatchups = (): JSX.Element => {
     setValue([...newVals, { id: matchupId, value: event.target.value }]);
   };
   return (
-    <div className="flex flex-col border border-black m-6">
-      <div>DECIDE MATCHUPS</div>
+    <AdminPanel title="Decide Matchups">
       {matchups
         ?.filter((m) => !m.pickable)
         ?.map((m, i) => (
-          <div key={m.id} className="rounded-sm border border-black m-1">
+          <Box
+            key={m.id}
+            className="m-1"
+            sx={{ border: 1, borderColor: "divider", borderRadius: 1 }}
+          >
             <RadioGroup
               aria-labelledby="demo-controlled-radio-buttons-group"
               name="controlled-radio-buttons-group"
@@ -91,8 +96,8 @@ export const DecideMatchups = (): JSX.Element => {
             <Button onClick={async () => await setCurrentMatchup(m.id)}>
               SET CURRENT
             </Button>
-          </div>
+          </Box>
         ))}
-    </div>
+    </AdminPanel>
   );
 };

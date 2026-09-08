@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Button, CircularProgress, TextField } from "@mui/material";
+import { Box, Button, CircularProgress, TextField } from "@mui/material";
 import GeneralApiSvc from "../../../services/GeneralApiSvc";
+import { AdminPanel } from "./AdminPanel";
 
 interface TagValues {
   mflleagueid: number;
@@ -40,8 +41,7 @@ export function FranchiseTagAdmin() {
   };
 
   return (
-    <div className="p-4 border rounded mt-6">
-      <h2 className="text-lg font-bold mb-3">Franchise Tag Value Generator</h2>
+    <AdminPanel title="Franchise Tag Value Generator">
       <div className="flex items-center gap-3 mb-4">
         <TextField
           label="Year"
@@ -53,7 +53,7 @@ export function FranchiseTagAdmin() {
       </div>
       <div className="flex flex-col gap-4">
         {LEAGUES.map((leagueId) => (
-          <div key={leagueId} className="border rounded p-3">
+          <Box key={leagueId} className="p-3" sx={{ border: 1, borderColor: "divider", borderRadius: 1 }}>
             <div className="flex items-center gap-3 mb-2">
               <span className="font-semibold">League {leagueId}</span>
               <Button
@@ -66,7 +66,9 @@ export function FranchiseTagAdmin() {
               </Button>
             </div>
             {errors[leagueId] && (
-              <p className="text-red-500 text-sm">{errors[leagueId]}</p>
+              <Box component="p" className="text-sm" sx={{ color: "error.main" }}>
+                {errors[leagueId]}
+              </Box>
             )}
             {results[leagueId] && (
               <table className="text-sm w-full mt-2">
@@ -92,9 +94,9 @@ export function FranchiseTagAdmin() {
                 </tbody>
               </table>
             )}
-          </div>
+          </Box>
         ))}
       </div>
-    </div>
+    </AdminPanel>
   );
 }

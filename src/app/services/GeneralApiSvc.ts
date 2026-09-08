@@ -702,6 +702,46 @@ const getAllOverUnderUsersAndPicks = (poolId: number): Promise<PoolUser[]> => {
     });
 };
 
+const getUnpaidPoolUsers = (poolId: number): Promise<PoolUser[]> => {
+  return axiosInstance
+    .get(`${URL}/games/pools/${poolId}/admin/unpaid`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(() => {
+      console.log("catch");
+      return undefined;
+    });
+};
+
+const setPoolUsersToPaid = (
+  poolId: number,
+  poolUserIds: number[],
+  userSub: string,
+): Promise<Response> => {
+  return axiosInstance
+    .post(
+      `${URL}/games/pools/${poolId}/admin/mark-paid?user=${encodeUserSub(userSub)}`,
+      poolUserIds,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    )
+    .then((res) => {
+      return res.data;
+    })
+    .catch(() => {
+      console.log("catch");
+      return undefined;
+    });
+};
+
 const proposeTrade = (tradeReq: TradeRequest): Promise<Response> => {
   return axiosInstance
     .post(`${URL}/dashboard/propose-trade`, tradeReq, {
@@ -863,6 +903,8 @@ export default {
   sendOverUnderPicks,
   getWinOverUndersForLeagueYear,
   getAllOverUnderUsersAndPicks,
+  getUnpaidPoolUsers,
+  setPoolUsersToPaid,
   getHoldoutCandidates,
   proposeTrade,
   cancelTrade,

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Button, CircularProgress, TextField } from "@mui/material";
+import { Box, Button, CircularProgress, TextField } from "@mui/material";
 import AuctionApiSvc from "../../../services/AuctionApiSvc";
+import { AdminPanel } from "./AdminPanel";
 
 const LEAGUES = [13894, 26548];
 
@@ -25,8 +26,7 @@ export function AuctionPauseAdmin() {
   };
 
   return (
-    <div className="p-4 border rounded mt-6">
-      <h2 className="text-lg font-bold mb-3">Extend Active Bid Timers (Pause)</h2>
+    <AdminPanel title="Extend Active Bid Timers (Pause)">
       <div className="flex items-center gap-3 mb-4">
         <TextField
           label="Hours to add"
@@ -50,16 +50,18 @@ export function AuctionPauseAdmin() {
               {loading === leagueId ? <CircularProgress size={18} /> : "Extend"}
             </Button>
             {results[leagueId] !== undefined && (
-              <span style={{ color: "green" }} className="text-sm">
+              <Box component="span" className="text-sm" sx={{ color: "success.main" }}>
                 Extended {results[leagueId]} bid{results[leagueId] !== 1 ? "s" : ""}
-              </span>
+              </Box>
             )}
             {errors[leagueId] && (
-              <span style={{ color: "red" }} className="text-sm">{errors[leagueId]}</span>
+              <Box component="span" className="text-sm" sx={{ color: "error.main" }}>
+                {errors[leagueId]}
+              </Box>
             )}
           </div>
         ))}
       </div>
-    </div>
+    </AdminPanel>
   );
 }

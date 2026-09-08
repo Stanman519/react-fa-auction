@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Button, CircularProgress } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import GeneralApiSvc from "../../../services/GeneralApiSvc";
+import { AdminPanel } from "./AdminPanel";
 
 const LEAGUES = [13894, 26548];
 
@@ -34,11 +35,10 @@ export function SalaryCapTrueUpAdmin() {
   };
 
   return (
-    <div className="p-4 border rounded mt-6">
-      <h2 className="text-lg font-bold mb-3">Salary Cap True-Up</h2>
-      <p className="text-sm mb-3" style={{ color: "#555" }}>
+    <AdminPanel title="Salary Cap True-Up">
+      <Typography variant="body2" color="text.secondary" className="mb-3">
         Pulls cap room from MFL and writes to DB for all franchises in the league.
-      </p>
+      </Typography>
       <div className="flex flex-col gap-3">
         {LEAGUES.map((leagueId) => (
           <div key={leagueId} className="flex items-center gap-3">
@@ -52,16 +52,18 @@ export function SalaryCapTrueUpAdmin() {
               {loading === leagueId ? <CircularProgress size={18} /> : "True Up Caps"}
             </Button>
             {results[leagueId] && (
-              <span className="text-green-600 text-sm">
+              <Box component="span" className="text-sm" sx={{ color: "success.main" }}>
                 Updated {results[leagueId].franchises} franchises
-              </span>
+              </Box>
             )}
             {errors[leagueId] && (
-              <span className="text-red-500 text-sm">{errors[leagueId]}</span>
+              <Box component="span" className="text-sm" sx={{ color: "error.main" }}>
+                {errors[leagueId]}
+              </Box>
             )}
           </div>
         ))}
       </div>
-    </div>
+    </AdminPanel>
   );
 }

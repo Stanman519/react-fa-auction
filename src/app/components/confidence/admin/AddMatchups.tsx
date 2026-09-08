@@ -12,6 +12,7 @@ import {
 } from "../../../redux/actions/ConfidenceActions";
 import { useAppSelector } from "../../../hooks";
 import { useAuth0 } from "@auth0/auth0-react";
+import { AdminPanel } from "./AdminPanel";
 
 export interface NewMatchup {
   left: number;
@@ -63,8 +64,7 @@ export const AddMatchups = (): JSX.Element => {
   };
 
   return (
-    <div className="flex flex-col border border-black m-6">
-      <div>ADD MATCHUPS</div>
+    <AdminPanel title="Add Matchups">
       {teams.length > 0 &&
         newMatchups.map((nm, index) => (
           <AddMatchupTeamSelector
@@ -138,19 +138,22 @@ export const AddMatchups = (): JSX.Element => {
       >
         LOCK ALL MATCHUPS
       </Button>
-    </div>
+    </AdminPanel>
   );
 };
 
 export const AdminMatchup = ({ m }: { m: NflMatchup }): JSX.Element => {
   return (
-    <div className="border rounded border-black flex flex-col m-3 w-1/2">
+    <Box
+      className="flex flex-col m-3 w-1/2"
+      sx={{ border: 1, borderColor: "divider", borderRadius: 1 }}
+    >
       <div>Week:{m.week}</div>
       <div className="flex flex-row justify-between">
         <div>{m.left.name}</div>
 
         <div>{m.right.name}</div>
       </div>
-    </div>
+    </Box>
   );
 };

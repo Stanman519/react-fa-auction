@@ -7,10 +7,12 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { OwnerPaymentManagement } from "./OwnerPaymentManagement";
+import { OverUnderPaymentManagement } from "./OverUnderPaymentManagement";
 import { FranchiseTagAdmin } from "./FranchiseTagAdmin";
 import { SalaryCapTrueUpAdmin } from "./SalaryCapTrueUpAdmin";
 import { AuctionPauseAdmin } from "./AuctionPauseAdmin";
 import { MenuBar } from "../../menuBar";
+import { Box } from "@mui/material";
 
 export function ConfidenceAdminHome() {
   const { owner } = useSelector((state: RootState) => state.profile);
@@ -21,15 +23,19 @@ export function ConfidenceAdminHome() {
   }, []);
 
   return (
-    <div className="flex flex-col justify-center p-5" style={{ backgroundColor: "#fff", color: "#000", minHeight: "100vh" }}>
+    <Box
+      className="flex flex-col justify-center p-5"
+      sx={{ bgcolor: "background.default", color: "text.primary", minHeight: "100vh" }}
+    >
       <MenuBar />
       <DecideMatchups />
       <AddMatchups />
       <PropManagement />
       <OwnerPaymentManagement />
+      <OverUnderPaymentManagement />
       <AuctionPauseAdmin />
       <FranchiseTagAdmin />
       <SalaryCapTrueUpAdmin />
-    </div>
+    </Box>
   );
 }
