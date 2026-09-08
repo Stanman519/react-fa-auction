@@ -264,9 +264,9 @@ const getNflTeams = (): Promise<NflTeam[]> => {
     });
 };
 
-const getUnpaidOwners = (): Promise<Owner[]> => {
+const getUnpaidOwners = (userSub: string): Promise<Owner[]> => {
   return axiosInstance
-    .get(`${URL}/confidence/admin/unpaid`, {
+    .get(`${URL}/confidence/admin/unpaid?user=${encodeUserSub(userSub)}`, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -702,9 +702,9 @@ const getAllOverUnderUsersAndPicks = (poolId: number): Promise<PoolUser[]> => {
     });
 };
 
-const getUnpaidPoolUsers = (poolId: number): Promise<PoolUser[]> => {
+const getUnpaidPoolUsers = (poolId: number, userSub: string): Promise<PoolUser[]> => {
   return axiosInstance
-    .get(`${URL}/games/pools/${poolId}/admin/unpaid`, {
+    .get(`${URL}/games/pools/${poolId}/admin/unpaid?user=${encodeUserSub(userSub)}`, {
       headers: {
         "Content-Type": "application/json",
       },

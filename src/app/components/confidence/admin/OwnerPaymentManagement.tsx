@@ -11,12 +11,13 @@ export const OwnerPaymentManagement = (): JSX.Element => {
   const { user } = useAuth0();
 
   useEffect(() => {
+    if (!user?.sub) return;
     const onLoad = async () => {
-      const unpaid = await GeneralApiSvc.getUnpaidOwners();
+      const unpaid = await GeneralApiSvc.getUnpaidOwners(user.sub!);
       setOwners(unpaid ?? []);
     };
     onLoad();
-  }, []);
+  }, [user?.sub]);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       setChecked([...checked, Number(event.target.value)]);
