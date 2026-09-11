@@ -11,6 +11,7 @@ import { OverUnderPaymentManagement } from "./OverUnderPaymentManagement";
 import { FranchiseTagAdmin } from "./FranchiseTagAdmin";
 import { SalaryCapTrueUpAdmin } from "./SalaryCapTrueUpAdmin";
 import { AuctionPauseAdmin } from "./AuctionPauseAdmin";
+import { OverUnderWinsAdmin } from "./OverUnderWinsAdmin";
 import { MenuBar } from "../../menuBar";
 import { Box } from "@mui/material";
 
@@ -36,6 +37,7 @@ export function ConfidenceAdminHome() {
       <AuctionPauseAdmin />
       <FranchiseTagAdmin />
       <SalaryCapTrueUpAdmin />
+      <OverUnderWinsAdmin />
     </Box>
   );
 }

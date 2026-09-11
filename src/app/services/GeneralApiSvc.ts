@@ -869,6 +869,9 @@ const trueUpSalaryCaps = (leagueId: number) =>
     `${URL}/dashboard/admin/leagues/${leagueId}/true-up-salary-caps`
   ).then((res) => res.data);
 
+const updateNflTeamWins = () =>
+  axiosInstance.post(`${URL}/games/update-wins`).then((res) => res.data);
+
 export default {
   synchronizeAuth,
   getDemoBootstrap,
@@ -912,4 +915,5 @@ export default {
   rejectTrade,
   generateFranchiseTagValues,
   trueUpSalaryCaps,
+  updateNflTeamWins,
 };
