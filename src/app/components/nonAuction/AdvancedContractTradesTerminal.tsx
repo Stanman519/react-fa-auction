@@ -13,6 +13,7 @@ import {
 } from "../../models/MflModels";
 import { PlayerDTO } from "../../redux/reducers/FreeAgentReducer";
 import { URL } from "../../services/AuctionApiSvc";
+import { contractStatusSuffixText } from "../../constants/contractStatusTags";
 import { submitTradeRequest } from "../../redux/actions/TransactionActions";
 import { RootState } from "../../redux/reducers/RootReducer";
 import {
@@ -190,7 +191,7 @@ function SidePanel({
               key={id}
               pos={p.position}
               label={p.fullName || `MFL #${id}`}
-              sub={`${p.team ?? "—"} · $${p.salary ?? 0}M × ${p.length ?? 0}YR`}
+              sub={`${p.team ?? "—"} · $${p.salary ?? 0}M × ${p.length ?? 0}YR${contractStatusSuffixText(p.contractStatus, p.projectedFifthYearOptionSalary)}`}
               selected={!!selected.find((s) => s.mflId === id)}
               onToggle={() =>
                 onToggle(id, !selected.find((s) => s.mflId === id))

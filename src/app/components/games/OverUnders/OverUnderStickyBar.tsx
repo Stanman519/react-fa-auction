@@ -15,7 +15,7 @@ import {
   REQUIRED_DOUBLES,
   REQUIRED_PICKS,
 } from "./pickStatus";
-import { useIsMobile } from "../../../hooks";
+import { useIsMobile, useUnreadMessageCount } from "../../../hooks";
 
 const label = {
   fontFamily: fontStacks.mono,
@@ -29,10 +29,12 @@ function OuBarButton({
   glyph,
   label: text,
   onClick,
+  hasUnread,
 }: {
   glyph: string;
   label: string;
   onClick: () => void;
+  hasUnread?: boolean;
 }) {
   return (
     <div
@@ -54,7 +56,22 @@ function OuBarButton({
       onMouseEnter={(e) => (e.currentTarget.style.color = T.text)}
       onMouseLeave={(e) => (e.currentTarget.style.color = T.textDim)}
     >
-      <span style={{ fontFamily: fontStacks.mono, fontSize: 13 }}>{glyph}</span>
+      <span style={{ position: "relative", fontFamily: fontStacks.mono, fontSize: 13 }}>
+        {glyph}
+        {hasUnread && (
+          <span
+            style={{
+              position: "absolute",
+              top: -2,
+              right: -3,
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: T.red,
+            }}
+          />
+        )}
+      </span>
       <span>{text}</span>
     </div>
   );
@@ -114,6 +131,8 @@ export const OverUnderStickyBar = ({
   const isMobile = useIsMobile(720);
   const [chatOpen, setChatOpen] = useState(false);
   const [showSeasons, setShowSeasons] = useState(false);
+  const unreadCount = useUnreadMessageCount();
+  const hasUnread = unreadCount > 0 && !chatOpen;
   const {
     franchiseWinTotals,
     currentPool,
@@ -435,6 +454,7 @@ export const OverUnderStickyBar = ({
               glyph="◎"
               label={isMobile ? "" : "CHAT"}
               onClick={() => setChatOpen(true)}
+              hasUnread={hasUnread}
             />
           </div>
         </div>

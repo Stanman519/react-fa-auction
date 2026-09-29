@@ -49,10 +49,15 @@ const HomeBase = ({ isDemo = false }: { isDemo?: boolean }) => {
 
   // Demo shows the read-only contract/cap surface only.
   const [currentTab, setCurrentTab] = useState(isDemo ? "roster" : "league");
+  // Set when navigation (e.g. clicking a team in standings) asks Roster to
+  // preselect a specific franchise instead of defaulting to "my team".
+  const [rosterFranchiseId, setRosterFranchiseId] = useState<number | undefined>(undefined);
 
   useEffect(() => {
-    const tabState = (location.state as any)?.tab;
+    const state = location.state as any;
+    const tabState = state?.tab;
     if (tabState) setCurrentTab(tabState);
+    if (typeof state?.franchiseId === "number") setRosterFranchiseId(state.franchiseId);
   }, [location.state]);
   const [loadingTab, setLoadingTab] = useState<string | null>(null);
   // Track which tabs have already had their data fetched this session
@@ -254,7 +259,7 @@ const HomeBase = ({ isDemo = false }: { isDemo?: boolean }) => {
                     </div>
                   )
                 )}
-                {currentTab === "roster" && <RosterContracts />}
+                {currentTab === "roster" && <RosterContracts initialFranchiseId={rosterFranchiseId} />}
                 {currentTab === "cap-outlook" && <CapOutlook />}
                 {currentTab === "rules" && <Rulebook />}
                 {currentTab === "tags" && (loadingTab === "tags" ? <div className="flex justify-center mt-8"><CircularProgress /></div> : <FranchiseTags />)}

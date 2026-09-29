@@ -38,6 +38,7 @@ import { PlayerDTO } from "../../redux/reducers/FreeAgentReducer";
 import React from "react";
 import { URL } from "../../services/AuctionApiSvc";
 import { TradeListItemHeader } from "./TradeListItemHeader";
+import { contractStatusSuffixText } from "../../constants/contractStatusTags";
 import { submitTradeRequest } from "../../redux/actions/TransactionActions";
 import { updateUI } from "../../redux/actions/UiActions";
 import { RootState } from "../../redux/reducers/RootReducer";
@@ -407,7 +408,7 @@ const AdvancedContractTrades = () => {
                             }}
                           />
                         }
-                        label={`${mp.fullName} (${mp.position} - ${mp.team}) $${mp.salary}/${mp.length}yr`}
+                        label={`${mp.fullName} (${mp.position} - ${mp.team}) $${mp.salary}/${mp.length}yr${contractStatusSuffixText(mp.contractStatus, mp.projectedFifthYearOptionSalary)}`}
                       />
                     ))}
                   {mflLeagueRoot?.franchises
@@ -467,7 +468,7 @@ const AdvancedContractTrades = () => {
                             }
                           />
                         }
-                        label={`${mp.fullName} (${mp.position} - ${mp.team}) $${mp.salary}/${mp.length}yr`}
+                        label={`${mp.fullName} (${mp.position} - ${mp.team}) $${mp.salary}/${mp.length}yr${contractStatusSuffixText(mp.contractStatus, mp.projectedFifthYearOptionSalary)}`}
                       />
                     ))}
                   {mflLeagueRoot?.franchises

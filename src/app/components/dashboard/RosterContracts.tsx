@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   CircularProgress,
@@ -14,6 +14,7 @@ import { PlayerDTO } from "../../redux/reducers/FreeAgentReducer";
 import { capHitForYear, deadCapIfCut, YEARS_SHOWN } from "./rosterMath";
 import { Transaction } from "../../redux/reducers/TransactionReducer";
 import { POS_COLORS } from "../../constants/positionColors";
+import { StatusBadges } from "../shared/StatusBadges";
 
 const label = {
   fontFamily: fontStacks.mono,
@@ -60,9 +61,48 @@ const PosBadge = ({ pos }: { pos: string }) => (
   </Box>
 );
 
+const OPTION_CELL_SX = {
+  fontStyle: "italic" as const,
+  opacity: 0.85,
+};
+
+const YearCell = ({ p, offset }: { p: PlayerDTO; offset: number }) => {
+  const hit = capHitForYear(p, offset);
+  if (hit > 0) {
+    return (
+      <Box sx={{ ...numSx, color: terminal.text, fontWeight: 700, textAlign: "right" }}>
+        ${hit}
+      </Box>
+    );
+  }
+  const isOptionYear = offset === (p.length ?? 0) && !!p.projectedFifthYearOptionSalary;
+  if (isOptionYear) {
+    return (
+      <Box
+        sx={{
+          ...numSx,
+          ...OPTION_CELL_SX,
+          color: "#b98add",
+          fontWeight: 700,
+          textAlign: "right",
+        }}
+        title="Projected 5th-year option — not yet exercised"
+      >
+        ${p.projectedFifthYearOptionSalary}?
+      </Box>
+    );
+  }
+  return (
+    <Box sx={{ ...numSx, color: terminal.textMute, fontWeight: 700, textAlign: "right" }}>
+      —
+    </Box>
+  );
+};
+
 const DesktopRow = ({ p, currentYear }: RowProps) => {
   const pos = p.position ?? "—";
   const isTaxi = p.rosterStatus === "TAXI_SQUAD";
+  const isHoldout = p.contractStatus?.split("|").includes("HOLDOUT") ?? false;
   return (
     <Box
       sx={{
@@ -73,24 +113,29 @@ const DesktopRow = ({ p, currentYear }: RowProps) => {
         px: 1.75,
         py: 0.75,
         borderBottom: `1px solid ${terminal.line}`,
+        borderLeft: isHoldout ? `3px solid ${terminal.red}` : "3px solid transparent",
+        background: isHoldout ? terminal.redDim : "transparent",
         fontFamily: fontStacks.mono,
         fontSize: 12,
-        "&:hover": { background: terminal.panel2 },
+        "&:hover": { background: isHoldout ? terminal.redDim : terminal.panel2 },
       }}
     >
       <PosBadge pos={pos} />
-      <Box
-        sx={{
-          color: terminal.text,
-          fontSize: 15,
-          fontWeight: 600,
-          fontFamily: fontStacks.sans,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {p.firstName} {p.lastName}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, minWidth: 0, flexWrap: "wrap" }}>
+        <Box
+          sx={{
+            color: terminal.text,
+            fontSize: 15,
+            fontWeight: 600,
+            fontFamily: fontStacks.sans,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {p.firstName} {p.lastName}
+        </Box>
+        <StatusBadges contractStatus={p.contractStatus} />
       </Box>
       <Box sx={{ ...numSx, color: terminal.textDim }}>
         {p.team?.toUpperCase() ?? "—"}
@@ -101,22 +146,9 @@ const DesktopRow = ({ p, currentYear }: RowProps) => {
       <Box sx={{ ...numSx, color: terminal.textDim, textAlign: "right" }}>
         {p.length ?? 0}YR
       </Box>
-      {Array.from({ length: YEARS_SHOWN }, (_, offset) => {
-        const hit = capHitForYear(p, offset);
-        return (
-          <Box
-            key={offset}
-            sx={{
-              ...numSx,
-              color: hit > 0 ? terminal.text : terminal.textMute,
-              fontWeight: 700,
-              textAlign: "right",
-            }}
-          >
-            {hit > 0 ? `$${hit}` : "—"}
-          </Box>
-        );
-      })}
+      {Array.from({ length: YEARS_SHOWN }, (_, offset) => (
+        <YearCell key={offset} p={p} offset={offset} />
+      ))}
       <Box
         sx={{
           ...numSx,
@@ -254,14 +286,23 @@ const SubtotalRow = ({
 const MobileCard = ({ p, currentYear }: RowProps) => {
   const pos = p.position ?? "—";
   const isTaxi = p.rosterStatus === "TAXI_SQUAD";
+  const isHoldout = p.contractStatus?.split("|").includes("HOLDOUT") ?? false;
   return (
-    <Box sx={{ p: 1.5, borderBottom: `1px solid ${terminal.line}` }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.75 }}>
+    <Box
+      sx={{
+        p: 1.5,
+        borderBottom: `1px solid ${terminal.line}`,
+        borderLeft: isHoldout ? `3px solid ${terminal.red}` : "3px solid transparent",
+        background: isHoldout ? terminal.redDim : "transparent",
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 0.75, flexWrap: "wrap" }}>
         <PosBadge pos={pos} />
-        <Box sx={{ flex: 1, fontSize: 14, fontWeight: 600, color: terminal.text }}>
+        <Box sx={{ fontSize: 14, fontWeight: 600, color: terminal.text }}>
           {p.firstName} {p.lastName}
         </Box>
-        <Box sx={{ ...numSx, fontSize: 11, color: terminal.textDim }}>
+        <StatusBadges contractStatus={p.contractStatus} />
+        <Box sx={{ ...numSx, fontSize: 11, color: terminal.textDim, ml: "auto" }}>
           {p.team?.toUpperCase()}
           {p.age ? ` · ${p.age}` : ""}
         </Box>
@@ -284,6 +325,7 @@ const MobileCard = ({ p, currentYear }: RowProps) => {
         </Box>
         {Array.from({ length: YEARS_SHOWN }, (_, offset) => {
           const hit = capHitForYear(p, offset);
+          const isOptionYear = hit === 0 && offset === (p.length ?? 0) && !!p.projectedFifthYearOptionSalary;
           return (
             <Box key={offset}>
               <Box sx={{ color: terminal.textMute, fontSize: 9 }}>
@@ -291,12 +333,17 @@ const MobileCard = ({ p, currentYear }: RowProps) => {
               </Box>
               <Box
                 sx={{
-                  color: hit > 0 ? terminal.text : terminal.textMute,
+                  color: hit > 0 ? terminal.text : isOptionYear ? "#b98add" : terminal.textMute,
+                  fontStyle: isOptionYear ? "italic" : "normal",
                   fontSize: 12,
                   fontWeight: 700,
                 }}
               >
-                {hit > 0 ? `$${hit}` : "—"}
+                {hit > 0
+                  ? `$${hit}`
+                  : isOptionYear
+                    ? `$${p.projectedFifthYearOptionSalary}?`
+                    : "—"}
               </Box>
             </Box>
           );
@@ -369,7 +416,13 @@ const AdjustmentRow = ({
   );
 };
 
-export const RosterContracts = () => {
+interface RosterContractsProps {
+  // Preselects a franchise on arrival (e.g. clicking a team in the standings table).
+  // Overrides the "my team" default but can still be changed via the dropdown afterward.
+  initialFranchiseId?: number;
+}
+
+export const RosterContracts = ({ initialFranchiseId }: RosterContractsProps = {}) => {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down("md"));
   const { currentLeagueId, owner } = useSelector((s: RootState) => s.profile);
@@ -384,6 +437,10 @@ export const RosterContracts = () => {
   const myFranchiseId = currentLeague?.mflfranchiseid;
 
   const [selectedFranchise, setSelectedFranchise] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (initialFranchiseId != null) setSelectedFranchise(initialFranchiseId);
+  }, [initialFranchiseId]);
 
   const defaultFranchise = useMemo(() => {
     if (!rosters) return null;

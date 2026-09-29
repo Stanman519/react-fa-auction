@@ -1,6 +1,7 @@
 import { Box, CircularProgress } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { RootState } from "../../../redux/reducers/RootReducer";
 import { tytFor } from "../../../services/Common";
 import { loadTriYearStandings } from "../../../redux/actions/TriYearStandingsActions";
@@ -10,6 +11,7 @@ import TLabel from "./TLabel";
 
 export default function TriYearTrophyTerminal() {
   const dispatch = useDispatch<ThunkAppDispatch>();
+  const navigate = useNavigate();
   const ownerList = useSelector((s: RootState) => s.deadCap.deadCap);
   const leagueId = useSelector((s: RootState) => s.profile.currentLeagueId);
   const myFranchiseId = useSelector(
@@ -186,11 +188,18 @@ export default function TriYearTrophyTerminal() {
                   <Box
                     component="tr"
                     key={row.franchiseId}
+                    onClick={() =>
+                      navigate("/league-home", {
+                        state: { tab: "roster", franchiseId: row.franchiseId },
+                      })
+                    }
                     sx={{
                       borderBottom: `1px solid ${A.line}`,
                       background: isMe
                         ? "rgba(132, 204, 22, 0.05)"
                         : "transparent",
+                      cursor: "pointer",
+                      "&:hover": { background: "rgba(255,255,255,0.04)" },
                     }}
                   >
                     <Box

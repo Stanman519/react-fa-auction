@@ -2,6 +2,7 @@ import { Box, CircularProgress, useMediaQuery, useTheme } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { RootState } from "../../redux/reducers/RootReducer";
 import {
   FranchiseStandings,
@@ -35,6 +36,7 @@ interface Row {
 
 export default function PowerRankings() {
   const theme = useTheme();
+  const navigate = useNavigate();
   const mobile = useMediaQuery(theme.breakpoints.down("md"));
   const ownerList = useSelector((s: RootState) => s.deadCap.deadCap);
   const leagueId = useSelector((s: RootState) => s.profile.currentLeagueId);
@@ -154,6 +156,11 @@ export default function PowerRankings() {
           {rows.map((r, i) => (
             <Box
               key={r.franchiseId}
+              onClick={() =>
+                navigate("/league-home", {
+                  state: { tab: "roster", franchiseId: r.franchiseId },
+                })
+              }
               sx={{
                 display: "grid",
                 gridTemplateColumns: "40px minmax(0, 2fr) 70px 70px 1fr",
@@ -164,6 +171,7 @@ export default function PowerRankings() {
                 borderBottom: `1px solid ${terminal.line}`,
                 fontFamily: fontStacks.mono,
                 fontSize: 12,
+                cursor: "pointer",
                 "&:hover": { background: terminal.panel2 },
               }}
             >
@@ -211,6 +219,11 @@ export default function PowerRankings() {
           {rows.map((r, i) => (
             <Box
               key={r.franchiseId}
+              onClick={() =>
+                navigate("/league-home", {
+                  state: { tab: "roster", franchiseId: r.franchiseId },
+                })
+              }
               sx={{
                 p: 1.5,
                 background: terminal.panel,
@@ -220,6 +233,7 @@ export default function PowerRankings() {
                 gridTemplateColumns: "32px 1fr auto",
                 gap: 1.25,
                 alignItems: "center",
+                cursor: "pointer",
               }}
             >
               <Box

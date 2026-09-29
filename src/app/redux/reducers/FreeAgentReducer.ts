@@ -21,6 +21,12 @@ export interface PlayerDTO {
   salary?: number;
   length?: number;
   rosterStatus?: string;
+  // Pipe-delimited MFL tags, e.g. "R1-2024|HOLDOUT". Absent when the league's "Contract
+  // Status" salary-cap setting is off or the player carries no tags.
+  contractStatus?: string;
+  // Only present for round-1 rookies still on their original rookie-scale deal whose 5th-year
+  // option decision falls within the visible roster-grid window. A projection, not a signed value.
+  projectedFifthYearOptionSalary?: number;
 }
 export interface HoldoutDTO {
   id: number;

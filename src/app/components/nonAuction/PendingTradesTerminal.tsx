@@ -37,6 +37,8 @@ const toAsset = (a: TradeOfferAsset): TAsset => {
     team: p?.team,
     apy: p?.salary,
     years: p?.length,
+    contractStatus: p?.contractStatus,
+    projectedFifthYearOptionSalary: p?.projectedFifthYearOptionSalary,
   };
 };
 

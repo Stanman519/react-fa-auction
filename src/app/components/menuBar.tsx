@@ -11,7 +11,7 @@ import { LEAGUE_PREF_KEY } from "./menu/LeagueSwitchMenu";
 import { FAChatWindow } from "./chat";
 import { ChatClient } from "../services/ChatUtils";
 import { setChatConnected } from "../redux/reducers/ChatReducer";
-import { useIsMobile } from "../hooks";
+import { useIsMobile, useUnreadMessageCount } from "../hooks";
 import { terminal as T, fontStacks } from "../../theme";
 
 type Page = "league-home" | "rosters" | "auction" | "games" | "other";
@@ -173,6 +173,8 @@ export function MenuBar() {
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const unreadCount = useUnreadMessageCount();
+  const hasUnread = unreadCount > 0 && !chatOpen;
 
   // The Over/Under page has its own chat button wired to that pool's channel.
   // This one opens the league channel, so showing both is two chats side by
@@ -397,6 +399,7 @@ export function MenuBar() {
                     setChatOpen(true);
                   }
             }
+            hasUnreadChat={hasUnread}
             onSwitchLeague={(id) => {
               switchLeague(id);
               setDrawerOpen(false);
@@ -555,7 +558,22 @@ export function MenuBar() {
                   cursor: "pointer",
                 }}
               >
-                <span>◎</span>
+                <span style={{ position: "relative" }}>
+                  ◎
+                  {hasUnread && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: -2,
+                        right: -3,
+                        width: 6,
+                        height: 6,
+                        borderRadius: "50%",
+                        background: T.red,
+                      }}
+                    />
+                  )}
+                </span>
                 <span>{chatOpen ? "CLOSE CHAT" : "CHAT"}</span>
               </div>
             )}
@@ -988,6 +1006,7 @@ function MobileDrawer({
   onClose,
   onNavigate,
   onOpenChat,
+  hasUnreadChat,
   onSwitchLeague,
   onLogout,
 }: {
@@ -1004,6 +1023,7 @@ function MobileDrawer({
   onNavigate: (path: string) => void;
   /** Omitted on pages that provide their own chat entry point. */
   onOpenChat?: () => void;
+  hasUnreadChat?: boolean;
   onSwitchLeague: (id: number) => void;
   onLogout: () => void;
 }) {
@@ -1325,6 +1345,7 @@ function MobileDrawer({
           >
             <span
               style={{
+                position: "relative",
                 fontFamily: fontStacks.mono,
                 fontSize: 16,
                 color: T.textDim,
@@ -1333,6 +1354,19 @@ function MobileDrawer({
               }}
             >
               ◎
+              {hasUnreadChat && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: -1,
+                    right: 2,
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: T.red,
+                  }}
+                />
+              )}
             </span>
             <span
               style={{

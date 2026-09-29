@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import { A, dfs } from "./tokens";
 import TPosBadge from "./TPosBadge";
+import { contractStatusSuffixText } from "../../../constants/contractStatusTags";
 
 export type AssetKind = "player" | "pick" | "cap";
 
@@ -12,6 +13,8 @@ export interface TAsset {
   apy?: number;
   years?: number;
   note?: string;
+  contractStatus?: string;
+  projectedFifthYearOptionSalary?: number;
 }
 
 export default function TAssetChip({ asset, mobile }: { asset: TAsset; mobile?: boolean }) {
@@ -51,6 +54,7 @@ export default function TAssetChip({ asset, mobile }: { asset: TAsset; mobile?: 
             {asset.team}
             {asset.apy != null && ` · $${asset.apy}M`}
             {asset.years != null && ` × ${asset.years}YR`}
+            {contractStatusSuffixText(asset.contractStatus, asset.projectedFifthYearOptionSalary)}
           </Box>
         )}
         {!isPlayer && asset.note && (

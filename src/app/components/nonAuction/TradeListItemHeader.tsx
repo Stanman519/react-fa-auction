@@ -1,5 +1,6 @@
-import { Avatar, Typography } from "@mui/material";
+import { Avatar, Box, Typography } from "@mui/material";
 import { PlayerDTO } from "../../redux/reducers/FreeAgentReducer";
+import { StatusBadges } from "../shared/StatusBadges";
 
 export const TradeListItemHeader = ({
   mflId,
@@ -11,7 +12,13 @@ export const TradeListItemHeader = ({
   return (
     <div style={{ flex: 1 }}>
       {/* {playerDetails.headshot && <Avatar src={playerDetails.headshot} />} */}
-      <Typography>{playerDetails.fullName}</Typography>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, flexWrap: "wrap" }}>
+        <Typography>{playerDetails.fullName}</Typography>
+        <StatusBadges
+          contractStatus={playerDetails.contractStatus}
+          projectedFifthYearOptionSalary={playerDetails.projectedFifthYearOptionSalary}
+        />
+      </Box>
       {/* {!mflId.startsWith("FP_") && !mflId.startsWith("DP_") && (
         <div
           style={{
