@@ -563,13 +563,25 @@ export default function AdvancedContractTradesTerminal() {
 
   const submit = () => {
     if (!currentLeague) return;
+    const myId = currentLeague.mflfranchiseid ?? 0;
+    // eater/receiver ids set at check time go stale if my picks were checked before/without
+    // the current partner; rebuild from the current trade
+    const withCapEatIds = (
+      assets: TradeOfferAsset[],
+      eaterId: number,
+      receiverId: number,
+    ) =>
+      assets.map((a) => ({
+        ...a,
+        capEats: (a.capEats ?? []).map((c) => ({ ...c, eaterId, receiverId })),
+      }));
     dispatch(
       submitTradeRequest({
         leagueId: currentLeague.league.leagueId,
         receiverId: Number(tradeTeamId),
         senderId: currentLeague.mflfranchiseid,
-        sendingAssets: mySelected,
-        receivingAssets: otherSelected,
+        sendingAssets: withCapEatIds(mySelected, myId, +tradeTeamId),
+        receivingAssets: withCapEatIds(otherSelected, +tradeTeamId, myId),
         senderTeamName: currentLeague.teamName ?? "",
         receiverTeamName: partnerFranchise?.name ?? "",
         expires: 0,

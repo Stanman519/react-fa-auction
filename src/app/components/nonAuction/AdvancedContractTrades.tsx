@@ -289,13 +289,24 @@ const AdvancedContractTrades = () => {
 
   const handleNext = () => {
     if (activeStep == 2) {
+      const myId = currentLeague?.mflfranchiseid ?? 0;
+      // eater/receiver ids set at check time can go stale; rebuild from the current trade
+      const withCapEatIds = (
+        assets: TradeOfferAsset[],
+        eaterId: number,
+        receiverId: number,
+      ) =>
+        assets.map((a) => ({
+          ...a,
+          capEats: (a.capEats ?? []).map((c) => ({ ...c, eaterId, receiverId })),
+        }));
       dispatch(
         submitTradeRequest({
           leagueId: currentLeague?.league.leagueId ?? -1,
           receiverId: Number(tradeTeamId) ?? -1,
           senderId: currentLeague?.mflfranchiseid ?? -1,
-          sendingAssets: mySelectedAssets,
-          receivingAssets: otherSelectedAssets,
+          sendingAssets: withCapEatIds(mySelectedAssets, myId, +tradeTeamId),
+          receivingAssets: withCapEatIds(otherSelectedAssets, +tradeTeamId, myId),
           senderTeamName: currentLeague?.teamName ?? "",
           receiverTeamName:
             franchises.find((f) => f.id == tradeTeamId)?.name ?? "",
@@ -353,7 +364,12 @@ const AdvancedContractTrades = () => {
               <Select
                 labelId="trade-partner-label"
                 label="Trading Partner"
-                onChange={(e) => setTradeTeamId(e.target.value)}
+                onChange={(e) => {
+                  setTradeTeamId(e.target.value);
+                  // picks carry eater/receiver ids; drop them when the partner changes
+                  setMySelectedAssets([]);
+                  setOtherSelectedAssets([]);
+                }}
                 value={tradeTeamId}
               >
                 {franchises
